@@ -6,20 +6,29 @@ import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
 import { ArrowLeft, Play, Trash2, ChevronRight, BarChart3 } from "lucide-react";
-import { simulate200, type N200 } from "@/lib/sim";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
 
 export const Route = createFileRoute("/partida")({
   head: () => ({
     meta: [
       { title: "Simular Partida · Ultra Simulador 2026" },
-      { name: "description", content: "Escolha duas seleções, monte a escalação e simule 200 partidas com estatísticas detalhadas." },
+      { name: "description", content: "Escolha duas seleções, monte a escalação e simule 200 partidas no Motor Quant." },
     ],
   }),
   component: PartidaPage,
 });
 
 type Step = "select" | "lineup" | "result";
+
+export type APIResult = {
+  aWinPct: number; 
+  drawPct: number; 
+  bWinPct: number;
+  topScorers: { player: string; team: string; goals: number }[];
+  avgGoals: { a: number; b: number };
+  scoreCounts: Record<string, number>;
+  sim_logs: string[];
+};
 
 function PartidaPage() {
   const [step, setStep] = useState<Step>("select");
@@ -28,12 +37,34 @@ function PartidaPage() {
   const [formA, setFormA] = useState<Formation>("4-2-3-1");
   const [formB, setFormB] = useState<Formation>("4-3-3");
   const [simulating, setSimulating] = useState(false);
-  const [result, setResult] = useState<N200 | null>(null);
+  const [result, setResult] = useState<APIResult | null>(null);
   const [rosterA, setRosterA] = useState<string[]>([]);
   const [rosterB, setRosterB] = useState<string[]>([]);
 
-  useEffect(() => { if (home) setRosterA(rosterFor(home.id).slice(0, 18)); }, [home]);
-  useEffect(() => { if (away) setRosterB(rosterFor(away.id).slice(0, 18)); }, [away]);
+  // Agora busca com .apiName (Ex: envia "Brazil" em vez de "Brasil")
+  useEffect(() => {
+    if (home) {
+      fetch(`http://localhost:8000/api/roster/${home.apiName}`)
+        .then(res => res.json())
+        .then(data => {
+          const arr = [...(data.starters || []), ...(data.bench || [])];
+          if (arr.length > 0) setRosterA(arr.slice(0, 18));
+        })
+        .catch(() => setRosterA(rosterFor(home.id).slice(0, 18)));
+    }
+  }, [home]);
+
+  useEffect(() => {
+    if (away) {
+      fetch(`http://localhost:8000/api/roster/${away.apiName}`)
+        .then(res => res.json())
+        .then(data => {
+          const arr = [...(data.starters || []), ...(data.bench || [])];
+          if (arr.length > 0) setRosterB(arr.slice(0, 18));
+        })
+        .catch(() => setRosterB(rosterFor(away.id).slice(0, 18)));
+    }
+  }, [away]);
 
   return (
     <NeonChrome>
@@ -66,13 +97,49 @@ function PartidaPage() {
                 rosterA={rosterA} rosterB={rosterB}
                 setRosterA={setRosterA} setRosterB={setRosterB}
                 onBack={() => setStep("select")}
-                onSimulate={() => {
+                onSimulate={async () => {
                   setSimulating(true);
-                  setTimeout(() => {
-                    setResult(simulate200(home, away));
-                    setSimulating(false);
+                  try {
+                    // Envia OS NOMES OFICIAIS pro Motor Python não se perder!
+                    const response = await fetch("http://localhost:8000/api/simulate_match", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        home: home.apiName,
+                        away: away.apiName,
+                        num_simulations: 200,
+                        home_excluded: [],
+                        away_excluded: []
+                      })
+                    });
+                    if (!response.ok) throw new Error("Erro na API");
+                    const data = await response.json();
+                    
+                    const scoreCounts: Record<string, number> = {};
+                    Object.entries(data.most_likely_scores || {}).forEach(([score, pct]) => {
+                       scoreCounts[score] = Math.round(((pct as number) / 100) * 200);
+                    });
+
+                    const topScorers = (data.top_scorers || []).map((s: any) => ({
+                      player: s[0], team: home.id, goals: s[1]
+                    }));
+
+                    setResult({
+                      aWinPct: data.home_win_prob || 0,
+                      drawPct: data.draw_prob || 0,
+                      bWinPct: data.away_win_prob || 0,
+                      topScorers: topScorers,
+                      avgGoals: { a: data.home_lambda || 0, b: data.away_lambda || 0 },
+                      scoreCounts: scoreCounts,
+                      sim_logs: data.sim_logs || []
+                    });
                     setStep("result");
-                  }, 2200);
+                  } catch (err) {
+                    console.error(err);
+                    alert("Erro ao conectar ao servidor FastAPI.");
+                  } finally {
+                    setSimulating(false);
+                  }
                 }}
               />
             </motion.div>
@@ -84,7 +151,7 @@ function PartidaPage() {
           )}
         </AnimatePresence>
 
-        {simulating && <SimOverlay onDone={() => {}} label="Simulando 200 Partidas" />}
+        {simulating && <SimOverlay onDone={() => {}} label="Processando XGBoost na GPU..." />}
       </main>
     </NeonChrome>
   );
@@ -187,25 +254,14 @@ function Pitch({ teamA, teamB, formA, formB, rosterA, rosterB }: { teamA: Team; 
   const posB = FORMATIONS[formB];
   return (
     <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-primary/40 bg-pitch shadow-[inset_0_0_120px_oklch(0_0_0/.6)]">
-      {/* field lines */}
       <div className="pointer-events-none absolute inset-3 rounded-md border border-primary/30" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/30" />
       <div className="pointer-events-none absolute left-3 right-3 top-1/2 h-px bg-primary/30" />
       <div className="pointer-events-none absolute left-1/2 top-3 h-20 w-44 -translate-x-1/2 border-l border-r border-b border-primary/30" />
       <div className="pointer-events-none absolute left-1/2 bottom-3 h-20 w-44 -translate-x-1/2 border-l border-r border-t border-primary/30" />
-      {/* turf stripes */}
       <div className="pointer-events-none absolute inset-3 opacity-30 [background:repeating-linear-gradient(0deg,oklch(0.4_0.18_160/.0)_0_28px,oklch(0.45_0.2_160/.18)_28px_56px)]" />
-
-      {/* Home (bottom half) */}
-      {posA.map(([x, y], i) => {
-        const mapped = 0.5 + y * 0.5;
-        return <PlayerNode key={`a${i}-${startersA[i]}`} pos={POSITIONS[i] ?? ""} name={startersA[i] ?? ""} x={x} y={mapped} delay={0.05 * i} />;
-      })}
-      {/* Away (top half, mirrored) */}
-      {posB.map(([x, y], i) => {
-        const mapped = 0.5 - y * 0.5;
-        return <PlayerNode key={`b${i}-${startersB[i]}`} pos={POSITIONS[i] ?? ""} name={startersB[i] ?? ""} x={1 - x} y={mapped} delay={0.05 * i + 0.3} mirrored />;
-      })}
+      {posA.map(([x, y], i) => <PlayerNode key={`a${i}-${startersA[i]}`} pos={POSITIONS[i] ?? ""} name={startersA[i] ?? ""} x={x} y={0.5 + y * 0.5} delay={0.05 * i} />)}
+      {posB.map(([x, y], i) => <PlayerNode key={`b${i}-${startersB[i]}`} pos={POSITIONS[i] ?? ""} name={startersB[i] ?? ""} x={1 - x} y={0.5 - y * 0.5} delay={0.05 * i + 0.3} mirrored />)}
     </div>
   );
 }
@@ -224,12 +280,8 @@ function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; fo
     swap(selected, idx);
     setSelected(null);
   };
-  const onDragStart = (e: React.DragEvent, idx: number) => {
-    e.dataTransfer.setData("text/plain", String(idx));
-    e.dataTransfer.effectAllowed = "move";
-    setSelected(idx);
-  };
-  const onDragOver = (e: React.DragEvent) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; };
+  const onDragStart = (e: React.DragEvent, idx: number) => { e.dataTransfer.setData("text/plain", String(idx)); setSelected(idx); };
+  const onDragOver = (e: React.DragEvent) => { e.preventDefault(); };
   const onDrop = (e: React.DragEvent, target: number) => {
     e.preventDefault();
     const src = Number(e.dataTransfer.getData("text/plain"));
@@ -251,51 +303,29 @@ function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; fo
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">RTG {team.rating}</div>
       </div>
       <div className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
-        {selected === null
-          ? "Clique ou arraste um jogador para trocar"
-          : <span className="text-gold">Selecionado: {roster[selected]} — clique no destino</span>}
+        {selected === null ? "Clique para trocar jogador" : <span className="text-gold">Selecionado: {roster[selected]}</span>}
       </div>
       <div>
         <div className="mb-1 text-[10px] uppercase tracking-[0.3em] text-primary/80">Titulares</div>
         <ul className="space-y-1">
           {roster.slice(0, 11).map((n, i) => (
-            <li
-              key={`s-${i}-${n}`}
-              draggable
-              onDragStart={(e) => onDragStart(e, i)}
-              onDragOver={onDragOver}
-              onDrop={(e) => onDrop(e, i)}
-              onClick={() => onPick(i)}
-              className={`group flex cursor-pointer items-center justify-between gap-2 rounded-md border bg-background/40 px-2 py-1 text-[12px] transition hover:border-primary/70 hover:shadow-[0_0_10px_oklch(0.82_0.23_152/.4)] active:cursor-grabbing ${selected === i ? "border-gold shadow-[0_0_14px_oklch(0.83_0.16_85/.7)]" : "border-primary/25"}`}
-              style={{ userSelect: "none" }}
-            >
-              <span className="flex items-center gap-2">
-                <PlayerAvatar name={n} px={24} />
-                <span className="truncate">{n}</span>
-              </span>
+            <li key={`s-${i}-${n}`} draggable onDragStart={(e) => onDragStart(e, i)} onDragOver={onDragOver} onDrop={(e) => onDrop(e, i)} onClick={() => onPick(i)}
+              className={`group flex cursor-pointer items-center justify-between gap-2 rounded-md border bg-background/40 px-2 py-1 text-[12px] transition ${selected === i ? "border-gold shadow-[0_0_14px_oklch(0.83_0.16_85/.7)]" : "border-primary/25"}`} style={{ userSelect: "none" }}>
+              <span className="flex items-center gap-2"><PlayerAvatar name={n} px={24} /><span className="truncate">{n}</span></span>
               <span className="text-[10px] text-primary">{POSITIONS[i]}</span>
             </li>
           ))}
         </ul>
       </div>
       <div>
-        <div className="mb-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Banco de Reservas</div>
+        <div className="mb-1 text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Reservas</div>
         <ul className="space-y-1">
           {roster.slice(11).map((n, i) => {
             const realIdx = i + 11;
             return (
-              <li
-                key={`b-${realIdx}-${n}`}
-                draggable
-                onDragStart={(e) => onDragStart(e, realIdx)}
-                onDragOver={onDragOver}
-                onDrop={(e) => onDrop(e, realIdx)}
-                onClick={() => onPick(realIdx)}
-                className={`group flex cursor-pointer items-center gap-2 rounded-md border bg-background/20 px-2 py-1 text-[11px] text-foreground/80 transition hover:border-primary/60 hover:text-foreground active:cursor-grabbing ${selected === realIdx ? "border-gold text-foreground shadow-[0_0_14px_oklch(0.83_0.16_85/.7)]" : "border-border/40"}`}
-                style={{ userSelect: "none" }}
-              >
-                <PlayerAvatar name={n} px={22} />
-                <span className="truncate">{n}</span>
+              <li key={`b-${realIdx}-${n}`} draggable onDragStart={(e) => onDragStart(e, realIdx)} onDragOver={onDragOver} onDrop={(e) => onDrop(e, realIdx)} onClick={() => onPick(realIdx)}
+                className={`group flex cursor-pointer items-center gap-2 rounded-md border bg-background/20 px-2 py-1 text-[11px] ${selected === realIdx ? "border-gold text-foreground" : "border-border/40"}`} style={{ userSelect: "none" }}>
+                <PlayerAvatar name={n} px={22} /><span className="truncate">{n}</span>
               </li>
             );
           })}
@@ -305,7 +335,7 @@ function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; fo
   );
 }
 
-function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, rosterB, setRosterA, setRosterB, onBack, onSimulate }: { home: Team; away: Team; formA: Formation; formB: Formation; setFormA: (f: Formation) => void; setFormB: (f: Formation) => void; rosterA: string[]; rosterB: string[]; setRosterA: (r: string[]) => void; setRosterB: (r: string[]) => void; onBack: () => void; onSimulate: () => void }) {
+function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, rosterB, setRosterA, setRosterB, onBack, onSimulate }: any) {
   return (
     <div className="mt-6 grid gap-5 lg:grid-cols-[260px_1fr_260px]">
       <TeamColumn team={home} form={formA} setForm={setFormA} roster={rosterA} setRoster={setRosterA} />
@@ -313,9 +343,7 @@ function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, ros
         <Pitch teamA={home} teamB={away} formA={formA} formB={formB} rosterA={rosterA} rosterB={rosterB} />
         <div className="flex items-center justify-between gap-3">
           <NeonButton variant="ghost" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Voltar</NeonButton>
-          <NeonButton onClick={onSimulate} className="animate-pulse-neon flex-1">
-            <Play className="h-4 w-4" /> Iniciar Simulação
-          </NeonButton>
+          <NeonButton onClick={onSimulate} className="animate-pulse-neon flex-1"><Play className="h-4 w-4" /> Iniciar Simulação</NeonButton>
           <NeonButton variant="ghost"><Trash2 className="h-4 w-4" /> Limpar</NeonButton>
         </div>
       </div>
@@ -324,12 +352,12 @@ function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, ros
   );
 }
 
-function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: Team; result: N200; onBack: () => void; onMenu: () => void }) {
+function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: Team; result: APIResult; onBack: () => void; onMenu: () => void }) {
   const topScores = useMemo(() => Object.entries(result.scoreCounts).sort((a, b) => b[1] - a[1]).slice(0, 5), [result]);
   return (
     <div className="mt-6 space-y-5">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <SectionTitle accent="200 SIMULAÇÕES">Simulação Concluída</SectionTitle>
+        <SectionTitle accent="200 SIMULAÇÕES">Simulação Concluída (Motor Quant)</SectionTitle>
       </motion.div>
 
       <div className="grid gap-5 md:grid-cols-3">
@@ -341,11 +369,7 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
           <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }}>
             <Panel glow={c.color}>
               <div className="flex flex-col items-center gap-2 text-center">
-                {(c as any).team ? (
-                  <TeamFlag teamId={(c as any).team.id} className="h-8 w-12" />
-                ) : (
-                  <div className="text-3xl">🤝</div>
-                )}
+                {(c as any).team ? <TeamFlag teamId={(c as any).team.id} className="h-8 w-12" /> : <div className="text-3xl">🤝</div>}
                 <div className="font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">{c.label}</div>
                 <div className={`font-display text-4xl font-bold ${c.color === "gold" ? "text-gold" : "text-neon"}`}>{c.pct.toFixed(1)}%</div>
               </div>
@@ -387,9 +411,6 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
                   <span className="font-display text-gold tabular-nums">{i + 1}</span>
                   <PlayerAvatar name={s.player} px={28} />
                   <span className="text-sm">{s.player}</span>
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <TeamFlag teamId={s.team} className="h-3 w-5" /> {teamById(s.team)?.name}
-                  </span>
                 </div>
                 <span className="font-display text-primary">{s.goals} gols</span>
               </motion.li>
@@ -400,28 +421,19 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
 
       <Panel>
         <div className="mb-3 flex items-center justify-between">
-          <div className="font-display text-sm uppercase tracking-[0.3em]">Histórico das 200 simulações</div>
-          <div className="text-xs text-muted-foreground">Média: <span className="text-primary">{result.avgGoals.a.toFixed(2)}</span> – <span className="text-primary">{result.avgGoals.b.toFixed(2)}</span></div>
+          <div className="font-display text-sm uppercase tracking-[0.3em]">Log (Amostra) das 200 Simulações</div>
+          <div className="text-xs text-muted-foreground">Expected Goals: <span className="text-primary">{result.avgGoals.a.toFixed(2)}</span> – <span className="text-primary">{result.avgGoals.b.toFixed(2)}</span></div>
         </div>
-        <div className="max-h-72 overflow-y-auto pr-2">
-          <ul className="grid grid-cols-2 gap-1 text-xs md:grid-cols-4">
-            {result.results.slice(0, 60).map((m, i) => (
-              <motion.li key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.005 }} className="flex items-center justify-between gap-1 rounded border border-border/30 bg-background/30 px-2 py-1 font-mono tabular-nums">
-                <span className="flex items-center gap-1"><TeamFlag teamId={home.id} className="h-3 w-5" /> {m.hs}</span>
-                <span className="text-muted-foreground">vs</span>
-                <span className="flex items-center gap-1">{m.as} <TeamFlag teamId={away.id} className="h-3 w-5" /></span>
-              </motion.li>
-            ))}
-          </ul>
+        <div className="max-h-56 overflow-y-auto pr-2 text-xs font-mono text-muted-foreground whitespace-pre-line rounded border border-border/30 bg-background/30 p-3">
+          {result.sim_logs && result.sim_logs.length > 0 ? result.sim_logs.slice(0, 50).join("\n") : "Sem log disponível."}
         </div>
       </Panel>
 
       <div className="flex flex-wrap justify-between gap-3">
         <NeonButton variant="ghost" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Voltar</NeonButton>
         <div className="flex gap-3">
-          <Link to="/copa"><NeonButton variant="gold">Ver Chaveamento Completo</NeonButton></Link>
+          <Link to="/copa"><NeonButton variant="gold">Ver Torneio Completo</NeonButton></Link>
           <NeonButton onClick={onMenu}>Nova Partida</NeonButton>
-          <Link to="/"><NeonButton variant="ghost">Voltar ao Menu</NeonButton></Link>
         </div>
       </div>
     </div>

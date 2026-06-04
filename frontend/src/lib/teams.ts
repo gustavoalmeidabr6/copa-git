@@ -1,6 +1,7 @@
 export type Team = {
   id: string;
   name: string;
+  apiName: string; // <-- A ponte vital entre o Frontend e o Backend Python
   flag: string;
   rating: number;
   group: string;
@@ -8,97 +9,86 @@ export type Team = {
 
 export const GROUPS: Record<string, Team[]> = {
   A: [
-    { id: "MEX", name: "México", flag: "🇲🇽", rating: 76, group: "A" },
-    { id: "RSA", name: "África do Sul", flag: "🇿🇦", rating: 70, group: "A" },
-    { id: "KOR", name: "Coreia do Sul", flag: "🇰🇷", rating: 74, group: "A" },
-    { id: "CZE", name: "Rep. Tcheca", flag: "🇨🇿", rating: 72, group: "A" },
+    { id: "MEX", name: "México", apiName: "Mexico", flag: "🇲🇽", rating: 76, group: "A" },
+    { id: "RSA", name: "África do Sul", apiName: "South Africa", flag: "🇿🇦", rating: 70, group: "A" },
+    { id: "KOR", name: "Coreia do Sul", apiName: "South Korea", flag: "🇰🇷", rating: 74, group: "A" },
+    { id: "CZE", name: "Rep. Tcheca", apiName: "Czech Republic", flag: "🇨🇿", rating: 72, group: "A" },
   ],
   B: [
-    { id: "CAN", name: "Canadá", flag: "🇨🇦", rating: 73, group: "B" },
-    { id: "AUS", name: "Austrália", flag: "🇦🇺", rating: 72, group: "B" },
-    { id: "NOR", name: "Noruega", flag: "🇳🇴", rating: 80, group: "B" },
-    { id: "SUI", name: "Suíça", flag: "🇨🇭", rating: 78, group: "B" },
+    { id: "CAN", name: "Canadá", apiName: "Canada", flag: "🇨🇦", rating: 73, group: "B" },
+    { id: "AUS", name: "Austrália", apiName: "Australia", flag: "🇦🇺", rating: 72, group: "B" },
+    { id: "NOR", name: "Noruega", apiName: "Norway", flag: "🇳🇴", rating: 80, group: "B" },
+    { id: "SUI", name: "Suíça", apiName: "Switzerland", flag: "🇨🇭", rating: 78, group: "B" },
   ],
   C: [
-    { id: "BRA", name: "Brasil", flag: "🇧🇷", rating: 90, group: "C" },
-    { id: "MAR", name: "Marrocos", flag: "🇲🇦", rating: 78, group: "C" },
-    { id: "SCO", name: "Escócia", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", rating: 71, group: "C" },
-    { id: "HAI", name: "Haiti", flag: "🇭🇹", rating: 64, group: "C" },
+    { id: "BRA", name: "Brasil", apiName: "Brazil", flag: "🇧🇷", rating: 90, group: "C" },
+    { id: "MAR", name: "Marrocos", apiName: "Morocco", flag: "🇲🇦", rating: 78, group: "C" },
+    { id: "SCO", name: "Escócia", apiName: "Scotland", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", rating: 71, group: "C" },
+    { id: "HAI", name: "Haiti", apiName: "Haiti", flag: "🇭🇹", rating: 64, group: "C" },
   ],
   D: [
-    { id: "USA", name: "EUA", flag: "🇺🇸", rating: 75, group: "D" },
-    { id: "PAR", name: "Paraguai", flag: "🇵🇾", rating: 72, group: "D" },
-    { id: "TUN", name: "Tunísia", flag: "🇹🇳", rating: 71, group: "D" },
-    { id: "DEN", name: "Dinamarca", flag: "🇩🇰", rating: 81, group: "D" },
+    { id: "USA", name: "EUA", apiName: "USA", flag: "🇺🇸", rating: 75, group: "D" }, 
+    { id: "PAR", name: "Paraguai", apiName: "Paraguay", flag: "🇵🇾", rating: 72, group: "D" },
+    { id: "TUN", name: "Tunísia", apiName: "Tunisia", flag: "🇹🇳", rating: 71, group: "D" },
+    { id: "DEN", name: "Dinamarca", apiName: "Denmark", flag: "🇩🇰", rating: 81, group: "D" },
   ],
   E: [
-    { id: "GER", name: "Alemanha", flag: "🇩🇪", rating: 86, group: "E" },
-    { id: "ECU", name: "Equador", flag: "🇪🇨", rating: 74, group: "E" },
-    { id: "CIV", name: "Costa do Marfim", flag: "🇨🇮", rating: 73, group: "E" },
-    { id: "KSA", name: "Arábia Saudita", flag: "🇸🇦", rating: 69, group: "E" },
+    { id: "GER", name: "Alemanha", apiName: "Germany", flag: "🇩🇪", rating: 86, group: "E" },
+    { id: "ECU", name: "Equador", apiName: "Ecuador", flag: "🇪🇨", rating: 74, group: "E" },
+    { id: "CIV", name: "Costa do Marfim", apiName: "Ivory Coast", flag: "🇨🇮", rating: 73, group: "E" },
+    { id: "KSA", name: "Arábia Saudita", apiName: "Saudi Arabia", flag: "🇸🇦", rating: 69, group: "E" },
   ],
   F: [
-    { id: "NED", name: "Holanda", flag: "🇳🇱", rating: 84, group: "F" },
-    { id: "JPN", name: "Japão", flag: "🇯🇵", rating: 78, group: "F" },
-    { id: "IRN", name: "Irã", flag: "🇮🇷", rating: 73, group: "F" },
-    { id: "UKR", name: "Ucrânia", flag: "🇺🇦", rating: 75, group: "F" },
+    { id: "NED", name: "Holanda", apiName: "Netherlands", flag: "🇳🇱", rating: 84, group: "F" },
+    { id: "JPN", name: "Japão", apiName: "Japan", flag: "🇯🇵", rating: 78, group: "F" },
+    { id: "IRN", name: "Irã", apiName: "Iran", flag: "🇮🇷", rating: 73, group: "F" },
+    { id: "UKR", name: "Ucrânia", apiName: "Ukraine", flag: "🇺🇦", rating: 75, group: "F" },
   ],
   G: [
-    { id: "BEL", name: "Bélgica", flag: "🇧🇪", rating: 83, group: "G" },
-    { id: "EGY", name: "Egito", flag: "🇪🇬", rating: 73, group: "G" },
-    { id: "IRL", name: "Irlanda", flag: "🇮🇪", rating: 70, group: "G" },
-    { id: "NZL", name: "Nova Zelândia", flag: "🇳🇿", rating: 66, group: "G" },
+    { id: "BEL", name: "Bélgica", apiName: "Belgium", flag: "🇧🇪", rating: 83, group: "G" },
+    { id: "EGY", name: "Egito", apiName: "Egypt", flag: "🇪🇬", rating: 73, group: "G" },
+    { id: "IRL", name: "Irlanda", apiName: "Ireland", flag: "🇮🇪", rating: 70, group: "G" },
+    { id: "NZL", name: "Nova Zelândia", apiName: "New Zealand", flag: "🇳🇿", rating: 66, group: "G" },
   ],
   H: [
-    { id: "ESP", name: "Espanha", flag: "🇪🇸", rating: 88, group: "H" },
-    { id: "URU", name: "Uruguai", flag: "🇺🇾", rating: 82, group: "H" },
-    { id: "CMR", name: "Camarões", flag: "🇨🇲", rating: 71, group: "H" },
-    { id: "AUT", name: "Áustria", flag: "🇦🇹", rating: 77, group: "H" },
+    { id: "ESP", name: "Espanha", apiName: "Spain", flag: "🇪🇸", rating: 88, group: "H" },
+    { id: "URU", name: "Uruguai", apiName: "Uruguay", flag: "🇺🇾", rating: 82, group: "H" },
+    { id: "CMR", name: "Camarões", apiName: "Cameroon", flag: "🇨🇲", rating: 71, group: "H" },
+    { id: "AUT", name: "Áustria", apiName: "Austria", flag: "🇦🇹", rating: 77, group: "H" },
   ],
   I: [
-    { id: "FRA", name: "França", flag: "🇫🇷", rating: 89, group: "I" },
-    { id: "SEN", name: "Senegal", flag: "🇸🇳", rating: 77, group: "I" },
-    { id: "POL", name: "Polônia", flag: "🇵🇱", rating: 76, group: "I" },
-    { id: "QAT", name: "Catar", flag: "🇶🇦", rating: 67, group: "I" },
+    { id: "FRA", name: "França", apiName: "France", flag: "🇫🇷", rating: 89, group: "I" },
+    { id: "SEN", name: "Senegal", apiName: "Senegal", flag: "🇸🇳", rating: 77, group: "I" },
+    { id: "POL", name: "Polônia", apiName: "Poland", flag: "🇵🇱", rating: 76, group: "I" },
+    { id: "QAT", name: "Catar", apiName: "Qatar", flag: "🇶🇦", rating: 67, group: "I" },
   ],
   J: [
-    { id: "ARG", name: "Argentina", flag: "🇦🇷", rating: 89, group: "J" },
-    { id: "COL", name: "Colômbia", flag: "🇨🇴", rating: 81, group: "J" },
-    { id: "NGA", name: "Nigéria", flag: "🇳🇬", rating: 75, group: "J" },
-    { id: "JAM", name: "Jamaica", flag: "🇯🇲", rating: 68, group: "J" },
+    { id: "ARG", name: "Argentina", apiName: "Argentina", flag: "🇦🇷", rating: 89, group: "J" },
+    { id: "COL", name: "Colômbia", apiName: "Colombia", flag: "🇨🇴", rating: 81, group: "J" },
+    { id: "NGA", name: "Nigéria", apiName: "Nigeria", flag: "🇳🇬", rating: 75, group: "J" },
+    { id: "JAM", name: "Jamaica", apiName: "Jamaica", flag: "🇯🇲", rating: 68, group: "J" },
   ],
   K: [
-    { id: "POR", name: "Portugal", flag: "🇵🇹", rating: 86, group: "K" },
-    { id: "GHA", name: "Gana", flag: "🇬🇭", rating: 73, group: "K" },
-    { id: "PER", name: "Peru", flag: "🇵🇪", rating: 71, group: "K" },
-    { id: "PAN", name: "Panamá", flag: "🇵🇦", rating: 68, group: "K" },
+    { id: "POR", name: "Portugal", apiName: "Portugal", flag: "🇵🇹", rating: 86, group: "K" },
+    { id: "GHA", name: "Gana", apiName: "Ghana", flag: "🇬🇭", rating: 73, group: "K" },
+    { id: "PER", name: "Peru", apiName: "Peru", flag: "🇵🇪", rating: 71, group: "K" },
+    { id: "PAN", name: "Panamá", apiName: "Panama", flag: "🇵🇦", rating: 68, group: "K" },
   ],
   L: [
-    { id: "ENG", name: "Inglaterra", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", rating: 87, group: "L" },
-    { id: "CRO", name: "Croácia", flag: "🇭🇷", rating: 82, group: "L" },
-    { id: "ALG", name: "Argélia", flag: "🇩🇿", rating: 73, group: "L" },
-    { id: "UZB", name: "Uzbequistão", flag: "🇺🇿", rating: 69, group: "L" },
+    { id: "ENG", name: "Inglaterra", apiName: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", rating: 87, group: "L" },
+    { id: "CRO", name: "Croácia", apiName: "Croatia", flag: "🇭🇷", rating: 82, group: "L" },
+    { id: "ALG", name: "Argélia", apiName: "Algeria", flag: "🇩🇿", rating: 73, group: "L" },
+    { id: "UZB", name: "Uzbequistão", apiName: "Uzbekistan", flag: "🇺🇿", rating: 69, group: "L" },
   ],
 };
 
 export const ALL_TEAMS: Team[] = Object.values(GROUPS).flat();
 export const teamById = (id: string) => ALL_TEAMS.find((t) => t.id === id)!;
 
-const ROSTERS: Record<string, string[]> = {
-  BRA: ["Alisson","Danilo","Marquinhos","Éder Militão","Alex Sandro","Casemiro","Bruno Guimarães","Raphinha","Neymar Jr","Vinícius Jr","Richarlison","Weverton","Bremer","Fabinho","G. Martinelli","Rodrygo","Gabriel Jesus","É. Ribeiro"],
-  ARG: ["E. Martínez","Molina","C. Romero","Otamendi","Tagliafico","E. Fernández","De Paul","Messi","Di María","J. Álvarez","L. Martínez","Armani","Pezzella","Paredes","A. Gómez","Mac Allister","Garnacho","Correa"],
-  FRA: ["Maignan","Koundé","Saliba","Upamecano","T. Hernández","Tchouaméni","Camavinga","Griezmann","Dembélé","Mbappé","Giroud","Lloris","Pavard","Konaté","Rabiot","Coman","Thuram","Kolo Muani"],
-  ESP: ["U. Simón","Carvajal","Le Normand","Laporte","Cucurella","Rodri","Pedri","Gavi","Yamal","Morata","N. Williams","Raya","Navas","Merino","Olmo","F. Torres","Oyarzabal","Joselu"],
-  ENG: ["Pickford","Walker","Stones","Maguire","Shaw","Rice","Bellingham","Foden","Saka","Kane","Sterling","Ramsdale","Trippier","Konsa","Mainoo","Gordon","Watkins","Toney"],
-  GER: ["Neuer","Kimmich","Rüdiger","Tah","Mittelstädt","Andrich","Groß","Musiala","Wirtz","Havertz","Sané","Ter Stegen","Henrichs","Schlotterbeck","Pavlovic","Füllkrug","Müller","Undav"],
-  POR: ["D. Costa","Cancelo","Pepe","R. Dias","Mendes","B. Fernandes","Vitinha","B. Silva","L. Diaz","Ronaldo","J. Félix","Patrício","Dalot","Inácio","R. Neves","Leão","G. Ramos","D. Jota"],
-  NED: ["Verbruggen","Dumfries","De Vrij","Van Dijk","Aké","Schouten","Reijnders","X. Simons","Gakpo","Depay","Bergwijn","Flekken","Geertruida","V.d. Ven","Veerman","Malen","Weghorst","Brobbey"],
-};
-
 const GENERIC = ["Silva","García","Müller","Rossi","Smith","Dubois","Petrov","Tanaka","Kim","Hassan","Okafor","Jansen","Andersen","Costa","Lopez","Nguyen","Schmidt","Ivanov"];
 
+// Fallback (caso a API falhe, usa este gerador)
 export function rosterFor(teamId: string): string[] {
-  if (ROSTERS[teamId]) return ROSTERS[teamId];
   return GENERIC.slice(0, 18).map((n, i) => `${n} ${i + 1}`);
 }
 
