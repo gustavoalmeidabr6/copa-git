@@ -1,5 +1,7 @@
 // Visual helpers: real flag images + deterministic player avatars
 
+import { forwardRef, useState } from "react";
+
 const ISO2: Record<string, string> = {
   MEX: "mx", RSA: "za", KOR: "kr", CZE: "cz",
   CAN: "ca", AUS: "au", NOR: "no", SUI: "ch",
@@ -20,13 +22,17 @@ export function flagUrl(teamId: string, size: 80 | 160 | 320 = 160): string {
   return `https://flagcdn.com/w${size}/${code}.png`;
 }
 
-// Deterministic stylized portrait per player name (DiceBear, no API key)
+// Busca a foto real do jogador usando o proxy público do Bing Imagens
 export function playerPhotoUrl(name: string, size = 96): string {
-  const seed = encodeURIComponent(name || "player");
-  return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundType=gradientLinear&backgroundColor=0a3d2b,1b6b4a,d4b24c&size=${size}`;
+  const query = encodeURIComponent(`${name} football player face`);
+  return `https://tse1.mm.bing.net/th?q=${query}&w=${size}&h=${size}&c=7&rs=1&p=0`;
 }
 
-import { forwardRef } from "react";
+// Fallback caso o Bing não encontre a imagem
+export function fallbackPhotoUrl(name: string, size = 96): string {
+  const seed = encodeURIComponent(name || "player");
+  return `https://api.dicebear.com/9.x/initials/svg?seed=${seed}&backgroundColor=0a3d2b,1b6b4a&size=${size}`;
+}
 
 type FlagProps = React.ImgHTMLAttributes<HTMLImageElement> & {
   teamId: string;
@@ -56,20 +62,26 @@ type AvatarProps = React.ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 export const PlayerAvatar = forwardRef<HTMLImageElement, AvatarProps>(
-  ({ name, px = 40, className, alt, ...rest }, ref) => (
-    <img
-      ref={ref}
-      src={playerPhotoUrl(name, px * 2)}
-      alt={alt ?? name}
-      loading="lazy"
-      draggable={false}
-      className={
-        "inline-block rounded-full bg-background object-cover ring-1 ring-primary/50 shadow-[0_0_10px_oklch(0.82_0.23_152/.45)] " +
-        (className ?? "")
-      }
-      style={{ width: px, height: px }}
-      {...rest}
-    />
-  ),
+  ({ name, px = 40, className, alt, ...rest }, ref) => {
+    const [hasError, setHasError] = useState(false);
+
+    return (
+      <img
+        ref={ref}
+        // Se der erro, troca a source instantaneamente para o fallback das iniciais
+        src={hasError ? fallbackPhotoUrl(name, px * 2) : playerPhotoUrl(name, px * 2)}
+        onError={() => setHasError(true)}
+        alt={alt ?? name}
+        loading="lazy"
+        draggable={false}
+        className={
+          "inline-block rounded-full bg-background object-cover ring-1 ring-primary/50 shadow-[0_0_10px_oklch(0.82_0.23_152/.45)] " +
+          (className ?? "")
+        }
+        style={{ width: px, height: px }}
+        {...rest}
+      />
+    );
+  }
 );
 PlayerAvatar.displayName = "PlayerAvatar";

@@ -1,12 +1,12 @@
 """
-utils/data_loader.py — VERSÃO v4 (Correção do Parse de Nomes Internacionais)
+utils/data_loader.py — VERSÃO v5 (Com Matriz Tática de Escalações Oficiais)
 
 CORREÇÕES DESTA VERSÃO:
-  - FIM DAS ABERRAÇÕES ("eko", "Golo Kanté", "inac"): O Regex antigo quebrava ao 
-    encontrar acentos do Leste Europeu (ž, š, ć) e apóstrofos curvos (’). 
-  - A função `_parse_player_names` foi reescrita para fazer um split estrutural 
-    (cortando entre vírgulas e parênteses), sendo 100% blindada a qualquer idioma 
-    ou caractere especial. Edin Džeko e N'Golo Kanté agora carregarão perfeitamente.
+  - FIM DA DITADURA DO RATING: Antes, o sistema forçava os 11 jogadores com maior
+    nota a serem titulares. Agora, implementamos a matriz `PREFERRED_STARTERS`.
+  - O sistema lê a escalação tática desejada e busca os nomes no elenco. Os 11 
+    escolhidos viram os `top_players` (Titulares), e astros lesionados/bancados 
+    como Neymar vão corretamente para os `bench_players` (Reservas).
 """
 
 import pandas as pd
@@ -22,8 +22,59 @@ TM_PLAYERS_CSV  = DATA_DIR / "players.csv"
 TM_GOALSCORERS_CSV = DATA_DIR / "goalscorers.csv"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# MAPEAMENTO EXPLÍCITO: nome-padrão EN → possíveis nomes no arquivo convocados
+# MATRIZ TÁTICA (ESCALAÇÕES TITULARES REAIS DA COPA 2026)
 # ─────────────────────────────────────────────────────────────────────────────
+PREFERRED_STARTERS = {
+    "Algeria": ["Zidane", "Belghali", "Belaid", "Bensebaini", "Ait-Nouri", "Zerrouki", "Boudaoui", "Mahrez", "Aouar", "Chaibi", "Gouiri"],
+    "Saudi Arabia": ["Al-Aqidi", "Boushal", "Tambakti", "Al-Amri", "Al-Harbi", "Kanno", "Al-Khaibari", "N. Al-Dawsari", "Mandash", "Al-Buraikan", "S. Al-Dawsari"],
+    "Argentina": ["Emiliano Martinez", "Molina", "Otamendi", "Romero", "Tagliafico", "Mac Allister", "Paredes", "Fernandez", "Messi", "Alvarez", "Almada"],
+    "Australia": ["Ryan", "Italiano", "Degenek", "Souttar", "Circati", "Bos", "Metcalfe", "Devlin", "O'Neill", "Irankunda", "Touré"],
+    "Austria": ["A. Schlager", "Laimer", "Lienhart", "Alaba", "Mwene", "X. Schlager", "Seiwald", "Wimmer", "Baumgartner", "Sabitzer", "Arnautovic"],
+    "Belgium": ["Courtois", "Castagne", "Debast", "Theate", "De Cuyper", "Tielemans", "Onana", "Doku", "De Bruyne", "Trossard", "De Ketelaere"],
+    "Bosnia and Herzegovina": ["Vasilj", "Dedic", "Katic", "Muharemovic", "Kolasinac", "Bajraktarevic", "Sunjic", "Tahirovic", "Memic", "Demirovic", "Dzeko"],
+    "Brazil": ["Alisson", "Wesley", "Marquinhos", "Gabriel Magalhães", "Douglas Santos", "Luis Henrique", "Casemiro", "Bruno Guimaraes", "Raphinha", "Vinicius", "Cunha"],
+    "Canada": ["Crepeau", "Sigur", "Bombito", "Jones", "Laryea", "Buchanan", "Koné", "Eustaquio", "Davies", "Oluwaseyi", "David"],
+    "Cape Verde": ["Voziha", "Moreira", "Lopes", "Borges", "Lopes Cabral", "Lenini", "Duarte", "Rodrigues", "Monteiro", "Cabral", "Livramento"],
+    "Colombia": ["Montero", "Munoz", "Sanchez", "Mina", "Mojica", "Lerma", "Rios", "Arias", "James", "Diaz", "Suarez"],
+    "South Korea": ["Seung-gyu Kim", "Seol", "Min-jae Kim", "Han-beom Lee", "Tae-seok Lee", "Wang", "Castrop", "Kang-in Lee", "Jae-sung Lee", "Bae", "Son"],
+    "Ivory Coast": ["Fofana", "Doué", "Koussonou", "Ndicka", "Konan", "Kessié", "Sangaré", "Oulai", "Pepé", "Guessand", "Diomandé"],
+    "Curaçao": ["Room", "Sambo", "Van Ejma", "Obispo", "Floranus", "J. Bacuna", "Comenancia", "L. Bacuna", "Chong", "Locadia", "Gorré"],
+    "Croatia": ["Livakovic", "Stanisic", "Sutalo", "Caleta-Car", "Gvardiol", "Sucic", "Modric", "Pasalic", "Kramaric", "Perisic", "Budimir"],
+    "Ecuador": ["Galindez", "Preciado", "Ordonez", "Pacho", "HIncapié", "Vite", "Caicedo", "Castillo", "Yeboah", "Valencia", "Angulo"],
+    "Egypt": ["El Shenawy", "Ibrahim", "Abdelmaguif", "Rabia", "Hany", "Ateya", "Lasheen", "Fatouh", "Ashour", "Salah", "Marmoush"],
+    "France": ["Maignan", "Koundé", "Saliba", "Upamecano", "Hernandez", "Rabiot", "Tchouameni", "Dembelé", "Olise", "Doué", "Mbappé"],
+    "Germany": ["Neuer", "Kimmich", "Tah", "Schlotterbeck", "Raum", "Pavlovic", "Goreztka", "Sané", "Musiala", "Wirtz", "Havertz"],
+    "Ghana": ["Asare", "Adjetei", "Seidu", "Oppong", "Yirenkyi", "Sibo", "Partey", "Mensah", "Sulemana", "Semenyo", "Ayew"],
+    "Japan": ["Suzuki", "Tomiyasu", "Taniguchi", "Itakura", "Doan", "Endo", "Tanaka", "Nakamura", "Kubo", "Ito", "Ueda"],
+    "Jordan": ["Abulaila", "Abu Dahab", "Nasib", "Al-Arab", "Haddad", "Al-Rawahbdeh", "Al-Rashdan", "Abu Taha", "Tamari", "Olwan", "Al-Mardi"],
+    "Haiti": ["Placide", "Arcus", "Adé", "Duverne", "Expérience", "Deedson", "Bellegarde", "Pierre", "Isidor", "Nazon", "Providence"],
+    "England": ["Pickford", "James", "Guehi", "Konsa", "O'Reilly", "Anderson", "Rice", "Saka", "Bellingham", "Eze", "Kane"],
+    "Iran": ["Beyranvand", "Yousefi", "Kanaani", "Khalilzadeh", "Mohammadi", "Ezatolahi", "Ghoddos", "Jahanbakhsh", "Ghayedi", "Mohebi", "Taremi"],
+    "Iraq": ["Hassan", "Hussein Ali", "Sulaka", "Tahseen", "Doski", "Al-Ammari", "Bayesh", "Ali Jasim", "Iqbal", "Amyn", "Aymen Hussein"],
+    "Morocco": ["Bono", "Hakimi", "Diop", "Aguerd", "Salah-Eddine", "Ounahi", "El Aynaoui", "Brahim Diaz", "Saibari", "Talbi", "El Kaabi"],
+    "Mexico": ["Rangel", "Sanchez", "Montes", "Vasquez", "Gallardo", "Pineda", "Alvarez", "Fidalgo", "Vega", "Jimenez", "Quinones"],
+    "Norway": ["Nyland", "Ryerson", "Heggem", "Ostigard", "Wolfe", "Thorstvedt", "Berg", "Berge", "Sorloth", "Haaland", "Nusa"],
+    "New Zealand": ["Crocombe", "Payne", "Bindon", "Boxall", "Cacace", "Samenic", "Bell", "McCowatt", "Singh", "Garbett", "Wood"],
+    "Netherlands": ["Verbruggen", "Dumfries", "Van Dijk", "Aké", "Van de Ven", "De Jong", "Gravenberch", "Malen", "Reijnders", "Gakpo", "Depay"],
+    "Panama": ["Mosquera", "Farina", "Andrade", "Cordoba", "Murillo", "Carrasquilla", "Godoy", "Davis", "Barcenas", "Diaz", "Fajardo"],
+    "Paraguay": ["Gill", "Caceres", "G. Gomez", "Alderete", "Alonso", "D. Gomez", "Ojeda", "Bobadilla", "Almiron", "Enciso", "Avalos"],
+    "Portugal": ["Costa", "Cancelo", "Ruben Dias", "Inacio", "Nuno Mendes", "Joao Neves", "Vitinha", "Bruno Fernandes", "Bernardo Silva", "Cristiano Ronaldo", "Joao Felix"],
+    "Qatar": ["Barsham", "Al-Oui", "Khoukhi", "Pedro Miguel", "Al-Amin", "Boudiaf", "Fathy", "Laye", "Edmilson Junior", "Almoez Ali", "Afif"],
+    "Czechia": ["Hornicek", "Chaloupek", "Hranac", "Krejci", "Zeleny", "Soucek", "Darida", "Coufal", "Provod", "Sulc", "Schick"],
+    "DR Congo": ["Mpasi", "Wan-Bissaka", "Mbemba", "Tuanzebe", "Masuaku", "Pickel", "Moutoussamy", "Bongonda", "Kakuta", "Wissa", "Bakambu"],
+    "Scotland": ["Gordon", "Hickey", "Hanley", "McKenna", "Robertson", "Ferguson", "Gannon-Doak", "Christie", "McTominay", "McGinn", "Adams"],
+    "Senegal": ["Mendy", "Diatta", "Koulibaly", "Niakhaté", "Jakobs", "Idrissa Gueye", "Pape Gueye", "Ismaila Sarr", "Iliman Ndiaye", "Mané", "Jackson"],
+    "Spain": ["Simon", "Llorente", "Cubarsì", "Laporte", "Cucurella", "Pedri", "Rodri", "Fabian Ruiz", "lamine Yamal", "Oyarzabal", "Nico Williams"],
+    "USA": ["Freese", "Freeman", "Richards", "Trusty", "Antonee Robinson", "McKennie", "Berhalter", "Adams", "Weah", "Balogun", "Pulisic"],
+    "South Africa": ["Williams", "Mudau", "Sibisi", "Ndamane", "Modiba", "Sithole", "Mokoena", "Apollis", "Zwane", "Mofokeng", "Foster"],
+    "Sweden": ["Nordfeldt", "Starfelt", "Lagerbielke", "Lindelof", "Svensson", "Karlstrom", "Ayari", "Gudmundsson", "Nygren", "Elanga", "Gyokeres"],
+    "Switzerland": ["Kobel", "Widmer", "Akanji", "Elvedi", "Rodriguez", "Freuler", "Xhaka", "Rieder", "Ndoye", "Embolo", "Vargas"],
+    "Tunisia": ["Dahmen", "Valery", "Bronn", "Talbi", "Abdi", "Gharbi", "Skhiri", "Hannibal", "Achouri", "Mastouri", "Tounekti"],
+    "Turkey": ["Cakir", "Demiral", "Kabak", "Bardakci", "Celik", "Calhanoglu", "Kokcu", "Ozer", "Guler", "Yildiz", "Akturkoglu"],
+    "Uruguay": ["Rochet", "Valera", "Gimenez", "Araujo", "Olivera", "Valverde", "Ugarte", "Bentancur", "Canobbio", "Nunez", "Rodriguez"],
+    "Uzbekistan": ["Nematov", "Abdullaev", "Ashurmatov", "Khusanov", "Sayfiev", "Shukurov", "Khamrobekov", "Nasrullaev", "Ganiev", "Urunov", "Shomurodov"]
+}
+
 SQUAD_NAME_ALIASES: dict[str, list[str]] = {
     "Argentina":              ["Argentina", "Selección Argentina"],
     "Australia":              ["Australia", "Socceroos"],
@@ -84,9 +135,6 @@ for _std, _aliases in SQUAD_NAME_ALIASES.items():
     for _alias in _aliases:
         _ALIAS_TO_STANDARD[_alias.lower().strip()] = _std
 
-# ─────────────────────────────────────────────────────────────────────────────
-# MAPEAMENTO EA FC
-# ─────────────────────────────────────────────────────────────────────────────
 EA_NATION_MAP: dict[str, str] = {
     "Argentina": "Argentina", "Australia": "Australia", "Austria": "Austria",
     "Belgium": "Belgium", "Bosnia and Herzegovina": "Bosnia & Herzegovina",
@@ -107,9 +155,6 @@ EA_NATION_MAP: dict[str, str] = {
     "Algeria": "Algeria",
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
-# ELENCOS GENÉRICOS DE FALLBACK
-# ─────────────────────────────────────────────────────────────────────────────
 GENERIC_SQUADS: dict[str, dict] = {
     "France": {
         "Goalkeeper":  [{"name": "Mike Maignan",        "rating": 8.7, "position": "Goalkeeper"}],
@@ -124,87 +169,8 @@ GENERIC_SQUADS: dict[str, dict] = {
                         {"name": "Ousmane Dembélé",      "rating": 8.5, "position": "Attacker"},
                         {"name": "Marcus Thuram",        "rating": 8.2, "position": "Attacker"}],
     },
-    "Portugal": {
-        "Goalkeeper":  [{"name": "Diogo Costa",          "rating": 8.5, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Rúben Dias",           "rating": 8.7, "position": "Defender"},
-                        {"name": "Pepe",                 "rating": 7.8, "position": "Defender"},
-                        {"name": "Nuno Mendes",          "rating": 8.3, "position": "Defender"},
-                        {"name": "João Cancelo",         "rating": 8.4, "position": "Defender"}],
-        "Midfielder":  [{"name": "Bernardo Silva",       "rating": 8.9, "position": "Midfielder"},
-                        {"name": "Bruno Fernandes",      "rating": 8.7, "position": "Midfielder"},
-                        {"name": "Vitinha",              "rating": 8.2, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Cristiano Ronaldo",    "rating": 8.8, "position": "Attacker"},
-                        {"name": "Rafael Leão",          "rating": 8.6, "position": "Attacker"},
-                        {"name": "Gonçalo Ramos",        "rating": 8.3, "position": "Attacker"}],
-    },
-    "Germany": {
-        "Goalkeeper":  [{"name": "Manuel Neuer",         "rating": 8.6, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Antonio Rüdiger",      "rating": 8.5, "position": "Defender"},
-                        {"name": "Jonathan Tah",         "rating": 8.1, "position": "Defender"},
-                        {"name": "David Raum",           "rating": 8.0, "position": "Defender"},
-                        {"name": "Joshua Kimmich",       "rating": 8.8, "position": "Defender"}],
-        "Midfielder":  [{"name": "Florian Wirtz",        "rating": 8.8, "position": "Midfielder"},
-                        {"name": "Jamal Musiala",        "rating": 8.9, "position": "Midfielder"},
-                        {"name": "Toni Kroos",           "rating": 8.7, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Kai Havertz",          "rating": 8.3, "position": "Attacker"},
-                        {"name": "Leroy Sané",           "rating": 8.4, "position": "Attacker"},
-                        {"name": "Thomas Müller",        "rating": 8.2, "position": "Attacker"}],
-    },
-    "Spain": {
-        "Goalkeeper":  [{"name": "Unai Simón",           "rating": 8.4, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Dani Carvajal",        "rating": 8.5, "position": "Defender"},
-                        {"name": "Aymeric Laporte",      "rating": 8.3, "position": "Defender"},
-                        {"name": "Pau Cubarsí",          "rating": 8.2, "position": "Defender"},
-                        {"name": "Alejandro Grimaldo",   "rating": 8.4, "position": "Defender"}],
-        "Midfielder":  [{"name": "Rodri",                "rating": 9.1, "position": "Midfielder"},
-                        {"name": "Pedri",                "rating": 8.9, "position": "Midfielder"},
-                        {"name": "Fabián Ruiz",          "rating": 8.6, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Lamine Yamal",         "rating": 8.8, "position": "Attacker"},
-                        {"name": "Nico Williams",        "rating": 8.6, "position": "Attacker"},
-                        {"name": "Álvaro Morata",        "rating": 8.2, "position": "Attacker"}],
-    },
-    "Argentina": {
-        "Goalkeeper":  [{"name": "Emiliano Martínez",   "rating": 9.0, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Cristian Romero",      "rating": 8.5, "position": "Defender"},
-                        {"name": "Lisandro Martínez",    "rating": 8.4, "position": "Defender"},
-                        {"name": "Nicolás Otamendi",     "rating": 8.0, "position": "Defender"},
-                        {"name": "Nahuel Molina",        "rating": 8.1, "position": "Defender"}],
-        "Midfielder":  [{"name": "Rodrigo De Paul",      "rating": 8.4, "position": "Midfielder"},
-                        {"name": "Enzo Fernández",       "rating": 8.5, "position": "Midfielder"},
-                        {"name": "Alexis Mac Allister",  "rating": 8.6, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Lionel Messi",         "rating": 9.3, "position": "Attacker"},
-                        {"name": "Lautaro Martínez",     "rating": 8.8, "position": "Attacker"},
-                        {"name": "Julián Álvarez",       "rating": 8.5, "position": "Attacker"}],
-    },
-    "England": {
-        "Goalkeeper":  [{"name": "Jordan Pickford",      "rating": 8.3, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Kyle Walker",          "rating": 8.2, "position": "Defender"},
-                        {"name": "John Stones",          "rating": 8.3, "position": "Defender"},
-                        {"name": "Harry Maguire",        "rating": 7.9, "position": "Defender"},
-                        {"name": "Luke Shaw",            "rating": 8.0, "position": "Defender"}],
-        "Midfielder":  [{"name": "Jude Bellingham",      "rating": 9.0, "position": "Midfielder"},
-                        {"name": "Declan Rice",          "rating": 8.7, "position": "Midfielder"},
-                        {"name": "Phil Foden",           "rating": 8.8, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Harry Kane",           "rating": 9.0, "position": "Attacker"},
-                        {"name": "Bukayo Saka",          "rating": 8.8, "position": "Attacker"},
-                        {"name": "Marcus Rashford",      "rating": 8.3, "position": "Attacker"}],
-    },
-    "Netherlands": {
-        "Goalkeeper":  [{"name": "Bart Verbruggen",      "rating": 8.0, "position": "Goalkeeper"}],
-        "Defender":    [{"name": "Virgil van Dijk",      "rating": 8.9, "position": "Defender"},
-                        {"name": "Stefan de Vrij",       "rating": 8.1, "position": "Defender"},
-                        {"name": "Denzel Dumfries",      "rating": 8.2, "position": "Defender"},
-                        {"name": "Nathan Aké",           "rating": 8.2, "position": "Defender"}],
-        "Midfielder":  [{"name": "Frenkie de Jong",      "rating": 8.7, "position": "Midfielder"},
-                        {"name": "Tijjani Reijnders",    "rating": 8.5, "position": "Midfielder"},
-                        {"name": "Xavi Simons",          "rating": 8.6, "position": "Midfielder"}],
-        "Attacker":    [{"name": "Cody Gakpo",           "rating": 8.5, "position": "Attacker"},
-                        {"name": "Donyell Malen",        "rating": 8.2, "position": "Attacker"},
-                        {"name": "Wout Weghorst",        "rating": 8.0, "position": "Attacker"}],
-    },
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
 WORLD_CUP_2026_TEAMS = {
     "Mexico":                 {"group": "A"}, "South Korea":    {"group": "A"},
     "South Africa":           {"group": "A"}, "Czechia":        {"group": "A"},
@@ -301,10 +267,8 @@ HISTORICAL_GOALS_AVG: dict[str, dict] = {
 }
 _DEFAULT_GOALS = {"scored": 1.2, "conceded": 1.2}
 
-
 def _get_historical_goals(team: str) -> dict:
     return HISTORICAL_GOALS_AVG.get(team, _DEFAULT_GOALS)
-
 
 class DataLoader:
     def __init__(self):
@@ -420,20 +384,10 @@ class DataLoader:
             players = self._parse_player_names(names_str)
             squads[current_team][pos_value].extend(players)
 
-        total = len(squads)
-        print(f"[DataLoader] convocados_2026.txt: {total} seleções carregadas.")
-        empty = [t for t, d in squads.items() if all(len(v) == 0 for v in d.values())]
-        if empty:
-            print(f"[DataLoader] AVISO: times sem jogadores detectados: {empty}")
         return squads
 
     @staticmethod
     def _parse_player_names(names_str: str) -> list[str]:
-        """
-        Nova Estratégia de Parse (100% blindada a idiomas e caracteres estendidos).
-        Corta as vírgulas e "and", e captura tudo o que estiver antes do parêntese.
-        Acabou o problema com Džeko e N'Golo Kanté!
-        """
         if '(' in names_str:
             parts = re.split(r',|\band\b|\be\b|\by\b', names_str, flags=re.IGNORECASE)
             result = []
@@ -447,7 +401,6 @@ class DataLoader:
             if result:
                 return result
 
-        # Estratégia 2: sem clube
         no_parens = re.sub(r'\(.*?\)', '', names_str)
         no_parens = re.sub(r'\*[^\,]*', '', no_parens)
         parts = re.split(r',|\band\b|\be\b|\by\b', no_parens, flags=re.IGNORECASE)
@@ -537,7 +490,6 @@ class DataLoader:
                 for pos, players_list in GENERIC_SQUADS[team_name].items():
                     official_roster.extend(players_list)
                 base_data["data_source"] = "Elenco Genérico (fallback)"
-                print(f"[DataLoader] {team_name}: usando elenco genérico de fallback.")
             else:
                 base_data["data_source"] = "Elenco Genérico Mínimo"
                 base_data["squad_rating"] = self._elo_to_squad_rating(
@@ -550,23 +502,78 @@ class DataLoader:
 
         official_roster.sort(key=lambda x: x["rating"], reverse=True)
 
-        gks  = [p for p in official_roster if p["position"] == "Goalkeeper"]
-        defs = [p for p in official_roster if p["position"] == "Defender"]
-        mids = [p for p in official_roster if p["position"] == "Midfielder"]
-        atts = [p for p in official_roster if p["position"] == "Attacker"]
+        # ── NOVA LÓGICA DE ESCALAÇÃO: Respeito Tático (Fim da Ditadura do Rating) ──
+        preferred_names = PREFERRED_STARTERS.get(dict_team_name)
+        
+        starters = []
+        used_indices = set()
+        
+        if preferred_names:
+            def normalize(n):
+                return n.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u').replace('ã','a').replace('õ','o').replace('ç','c').strip()
 
-        starters = gks[:1] + defs[:4] + mids[:3] + atts[:3]
-        if len(starters) < 11:
-            used_names = {p["name"] for p in starters}
-            for p in official_roster:
-                if p["name"] not in used_names:
-                    starters.append(p)
-                    used_names.add(p["name"])
-                    if len(starters) == 11:
+            for pref_name in preferred_names:
+                p_norm = normalize(pref_name)
+                best_match_idx = -1
+                
+                # 1. Tenta achar exatamente o nome
+                for i, p in enumerate(official_roster):
+                    if i in used_indices: continue
+                    r_norm = normalize(p["name"])
+                    if p_norm == r_norm:
+                        best_match_idx = i
                         break
+                
+                # 2. Tenta por Substring (Ex: "Vini" em "Vinicius Jr")
+                if best_match_idx == -1:
+                    for i, p in enumerate(official_roster):
+                        if i in used_indices: continue
+                        r_norm = normalize(p["name"])
+                        if p_norm in r_norm or r_norm in p_norm:
+                            best_match_idx = i
+                            break
+                            
+                # 3. Fuzzy Logic (Se escreveu errado no doc)
+                if best_match_idx == -1:
+                    avail_names = [p["name"] for i, p in enumerate(official_roster) if i not in used_indices]
+                    if avail_names:
+                        fuzzy = get_close_matches(pref_name, avail_names, n=1, cutoff=0.5)
+                        if fuzzy:
+                            best_match_idx = next(i for i, p in enumerate(official_roster) if p["name"] == fuzzy[0])
+                
+                if best_match_idx != -1:
+                    starters.append(official_roster[best_match_idx])
+                    used_indices.add(best_match_idx)
+            
+            # Se faltar algum jogador na Matriz Tática, completa com os melhores
+            for i, p in enumerate(official_roster):
+                if len(starters) == 11: break
+                if i not in used_indices:
+                    starters.append(p)
+                    used_indices.add(i)
 
-        used_names = {p["name"] for p in starters}
-        bench      = [p for p in official_roster if p["name"] not in used_names]
+            bench = [p for i, p in enumerate(official_roster) if i not in used_indices]
+            
+        else:
+            # Fallback para seleções que não estão na matriz (pega os melhores por posição)
+            gks  = [p for p in official_roster if p["position"] == "Goalkeeper"]
+            defs = [p for p in official_roster if p["position"] == "Defender"]
+            mids = [p for p in official_roster if p["position"] == "Midfielder"]
+            atts = [p for p in official_roster if p["position"] == "Attacker"]
+
+            starters = gks[:1] + defs[:4] + mids[:3] + atts[:3]
+            if len(starters) < 11:
+                used_names = {p["name"] for p in starters}
+                for p in official_roster:
+                    if p["name"] not in used_names:
+                        starters.append(p)
+                        used_names.add(p["name"])
+                        if len(starters) == 11:
+                            break
+
+            used_names = {p["name"] for p in starters}
+            bench = [p for p in official_roster if p["name"] not in used_names]
+
         avg_rating = sum(p["rating"] for p in starters) / len(starters) if starters else 7.0
 
         base_data["squad_rating"]  = round(avg_rating, 2)
@@ -639,4 +646,3 @@ class DataLoader:
                     "awayTeam": {"name": away},
                 })
         return fixtures
-    

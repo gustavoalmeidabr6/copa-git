@@ -1,7 +1,8 @@
+// src/routes/partida.tsx
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { ALL_TEAMS, FORMATIONS, POSITIONS, Team, rosterFor, teamById, type Formation } from "@/lib/teams";
+import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, KNOWN_PLAYER_POSITIONS, Team, rosterFor, teamById, type Formation } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
@@ -24,11 +25,31 @@ export type APIResult = {
   aWinPct: number; 
   drawPct: number; 
   bWinPct: number;
+  expectedScore: string;
   topScorers: { player: string; team: string; goals: number }[];
+  topAssists: { player: string; team: string; assists: number }[];
   avgGoals: { a: number; b: number };
   scoreCounts: Record<string, number>;
   sim_logs: string[];
 };
+
+// O segredo: Ordena os titulares de acordo com o dicionário de conhecimento. 
+// Isso força cada jogador que chega da API para o seu "Slot" ideal no campinho.
+function sortRoster(roster: string[]) {
+  if (!roster || roster.length === 0) return [];
+  const starters = roster.slice(0, 11);
+  const bench = roster.slice(11);
+  
+  starters.sort((a, b) => {
+    const posA = KNOWN_PLAYER_POSITIONS[a];
+    const posB = KNOWN_PLAYER_POSITIONS[b];
+    const wA = posA ? POSITION_WEIGHT[posA] : 99;
+    const wB = posB ? POSITION_WEIGHT[posB] : 99;
+    return wA - wB;
+  });
+  
+  return [...starters, ...bench];
+}
 
 function PartidaPage() {
   const [step, setStep] = useState<Step>("select");
@@ -41,16 +62,15 @@ function PartidaPage() {
   const [rosterA, setRosterA] = useState<string[]>([]);
   const [rosterB, setRosterB] = useState<string[]>([]);
 
-  // Agora busca com .apiName (Ex: envia "Brazil" em vez de "Brasil")
   useEffect(() => {
     if (home) {
       fetch(`http://localhost:8000/api/roster/${home.apiName}`)
         .then(res => res.json())
         .then(data => {
           const arr = [...(data.starters || []), ...(data.bench || [])];
-          if (arr.length > 0) setRosterA(arr.slice(0, 18));
+          if (arr.length > 0) setRosterA(sortRoster(arr.slice(0, 26)));
         })
-        .catch(() => setRosterA(rosterFor(home.id).slice(0, 18)));
+        .catch(() => setRosterA(sortRoster(rosterFor(home.id).slice(0, 26))));
     }
   }, [home]);
 
@@ -60,9 +80,9 @@ function PartidaPage() {
         .then(res => res.json())
         .then(data => {
           const arr = [...(data.starters || []), ...(data.bench || [])];
-          if (arr.length > 0) setRosterB(arr.slice(0, 18));
+          if (arr.length > 0) setRosterB(sortRoster(arr.slice(0, 26)));
         })
-        .catch(() => setRosterB(rosterFor(away.id).slice(0, 18)));
+        .catch(() => setRosterB(sortRoster(rosterFor(away.id).slice(0, 26))));
     }
   }, [away]);
 
@@ -100,7 +120,6 @@ function PartidaPage() {
                 onSimulate={async () => {
                   setSimulating(true);
                   try {
-                    // Envia OS NOMES OFICIAIS pro Motor Python não se perder!
                     const response = await fetch("http://localhost:8000/api/simulate_match", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
@@ -124,11 +143,17 @@ function PartidaPage() {
                       player: s[0], team: home.id, goals: s[1]
                     }));
 
+                    const topAssists = (data.top_assists || []).map((s: any) => ({
+                      player: s[0], team: home.id, assists: s[1]
+                    }));
+
                     setResult({
                       aWinPct: data.home_win_prob || 0,
                       drawPct: data.draw_prob || 0,
                       bWinPct: data.away_win_prob || 0,
+                      expectedScore: data.expected_score || "N/A",
                       topScorers: topScorers,
+                      topAssists: topAssists,
                       avgGoals: { a: data.home_lambda || 0, b: data.away_lambda || 0 },
                       scoreCounts: scoreCounts,
                       sim_logs: data.sim_logs || []
@@ -233,15 +258,14 @@ function PlayerNode({ name, pos, x, y, delay = 0, mirrored = false }: { name: st
       initial={{ opacity: 0, scale: 0.4 }}
       animate={{ opacity: 1, scale: 1, left: `${x * 100}%`, top: `${y * 100}%` }}
       transition={{ type: "spring", stiffness: 120, damping: 14, delay }}
-      className="absolute -translate-x-1/2 -translate-y-1/2"
+      className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
     >
       <div className="flex flex-col items-center gap-1">
         <div className="relative h-11 w-11 overflow-visible rounded-full">
           <PlayerAvatar name={name} px={44} className={mirrored ? "ring-gold/60" : ""} />
           <span className="absolute -bottom-1 -right-1 rounded-sm bg-background/90 px-1 text-[8px] font-bold text-primary ring-1 ring-primary/50">{pos}</span>
-          <motion.span className="absolute -inset-1 -z-10 rounded-full" animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: delay }} style={{ boxShadow: "0 0 24px var(--primary)" }} />
         </div>
-        <div className={`whitespace-nowrap rounded-sm bg-background/80 px-1.5 py-0.5 text-[10px] uppercase tracking-wider ${mirrored ? "text-gold" : "text-primary"}`}>{name}</div>
+        <div className={`whitespace-nowrap rounded-sm bg-background/90 px-1.5 py-0.5 text-[10px] uppercase tracking-wider shadow-sm ${mirrored ? "text-gold" : "text-primary"}`}>{name}</div>
       </div>
     </motion.div>
   );
@@ -250,8 +274,13 @@ function PlayerNode({ name, pos, x, y, delay = 0, mirrored = false }: { name: st
 function Pitch({ teamA, teamB, formA, formB, rosterA, rosterB }: { teamA: Team; teamB: Team; formA: Formation; formB: Formation; rosterA: string[]; rosterB: string[] }) {
   const startersA = rosterA.slice(0, 11);
   const startersB = rosterB.slice(0, 11);
-  const posA = FORMATIONS[formA];
-  const posB = FORMATIONS[formB];
+  
+  // Extrai as coordenadas dinâmicas e o label correto de posição para as formações atuais
+  const posA = FORMATIONS[formA].coords;
+  const labelsA = FORMATIONS[formA].positions;
+  const posB = FORMATIONS[formB].coords;
+  const labelsB = FORMATIONS[formB].positions;
+
   return (
     <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-primary/40 bg-pitch shadow-[inset_0_0_120px_oklch(0_0_0/.6)]">
       <div className="pointer-events-none absolute inset-3 rounded-md border border-primary/30" />
@@ -260,26 +289,30 @@ function Pitch({ teamA, teamB, formA, formB, rosterA, rosterB }: { teamA: Team; 
       <div className="pointer-events-none absolute left-1/2 top-3 h-20 w-44 -translate-x-1/2 border-l border-r border-b border-primary/30" />
       <div className="pointer-events-none absolute left-1/2 bottom-3 h-20 w-44 -translate-x-1/2 border-l border-r border-t border-primary/30" />
       <div className="pointer-events-none absolute inset-3 opacity-30 [background:repeating-linear-gradient(0deg,oklch(0.4_0.18_160/.0)_0_28px,oklch(0.45_0.2_160/.18)_28px_56px)]" />
-      {posA.map(([x, y], i) => <PlayerNode key={`a${i}-${startersA[i]}`} pos={POSITIONS[i] ?? ""} name={startersA[i] ?? ""} x={x} y={0.5 + y * 0.5} delay={0.05 * i} />)}
-      {posB.map(([x, y], i) => <PlayerNode key={`b${i}-${startersB[i]}`} pos={POSITIONS[i] ?? ""} name={startersB[i] ?? ""} x={1 - x} y={0.5 - y * 0.5} delay={0.05 * i + 0.3} mirrored />)}
+      
+      {posA.map(([x, y], i) => <PlayerNode key={`a${i}-${startersA[i]}`} pos={labelsA[i] ?? ""} name={startersA[i] ?? ""} x={x} y={0.5 + y * 0.5} delay={0.05 * i} />)}
+      {posB.map(([x, y], i) => <PlayerNode key={`b${i}-${startersB[i]}`} pos={labelsB[i] ?? ""} name={startersB[i] ?? ""} x={1 - x} y={0.5 - y * 0.5} delay={0.05 * i + 0.3} mirrored />)}
     </div>
   );
 }
 
 function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; form: Formation; setForm: (f: Formation) => void; roster: string[]; setRoster: (r: string[]) => void }) {
   const [selected, setSelected] = useState<number | null>(null);
+  
   const swap = (i: number, j: number) => {
     if (i === j) return;
     const next = roster.slice();
     [next[i], next[j]] = [next[j], next[i]];
     setRoster(next);
   };
+  
   const onPick = (idx: number) => {
     if (selected === null) return setSelected(idx);
     if (selected === idx) return setSelected(null);
     swap(selected, idx);
     setSelected(null);
   };
+  
   const onDragStart = (e: React.DragEvent, idx: number) => { e.dataTransfer.setData("text/plain", String(idx)); setSelected(idx); };
   const onDragOver = (e: React.DragEvent) => { e.preventDefault(); };
   const onDrop = (e: React.DragEvent, target: number) => {
@@ -288,8 +321,11 @@ function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; fo
     if (!Number.isNaN(src)) swap(src, target);
     setSelected(null);
   };
+
+  const labels = FORMATIONS[form].positions;
+
   return (
-    <Panel className="space-y-3 text-sm">
+    <Panel className="space-y-3 text-sm h-full overflow-y-auto pr-2 max-h-[80vh] custom-scrollbar">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <TeamFlag teamId={team.id} className="h-6 w-9" />
@@ -312,7 +348,7 @@ function TeamColumn({ team, form, setForm, roster, setRoster }: { team: Team; fo
             <li key={`s-${i}-${n}`} draggable onDragStart={(e) => onDragStart(e, i)} onDragOver={onDragOver} onDrop={(e) => onDrop(e, i)} onClick={() => onPick(i)}
               className={`group flex cursor-pointer items-center justify-between gap-2 rounded-md border bg-background/40 px-2 py-1 text-[12px] transition ${selected === i ? "border-gold shadow-[0_0_14px_oklch(0.83_0.16_85/.7)]" : "border-primary/25"}`} style={{ userSelect: "none" }}>
               <span className="flex items-center gap-2"><PlayerAvatar name={n} px={24} /><span className="truncate">{n}</span></span>
-              <span className="text-[10px] text-primary">{POSITIONS[i]}</span>
+              <span className="text-[10px] text-primary">{labels[i]}</span>
             </li>
           ))}
         </ul>
@@ -344,7 +380,6 @@ function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, ros
         <div className="flex items-center justify-between gap-3">
           <NeonButton variant="ghost" onClick={onBack}><ArrowLeft className="h-4 w-4" /> Voltar</NeonButton>
           <NeonButton onClick={onSimulate} className="animate-pulse-neon flex-1"><Play className="h-4 w-4" /> Iniciar Simulação</NeonButton>
-          <NeonButton variant="ghost"><Trash2 className="h-4 w-4" /> Limpar</NeonButton>
         </div>
       </div>
       <TeamColumn team={away} form={formB} setForm={setFormB} roster={rosterB} setRoster={setRosterB} />
@@ -378,10 +413,15 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
         ))}
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <Panel>
+      <div className="grid gap-5 md:grid-cols-3">
+        <Panel className="md:col-span-1">
+          <div className="mb-4 rounded-md border border-neon/30 bg-neon/5 p-3 text-center">
+             <div className="font-display text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Placar Exato Médio</div>
+             <div className="mt-1 font-display text-lg text-neon">{result.expectedScore}</div>
+          </div>
+          
           <div className="mb-3 flex items-center justify-between">
-            <div className="font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Placares mais prováveis</div>
+            <div className="font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Mais prováveis</div>
             <BarChart3 className="h-4 w-4 text-primary" />
           </div>
           <ul className="space-y-2">
@@ -402,19 +442,38 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
           </ul>
         </Panel>
 
-        <Panel glow="gold">
-          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em]">Top 5 Artilheiros</div>
+        <Panel glow="gold" className="md:col-span-1">
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em]">Artilheiros</div>
           <ol className="space-y-2">
-            {result.topScorers.map((s, i) => (
+            {result.topScorers.slice(0, 5).map((s, i) => (
               <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
                 <div className="flex items-center gap-3">
                   <span className="font-display text-gold tabular-nums">{i + 1}</span>
                   <PlayerAvatar name={s.player} px={28} />
                   <span className="text-sm">{s.player}</span>
                 </div>
-                <span className="font-display text-primary">{s.goals} gols</span>
+                <span className="font-display text-primary">{s.goals} G</span>
               </motion.li>
             ))}
+          </ol>
+        </Panel>
+
+        <Panel glow="neon" className="md:col-span-1">
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em]">Garçons (Assist.)</div>
+          <ol className="space-y-2">
+            {result.topAssists.slice(0, 5).map((s, i) => (
+              <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <span className="font-display text-neon tabular-nums">{i + 1}</span>
+                  <PlayerAvatar name={s.player} px={28} />
+                  <span className="text-sm">{s.player}</span>
+                </div>
+                <span className="font-display text-primary">{s.assists} A</span>
+              </motion.li>
+            ))}
+            {result.topAssists.length === 0 && (
+              <div className="text-xs text-muted-foreground p-3 text-center">Nenhuma assistência simulada</div>
+            )}
           </ol>
         </Panel>
       </div>
@@ -424,7 +483,7 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
           <div className="font-display text-sm uppercase tracking-[0.3em]">Log (Amostra) das 200 Simulações</div>
           <div className="text-xs text-muted-foreground">Expected Goals: <span className="text-primary">{result.avgGoals.a.toFixed(2)}</span> – <span className="text-primary">{result.avgGoals.b.toFixed(2)}</span></div>
         </div>
-        <div className="max-h-56 overflow-y-auto pr-2 text-xs font-mono text-muted-foreground whitespace-pre-line rounded border border-border/30 bg-background/30 p-3">
+        <div className="max-h-56 overflow-y-auto pr-2 text-xs font-mono text-muted-foreground whitespace-pre-line rounded border border-border/30 bg-background/30 p-3 custom-scrollbar">
           {result.sim_logs && result.sim_logs.length > 0 ? result.sim_logs.slice(0, 50).join("\n") : "Sem log disponível."}
         </div>
       </Panel>

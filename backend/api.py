@@ -28,8 +28,25 @@ def get_teams():
 def get_roster(team_name: str):
     # Puxa os dados reais dos elencos do seu DataLoader
     squad = simulator.feature_builder.data_loader.get_real_squad_data(team_name)
-    top_players = [p["name"] for p in squad.get("top_players", [])]
-    bench_players = [p["name"] for p in squad.get("bench_players", [])]
+    
+    # --- NOVA LÓGICA DE ORDENAÇÃO POR POSIÇÃO ---
+    # Força a lista a seguir o padrão Tático do Frontend (GK -> DEF -> MID -> ATT)
+    pos_order = {"Goalkeeper": 0, "Defender": 1, "Midfielder": 2, "Attacker": 3}
+    
+    # Ordena primeiro pela posição no campo, e como critério de desempate, pela maior nota (rating)
+    top_players_data = sorted(
+        squad.get("top_players", []),
+        key=lambda x: (pos_order.get(x.get("position", "Midfielder"), 2), -x.get("rating", 7.0))
+    )
+    
+    bench_players_data = sorted(
+        squad.get("bench_players", []),
+        key=lambda x: (pos_order.get(x.get("position", "Midfielder"), 2), -x.get("rating", 7.0))
+    )
+
+    top_players = [p["name"] for p in top_players_data]
+    bench_players = [p["name"] for p in bench_players_data]
+    
     return {"starters": top_players, "bench": bench_players}
 
 # Modelo de dados que o frontend vai enviar

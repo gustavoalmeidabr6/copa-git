@@ -20,10 +20,12 @@ export const Route = createFileRoute("/copa")({
 
 type Step = "groups" | "final";
 
+// TIPAGEM ATUALIZADA: Adicionado top_assists
 export type TournamentAPIResult = {
   total_sims: number;
   favorites: { team: string; prob: number }[];
   top_scorers: { player: string; avg_goals: number }[];
+  top_assists: { player: string; avg_assists: number }[]; 
   best_attack: { team: string; gf: number }[];
   best_defense: { team: string; ga: number }[];
   biggest_zebra?: { team: string; elo: number; avg_stage_score: number };
@@ -123,12 +125,11 @@ function GroupsStep({ onSim }: { onSim: () => void }) {
 
 function FinalStep({ result }: { result: TournamentAPIResult }) {
   
-  // Função que nunca mais vai deixar o México ganhar acidentalmente!
   const getTeam = (apiName: string) => {
     const found = ALL_TEAMS.find(t => t.apiName.toLowerCase() === apiName.toLowerCase() || t.name.toLowerCase() === apiName.toLowerCase());
     if (!found) {
         console.warn(`⚠️ ALERTA: O Python retornou a seleção '${apiName}', mas ela não existe no frontend.`);
-        return ALL_TEAMS[0]; // Retorna Mexico pra não quebrar a tela
+        return ALL_TEAMS[0]; 
     }
     return found;
   };
@@ -140,6 +141,7 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
       <SectionTitle accent="CONCLUÍDA">Estatísticas Monte Carlo</SectionTitle>
       <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">O motor processou as probabilidades baseadas em {result.total_sims} torneios massivos</p>
 
+      {/* BLOCO 1: Grande Campeão e Top 5 Favoritos */}
       <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <Panel glow="gold" className="text-center">
           <CornerTicks />
@@ -174,34 +176,105 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
         </Panel>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-3">
-        <Panel>
-          <div className="text-center font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">Artilheiro da Copa</div>
-          <div className="mt-3 grid place-items-center"><PlayerAvatar name={result.top_scorers[0]?.player || "Desconhecido"} px={72} /></div>
-          <div className="mt-2 text-center font-display text-xl uppercase">{result.top_scorers[0]?.player}</div>
-          <div className="mt-3 text-center"><span className="font-display text-4xl text-neon">{result.top_scorers[0]?.avg_goals.toFixed(2)}</span> <span className="text-xs uppercase tracking-widest text-muted-foreground">gols em média</span></div>
+      {/* BLOCO 2: TOP 3 Listas Completas */}
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        
+        {/* Top 3 Artilheiros */}
+        <Panel glow="gold">
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-gold">Chuteira de Ouro</div>
+          <ol className="space-y-2">
+            {(result.top_scorers || []).slice(0, 3).map((s, i) => (
+              <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-gold tabular-nums">{i + 1}</span>
+                  <PlayerAvatar name={s.player} px={24} />
+                  <span className="text-xs truncate w-[85px]" title={s.player}>{s.player}</span>
+                </div>
+                <span className="font-display text-primary text-[11px] whitespace-nowrap">{s.avg_goals.toFixed(2)} G</span>
+              </motion.li>
+            ))}
+          </ol>
         </Panel>
-        <Panel>
-          <div className="text-center font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">Melhor Defesa</div>
-          {result.best_defense[0] && (
-            <>
-              <div className="mt-3 flex justify-center"><TeamFlag teamId={getTeam(result.best_defense[0].team).id} className="h-12 w-20" /></div>
-              <div className="mt-1 text-center font-display text-xl uppercase">{getTeam(result.best_defense[0].team).name}</div>
-              <div className="mt-3 text-center"><span className="font-display text-4xl text-neon">{result.best_defense[0].ga.toFixed(2)}</span> <span className="text-xs uppercase tracking-widest text-muted-foreground">gols sofridos/jogo</span></div>
-            </>
-          )}
+
+        {/* Top 3 Assistências */}
+        <Panel glow="neon">
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-neon">Líderes de Assist.</div>
+          <ol className="space-y-2">
+            {(result.top_assists || []).slice(0, 3).map((s, i) => (
+              <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-neon tabular-nums">{i + 1}</span>
+                  <PlayerAvatar name={s.player} px={24} />
+                  <span className="text-xs truncate w-[85px]" title={s.player}>{s.player}</span>
+                </div>
+                <span className="font-display text-primary text-[11px] whitespace-nowrap">{s.avg_assists.toFixed(2)} A</span>
+              </motion.li>
+            ))}
+            {(!result.top_assists || result.top_assists.length === 0) && (
+              <div className="text-xs text-muted-foreground p-3 text-center">Nenhuma assistência registrada</div>
+            )}
+          </ol>
         </Panel>
+
+        {/* Top 3 Ataques */}
         <Panel>
-          <div className="text-center font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">Melhor Ataque</div>
-          {result.best_attack[0] && (
-            <>
-              <div className="mt-3 flex justify-center"><TeamFlag teamId={getTeam(result.best_attack[0].team).id} className="h-12 w-20" /></div>
-              <div className="mt-1 text-center font-display text-xl uppercase">{getTeam(result.best_attack[0].team).name}</div>
-              <div className="mt-3 text-center"><span className="font-display text-4xl text-neon">{result.best_attack[0].gf.toFixed(2)}</span> <span className="text-xs uppercase tracking-widest text-muted-foreground">gols marcados/jogo</span></div>
-            </>
-          )}
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Ataques</div>
+          <ol className="space-y-2">
+            {(result.best_attack || []).slice(0, 3).map((t, i) => {
+              const teamData = getTeam(t.team);
+              return (
+                <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display tabular-nums text-muted-foreground">{i + 1}</span>
+                    <TeamFlag teamId={teamData.id} className="h-4 w-6" />
+                    <span className="text-xs uppercase tracking-wider truncate w-[80px]">{teamData.name}</span>
+                  </div>
+                  <span className="font-display text-primary text-[11px] whitespace-nowrap">{t.gf.toFixed(2)} G/J</span>
+                </motion.li>
+              );
+            })}
+          </ol>
+        </Panel>
+
+        {/* Top 3 Defesas */}
+        <Panel>
+          <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Defesas</div>
+          <ol className="space-y-2">
+            {(result.best_defense || []).slice(0, 3).map((t, i) => {
+              const teamData = getTeam(t.team);
+              return (
+                <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display tabular-nums text-muted-foreground">{i + 1}</span>
+                    <TeamFlag teamId={teamData.id} className="h-4 w-6" />
+                    <span className="text-xs uppercase tracking-wider truncate w-[80px]">{teamData.name}</span>
+                  </div>
+                  <span className="font-display text-primary text-[11px] whitespace-nowrap">{t.ga.toFixed(2)} GS/J</span>
+                </motion.li>
+              );
+            })}
+          </ol>
         </Panel>
       </div>
+
+      {/* BLOCO 3: Painel Extra - A Cinderela / Zebra */}
+      {result.biggest_zebra && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Panel glow="neon" className="flex flex-col sm:flex-row items-center justify-between gap-4 border-dashed border-neon/50 bg-neon/5">
+             <div className="flex items-center gap-4">
+                <div className="text-4xl">📉</div>
+                <div>
+                   <div className="font-display text-sm uppercase tracking-[0.3em] text-neon">A Grande Zebra Matemática</div>
+                   <div className="text-xs text-muted-foreground">A seleção de baixo ELO com a maior propensão estatística a surpreender na Copa.</div>
+                </div>
+             </div>
+             <div className="flex items-center gap-3 bg-background/60 px-4 py-2 rounded-md border border-border/50">
+                <TeamFlag teamId={getTeam(result.biggest_zebra.team).id} className="h-6 w-10" />
+                <span className="font-display uppercase tracking-widest text-lg">{getTeam(result.biggest_zebra.team).name}</span>
+             </div>
+          </Panel>
+        </motion.div>
+      )}
 
       <div className="flex flex-wrap justify-between gap-3">
         <Link to="/"><NeonButton variant="ghost"><ArrowLeft className="h-4 w-4" /> Voltar ao Menu</NeonButton></Link>
