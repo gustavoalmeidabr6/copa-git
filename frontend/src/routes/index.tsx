@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ALL_TEAMS } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, CornerTicks } from "@/components/sim/ui";
@@ -26,6 +26,14 @@ function Index() {
   const teams = FAVS.map((id) => ALL_TEAMS.find((t) => t.id === id)!);
   const team = teams[active];
 
+  // Alterna a seleção automaticamente a cada 2 segundos
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % teams.length);
+    }, 2000);
+    return () => clearInterval(timer); // Limpa o intervalo ao desmontar o componente
+  }, [teams.length]);
+
   return (
     <NeonChrome>
       <main className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8">
@@ -47,7 +55,19 @@ function Index() {
             <p className="text-sm uppercase tracking-[0.5em] text-primary/80">Ultra</p>
             <h1 className="mt-1 text-6xl font-bold uppercase leading-none md:text-8xl">
               <span className="block">Simulador</span>
-              <span className="mt-1 block shimmer-text">Copa do Mundo 2026</span>
+              <span
+                className="mt-1 block"
+                style={{
+                  background: 'linear-gradient(90deg, #fff 0%, #ffe566 12%, #ffb347 28%, #ff6b35 45%, #ff4081 62%, #e040fb 76%, #ffb347 88%, #fff 100%)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  animation: 'gradientShift 4s linear infinite',
+                }}
+              >
+                Copa do Mundo 2026
+              </span>
             </h1>
           </motion.div>
 

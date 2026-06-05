@@ -1,11 +1,12 @@
 """
-main.py — VERSÃO v6 (A Versão Definitiva com Dashboard do Torneio)
+main.py — VERSÃO v7 (Upgrade para 400 Simulações)
 
 MUDANÇAS:
-  - Aba de Torneio reconstruída: Agora exibe um Dashboard Estatístico de Monte Carlo.
-  - Botão para rodar 200 Copas do Mundo em tempo real.
-  - Relatório formatado com Emojis mostrando Favoritos, Artilheiros, Garçons,
-    Melhores Ataques/Defesas e a grande Zebra da Copa!
+  - Lei dos Grandes Números: As chamadas lógicas do simulador passaram de 200 
+    para 400 simulações (tanto para Partida Única quanto para o Torneio).
+  - O ruído de Monte Carlo cai drasticamente, estabilizando os rankings de
+    Favoritos, Artilheiros e Garçons, sem perder a agilidade do Motor Multicore.
+  - Toda a Interface de Usuário (Textos, Botões e Logs) atualizada para refletir "400".
 """
 
 import customtkinter as ctk
@@ -70,7 +71,7 @@ class WorldCupApp(ctk.CTk):
         self._build_tournament_tab()
 
     # =========================================================================
-    # ABA 1: PARTIDA ÚNICA (MANTIDA E MELHORADA)
+    # ABA 1: PARTIDA ÚNICA 
     # =========================================================================
     def _build_single_match_tab(self):
         tab = self.tabview.tab("Partida Única")
@@ -172,17 +173,18 @@ class WorldCupApp(ctk.CTk):
         btn: ctk.CTkButton,
     ):
         try:
+            # ---> Upgrade para 400 simulações de partida
             res = self.simulator.simulate_match(
                 home, away, 
-                num_simulations=200,
+                num_simulations=400,
                 home_excluded=home_excluded,
                 away_excluded=away_excluded
             )
 
             scores_str = "\n".join(f"      {sc}: {pct:.1f}%" for sc, pct in res.get("most_likely_scores", {}).items())
-            scorers_str = "\n".join(f"      {p}: {g} gols em 200 sim" for p, g in res.get("top_scorers", []))
+            scorers_str = "\n".join(f"      {p}: {g} gols em 400 sim" for p, g in res.get("top_scorers", []))
             
-            assists_str = "\n".join(f"      {p}: {a} assistências em 200 sim" for p, a in res.get("top_assists", []))
+            assists_str = "\n".join(f"      {p}: {a} assistências em 400 sim" for p, a in res.get("top_assists", []))
             if not assists_str: assists_str = "      Nenhuma assistência registrada."
             
             ratings_str = "\n".join(f"      {p}: {r:.2f} nota média" for p, r in res.get("top_ratings", []))
@@ -206,7 +208,7 @@ class WorldCupApp(ctk.CTk):
                 excl_str += "\n"
 
             output = (
-                f"=== RELATÓRIO QUANT (200 SIMULAÇÕES) ===\n"
+                f"=== RELATÓRIO QUANT (400 SIMULAÇÕES) ===\n"
                 f"[{home}] vs [{away}]\n"
                 f"🏟️  Sede: {stadium_info}\n\n"
                 f"{excl_str}"
@@ -216,13 +218,13 @@ class WorldCupApp(ctk.CTk):
                 f"📊 CALIBRAÇÃO DO MODELO ML:\n{calib_str}\n\n"
                 f"🎯 PROBABILIDADES ANALÍTICAS (sem variância):\n"
                 f"   Vitória {home}: {res.get('home_win_prob', 0):.1f}% | Empate: {res.get('draw_prob', 0):.1f}% | Vitória {away}: {res.get('away_win_prob', 0):.1f}%\n\n"
-                f"🔥 PLACAR PROVÁVEL MÉDIO (Média exata das 200 simulações):\n   >>> {res.get('expected_score', 'Indisponível')} <<<\n\n"
+                f"🔥 PLACAR PROVÁVEL MÉDIO (Média exata das 400 simulações):\n   >>> {res.get('expected_score', 'Indisponível')} <<<\n\n"
                 f"🎲 PLACARES MAIS FREQUENTES (analítico):\n{scores_str}\n\n"
-                f"🌟 ARTILHEIROS (200 simulações Monte Carlo):\n{scorers_str}\n\n"
+                f"🌟 ARTILHEIROS (400 simulações Monte Carlo):\n{scorers_str}\n\n"
                 f"👟 GARÇONS / ASSISTÊNCIAS (Mais raras que gols):\n{assists_str}\n\n"
                 f"⭐ MELHORES EM CAMPO (nota média):\n{ratings_str}\n\n"
                 f"{'─'*46}\n"
-                f"📋 LOG DAS 200 SIMULAÇÕES:\n"
+                f"📋 LOG DAS 400 SIMULAÇÕES:\n"
             )
             output += "\n".join(res.get("sim_logs", []))
 
@@ -236,7 +238,7 @@ class WorldCupApp(ctk.CTk):
             except Exception: pass
 
     # =========================================================================
-    # ABA 2: NOVO DASHBOARD DO TORNEIO (MONTE CARLO)
+    # ABA 2: DASHBOARD DO TORNEIO (MONTE CARLO)
     # =========================================================================
     def _build_tournament_tab(self):
         tab = self.tabview.tab("Simulação do Torneio (Monte Carlo)")
@@ -246,7 +248,7 @@ class WorldCupApp(ctk.CTk):
 
         ctk.CTkLabel(
             top_frame, 
-            text="Simulação Quântica de 200 Copas do Mundo Simultâneas\n(Considera Zebras, Pênaltis e Cruzamentos Reais da FIFA)",
+            text="Simulação Quântica de 400 Copas do Mundo Simultâneas\n(Considera Zebras, Pênaltis e Cruzamentos Reais da FIFA)",
             font=ctk.CTkFont(size=14),
             justify="center"
         ).pack(pady=(0, 10))
@@ -254,7 +256,7 @@ class WorldCupApp(ctk.CTk):
         self.tourn_btn = ctk.CTkButton(
             top_frame, text="🌍  INICIAR MOTOR DE TORNEIOS (Processamento Pesado)", height=50,
             command=self._start_tournament_sim,
-            fg_color="#8B0000", hover_color="#A52A2A"  # Um vermelho escuro para dar peso ao botão
+            fg_color="#8B0000", hover_color="#A52A2A" 
         )
         self.tourn_btn.pack(pady=5)
 
@@ -270,18 +272,18 @@ class WorldCupApp(ctk.CTk):
             " 1. Criar os grupos oficiais da Copa 2026.\n"
             " 2. Rolar probabilidades para TODAS as 104 partidas do torneio.\n"
             " 3. Aplicar a roleta dos pênaltis nos mata-matas empatados.\n"
-            " 4. Repetir esse processo 200 VEZES (simulando 20.800 partidas).\n\n"
+            " 4. Repetir esse processo 400 VEZES (simulando 41.600 partidas).\n\n"
             "Resultado esperado:\n"
             " - Você verá os maiores favoritos estatísticos a erguer a taça.\n"
-            " - Estatísticas de artilheiros e garçons ao longo do torneio inteiro.\n"
+            " - Estatísticas de artilheiros e garçons com variância matemática estável.\n"
             " - A 'Maior Zebra' matemática que pode chocar o mundo.\n\n"
             "⏳ Aguarde alguns segundos após o clique, a CPU trabalhará em 100%!"
         )
         self._write(self.tourn_text, instrucoes)
 
     def _start_tournament_sim(self):
-        self.tourn_btn.configure(state="disabled", text="⏳  Simulando 200 Universos Paralelos... Aguarde!")
-        self._write(self.tourn_text, "🚀 Processando os lambdas e rolando os dados... Isso levará cerca de 10-20 segundos na CPU.")
+        self.tourn_btn.configure(state="disabled", text="⏳  Simulando 400 Universos Paralelos... Aguarde!")
+        self._write(self.tourn_text, "🚀 Processando os lambdas e rolando os dados... Aproveitando 100% dos núcleos do CPU.")
         
         threading.Thread(
             target=self._run_tournament_logic,
@@ -291,8 +293,8 @@ class WorldCupApp(ctk.CTk):
 
     def _run_tournament_logic(self, textbox: ctk.CTkTextbox, btn: ctk.CTkButton):
         try:
-            # Roda as 200 copas chamando o simulador
-            res = self.simulator.run_full_tournament(num_tournaments=200)
+            # ---> Upgrade para 400 Copas do Mundo completas 
+            res = self.simulator.run_full_tournament(num_tournaments=400)
 
             out =  f"🌍 =============================================================== 🌍\n"
             out += f"      RELATÓRIO QUANTITATIVO: {res['total_sims']} COPAS DO MUNDO SIMULADAS\n"
@@ -324,8 +326,8 @@ class WorldCupApp(ctk.CTk):
                 z = res["biggest_zebra"]
                 out += f"\n📉 A CINDERELA (A Maior Zebra Matemática do Torneio):\n"
                 out += f"   • Seleção: {z['team']} (ELO Baixo: {int(z['elo'])})\n"
-                out += f"   • Por que? Nas 200 Copas, essa seleção acumulou em média {z['avg_stage_score']:.1f} pts de avanço\n"
-                out += f"     (Conseguindo escapar dos Grupos ou até ir mais longe mesmo sendo considerada 'fraca')\n"
+                out += f"   • Por que? Nas 400 Copas, essa seleção acumulou em média {z['avg_stage_score']:.1f} pts de avanço\n"
+                out += f"     (Conseguindo escapar dos Grupos ou ir mais longe mesmo sendo considerada 'fraca')\n"
 
             self._write(textbox, out)
 
@@ -334,7 +336,7 @@ class WorldCupApp(ctk.CTk):
             self._write(textbox, f"❌ Erro Crítico no Torneio:\n{exc}\n\n{traceback.format_exc()}")
         finally:
             try: 
-                btn.configure(state="normal", text="🌍  RODAR NOVAMENTE (Mais 200 Copas)")
+                btn.configure(state="normal", text="🌍  RODAR NOVAMENTE (Mais 400 Copas)")
             except Exception: pass
 
     # =========================================================================
@@ -346,7 +348,6 @@ class WorldCupApp(ctk.CTk):
         textbox.insert("0.0", text)
         textbox.configure(state="disabled")
 
-    # MANTIDA PARA COMPATIBILIDADE DE TESTE INTERNO, NÃO APAGADA:
     def _run_from_list(self, home: str, away: str):
         pass
 

@@ -1,0 +1,628 @@
+Confederacao,Selecao,Formacao,Jogador,Posicao,Sub_Funcao_Tatica
+UEFA,Inglaterra,4-2-3-1,Jordan Pickford,GK,Sweeper Keeper
+UEFA,Inglaterra,4-2-3-1,Reece James,RB,Attacking Fullback
+UEFA,Inglaterra,4-2-3-1,Marc Guehi,CB,Ball-Playing Defender
+UEFA,Inglaterra,4-2-3-1,Ezri Konsa,CB,Central Defender
+UEFA,Inglaterra,4-2-3-1,Nico O'Reilly,LB,Inverted Fullback
+UEFA,Inglaterra,4-2-3-1,Declan Rice,CDM,Holding Midfielder
+UEFA,Inglaterra,4-2-3-1,Elliot Anderson,CDM,Box-to-Box Midfielder
+UEFA,Inglaterra,4-2-3-1,Bukayo Saka,RW,Inside Forward
+UEFA,Inglaterra,4-2-3-1,Jude Bellingham,CAM,Advanced Playmaker
+UEFA,Inglaterra,4-2-3-1,Eberechi Eze,LW,Wide Playmaker
+UEFA,Inglaterra,4-2-3-1,Harry Kane,ST,Deep-Lying Forward
+UEFA,Escócia,4-1-4-1,Craig Gordon,GK,Standard Goalkeeper
+UEFA,Escócia,4-1-4-1,Aaron Hickey,RB,Attacking Fullback
+UEFA,Escócia,4-1-4-1,Grant Hanley,CB,Central Defender
+UEFA,Escócia,4-1-4-1,Scott McKenna,CB,Central Defender
+UEFA,Escócia,4-1-4-1,Andy Robertson,LB,Complete Wing-Back
+UEFA,Escócia,4-1-4-1,Lewis Ferguson,CDM,Deep-Lying Playmaker
+UEFA,Escócia,4-1-4-1,Ben Gannon-Doak,RM,Traditional Winger
+UEFA,Escócia,4-1-4-1,Ryan Christie,CM,Advanced Playmaker
+UEFA,Escócia,4-1-4-1,Scott McTominay,CM,Box-to-Box Midfielder
+UEFA,Escócia,4-1-4-1,John McGinn,LM,Wide Midfielder
+UEFA,Escócia,4-1-4-1,Che Adams,ST,Pressing Forward
+UEFA,Espanha,4-3-3,Unai Simon,GK,Sweeper Keeper
+UEFA,Espanha,4-3-3,Marcos Llorente,RB,Inverted Fullback
+UEFA,Espanha,4-3-3,Pau Cubarsí,CB,Ball-Playing Defender
+UEFA,Espanha,4-3-3,Aymeric Laporte,CB,Central Defender
+UEFA,Espanha,4-3-3,Marc Cucurella,LB,Attacking Fullback
+UEFA,Espanha,4-3-3,Rodri,CDM,Deep-Lying Playmaker
+UEFA,Espanha,4-3-3,Pedri,CM,Advanced Playmaker
+UEFA,Espanha,4-3-3,Fabian Ruiz,CM,Mezzala
+UEFA,Espanha,4-3-3,Lamine Yamal,RW,Inside Forward
+UEFA,Espanha,4-3-3,Nico Williams,LW,Traditional Winger
+UEFA,Espanha,4-3-3,Mikel Oyarzabal,ST,False 9
+UEFA,Holanda,4-2-3-1,Bart Verbruggen,GK,Sweeper Keeper
+UEFA,Holanda,4-2-3-1,Denzel Dumfries,RB,Wing-Back
+UEFA,Holanda,4-2-3-1,Virgil van Dijk,CB,Central Defender
+UEFA,Holanda,4-2-3-1,Nathan Aké,CB,Ball-Playing Defender
+UEFA,Holanda,4-2-3-1,Micky van de Ven,LB,Defensive Fullback
+UEFA,Holanda,4-2-3-1,Frenkie de Jong,CDM,Deep-Lying Playmaker
+UEFA,Holanda,4-2-3-1,Ryan Gravenberch,CDM,Box-to-Box Midfielder
+UEFA,Holanda,4-2-3-1,Tijjani Reijnders,CAM,Shadow Striker
+UEFA,Holanda,4-2-3-1,Donyell Malen,RW,Inside Forward
+UEFA,Holanda,4-2-3-1,Cody Gakpo,LW,Inside Forward
+UEFA,Holanda,4-2-3-1,Memphis Depay,ST,Complete Forward
+UEFA,Turquia,3-4-2-1,Ugurcan Cakir,GK,Standard Goalkeeper
+UEFA,Turquia,3-4-2-1,Merih Demiral,CB,Central Defender
+UEFA,Turquia,3-4-2-1,Ozan Kabak,CB,Ball-Playing Defender
+UEFA,Turquia,3-4-2-1,Abdulkerim Bardakci,CB,Wide Center Back
+UEFA,Turquia,3-4-2-1,Zeki Celik,RM,Defensive Winger
+UEFA,Turquia,3-4-2-1,Hakan Calhanoglu,CM,Deep-Lying Playmaker
+UEFA,Turquia,3-4-2-1,Orkun Kokcu,CM,Box-to-Box Midfielder
+UEFA,Turquia,3-4-2-1,Ozer,LM,Wide Midfielder (Data Anomaly)
+UEFA,Turquia,3-4-2-1,Arda Guler,CAM,Advanced Playmaker
+UEFA,Turquia,3-4-2-1,Kenan Yildiz,CAM,Shadow Striker
+UEFA,Turquia,3-4-2-1,Kerem Akturkoglu,ST,False 9
+UEFA,Áustria,4-2-3-1,Alexander Schlager,GK,Sweeper Keeper
+UEFA,Áustria,4-2-3-1,Konrad Laimer,RB,Inverted Wing-Back
+UEFA,Áustria,4-2-3-1,Philipp Lienhart,CB,Central Defender
+UEFA,Áustria,4-2-3-1,David Alaba,CB,Ball-Playing Defender
+UEFA,Áustria,4-2-3-1,Phillipp Mwene,LB,Attacking Fullback
+UEFA,Áustria,4-2-3-1,Xaver Schlager,CDM,Ball-Winning Midfielder
+UEFA,Áustria,4-2-3-1,Nicolas Seiwald,CDM,Deep-Lying Playmaker
+UEFA,Áustria,4-2-3-1,Christoph Baumgartner,CAM,Advanced Playmaker
+UEFA,Áustria,4-2-3-1,Patrick Wimmer,RW,Inside Forward
+UEFA,Áustria,4-2-3-1,Marcel Sabitzer,LW,Wide Playmaker
+UEFA,Áustria,4-2-3-1,Marko Arnautovic,ST,Target Man
+UEFA,Suíça,4-3-3,Gregor Kobel,GK,Standard Goalkeeper
+UEFA,Suíça,4-3-3,Silvan Widmer,RB,Attacking Fullback
+UEFA,Suíça,4-3-3,Manuel Akanji,CB,Ball-Playing Defender
+UEFA,Suíça,4-3-3,Nico Elvedi,CB,Central Defender
+UEFA,Suíça,4-3-3,Ricardo Rodriguez,LB,Defensive Fullback
+UEFA,Suíça,4-3-3,Remo Freuler,CM,Box-to-Box Midfielder
+UEFA,Suíça,4-3-3,Granit Xhaka,CM,Deep-Lying Playmaker
+UEFA,Suíça,4-3-3,Fabian Rieder,CM,Advanced Playmaker
+UEFA,Suíça,4-3-3,Dan Ndoye,RW,Traditional Winger
+UEFA,Suíça,4-3-3,Rubén Vargas,LW,Inside Forward
+UEFA,Suíça,4-3-3,Breel Embolo,ST,Advanced Forward
+UEFA,Suécia,3-4-2-1,Kristoffer Nordfeldt,GK,Standard Goalkeeper
+UEFA,Suécia,3-4-2-1,Carl Starfelt,CB,Central Defender
+UEFA,Suécia,3-4-2-1,Gustaf Lagerbielke,CB,Ball-Playing Defender
+UEFA,Suécia,3-4-2-1,Victor Lindelof,CB,Wide Center Back
+UEFA,Suécia,3-4-2-1,Gustav Svensson,RM,Wide Midfielder
+UEFA,Suécia,3-4-2-1,Jesper Karlstrom,CM,Ball-Winning Midfielder
+UEFA,Suécia,3-4-2-1,Yasin Ayari,CM,Advanced Playmaker
+UEFA,Suécia,3-4-2-1,Gabriel Gudmundsson,LM,Wide Midfielder
+UEFA,Suécia,3-4-2-1,Benjamin Nygren,CAM,Shadow Striker
+UEFA,Suécia,3-4-2-1,Anthony Elanga,CAM,Inside Forward
+UEFA,Suécia,3-4-2-1,Viktor Gyokeres,ST,Complete Forward
+UEFA,Bélgica,4-2-3-1,Thibaut Courtois,GK,Sweeper Keeper
+UEFA,Bélgica,4-2-3-1,Timothy Castagne,RB,Attacking Fullback
+UEFA,Bélgica,4-2-3-1,Zeno Debast,CB,Ball-Playing Defender
+UEFA,Bélgica,4-2-3-1,Arthur Theate,CB,Central Defender
+UEFA,Bélgica,4-2-3-1,Maxim De Cuyper,LB,Attacking Fullback
+UEFA,Bélgica,4-2-3-1,Youri Tielemans,CDM,Deep-Lying Playmaker
+UEFA,Bélgica,4-2-3-1,Amadou Onana,CDM,Ball-Winning Midfielder
+UEFA,Bélgica,4-2-3-1,Kevin De Bruyne,CAM,Advanced Playmaker
+UEFA,Bélgica,4-2-3-1,Jeremy Doku,RW,Winger
+UEFA,Bélgica,4-2-3-1,Leandro Trossard,LW,Inside Forward
+UEFA,Bélgica,4-2-3-1,Charles De Ketelaere,ST,False 9
+UEFA,Bósnia,4-4-2,Nikola Vasilj,GK,Standard Goalkeeper
+UEFA,Bósnia,4-4-2,Amar Dedic,RB,Attacking Fullback
+UEFA,Bósnia,4-4-2,Nikola Katic,CB,Central Defender
+UEFA,Bósnia,4-4-2,Tarik Muharemovic,CB,Ball-Playing Defender
+UEFA,Bósnia,4-4-2,Sead Kolasinac,LB,Defensive Fullback
+UEFA,Bósnia,4-4-2,Esmir Bajraktarevic,RM,Winger
+UEFA,Bósnia,4-4-2,Ivan Sunjic,CM,Ball-Winning Midfielder
+UEFA,Bósnia,4-4-2,Benjamin Tahirovic,CM,Deep-Lying Playmaker
+UEFA,Bósnia,4-4-2,Amar Memic,LM,Wide Midfielder
+UEFA,Bósnia,4-4-2,Ermedin Demirovic,ST,Advanced Forward
+UEFA,Bósnia,4-4-2,Edin Dzeko,ST,Target Man
+UEFA,Noruega,4-3-3,Ørjan Nyland,GK,Standard Goalkeeper
+UEFA,Noruega,4-3-3,Julian Ryerson,RB,Defensive Fullback
+UEFA,Noruega,4-3-3,Colin Heggem,CB,Central Defender
+UEFA,Noruega,4-3-3,Leo Ostigard,CB,Ball-Playing Defender
+UEFA,Noruega,4-3-3,David Møller Wolfe,LB,Attacking Fullback
+UEFA,Noruega,4-3-3,Kristian Thorstvedt,CM,Box-to-Box Midfielder
+UEFA,Noruega,4-3-3,Patrick Berg,CM,Deep-Lying Playmaker
+UEFA,Noruega,4-3-3,Sander Berge,CM,Ball-Winning Midfielder
+UEFA,Noruega,4-3-3,Alexander Sorloth,RW,Target Man (Wide)
+UEFA,Noruega,4-3-3,Antonio Nusa,LW,Inside Forward
+UEFA,Noruega,4-3-3,Erling Haaland,ST,Poacher
+UEFA,Croácia,4-2-3-1,Livakovic,GK,N/A
+UEFA,Croácia,4-2-3-1,Stanisic,RB,N/A
+UEFA,Croácia,4-2-3-1,Sutalo,CB,N/A
+UEFA,Croácia,4-2-3-1,Caleta-Car,CB,N/A
+UEFA,Croácia,4-2-3-1,Gvardiol,LB,N/A
+UEFA,Croácia,4-2-3-1,Sucic,CDM,N/A
+UEFA,Croácia,4-2-3-1,Modric,CDM,N/A
+UEFA,Croácia,4-2-3-1,Pasalic,RW,N/A
+UEFA,Croácia,4-2-3-1,Kramaric,CAM,N/A
+UEFA,Croácia,4-2-3-1,Perisic,LW,N/A
+UEFA,Croácia,4-2-3-1,Budimir,ST,N/A
+UEFA,França,4-2-3-1,Maignan,GK,N/A
+UEFA,França,4-2-3-1,Koundé,RB,N/A
+UEFA,França,4-2-3-1,Saliba,CB,N/A
+UEFA,França,4-2-3-1,Upamecano,CB,N/A
+UEFA,França,4-2-3-1,Hernandez,LB,N/A
+UEFA,França,4-2-3-1,Rabiot,CDM,N/A
+UEFA,França,4-2-3-1,Tchouameni,CDM,N/A
+UEFA,França,4-2-3-1,Dembelé,RW,N/A
+UEFA,França,4-2-3-1,Olise,CAM,N/A
+UEFA,França,4-2-3-1,Doué,LW,N/A
+UEFA,França,4-2-3-1,Mbappé,ST,N/A
+UEFA,Alemanha,4-2-3-1,Neuer,GK,N/A
+UEFA,Alemanha,4-2-3-1,Kimmich,RB,N/A
+UEFA,Alemanha,4-2-3-1,Tah,CB,N/A
+UEFA,Alemanha,4-2-3-1,Schlotterbeck,CB,N/A
+UEFA,Alemanha,4-2-3-1,Raum,LB,N/A
+UEFA,Alemanha,4-2-3-1,Pavlovic,CDM,N/A
+UEFA,Alemanha,4-2-3-1,Goretzka,CDM,N/A
+UEFA,Alemanha,4-2-3-1,Sané,RW,N/A
+UEFA,Alemanha,4-2-3-1,Musiala,CAM,N/A
+UEFA,Alemanha,4-2-3-1,Wirtz,LW,N/A
+UEFA,Alemanha,4-2-3-1,Havertz,ST,N/A
+UEFA,Portugal,4-3-3,Costa,GK,N/A
+UEFA,Portugal,4-3-3,Cancelo,RB,N/A
+UEFA,Portugal,4-3-3,Ruben Dias,CB,N/A
+UEFA,Portugal,4-3-3,Inacio,CB,N/A
+UEFA,Portugal,4-3-3,Nuno Mendes,LB,N/A
+UEFA,Portugal,4-3-3,Joao Neves,CM,N/A
+UEFA,Portugal,4-3-3,Vitinha,CM,N/A
+UEFA,Portugal,4-3-3,Bruno Fernandes,CM,N/A
+UEFA,Portugal,4-3-3,Bernardo Silva,RW,N/A
+UEFA,Portugal,4-3-3,Cristiano Ronaldo,ST,N/A
+UEFA,Portugal,4-3-3,Joao Felix,LW,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Hornicek,GK,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Chaloupek,CB,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Hranac,CB,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Krejci,CB,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Coufal,RM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Soucek,CM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Darida,CM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Zeleny,LM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Provod,CAM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Sulc,CAM,N/A
+UEFA,Rep. Tcheca,3-4-2-1,Schick,ST,N/A
+CONMEBOL,Brasil,4-4-2,Alisson Becker,GK,Sweeper Keeper
+CONMEBOL,Brasil,4-4-2,Wesley,RB,Attacking Fullback
+CONMEBOL,Brasil,4-4-2,Marquinhos,CB,Ball-Playing Defender
+CONMEBOL,Brasil,4-4-2,Gabriel Magalhães,CB,Central Defender
+CONMEBOL,Brasil,4-4-2,Douglas Santos,LB,Support Fullback
+CONMEBOL,Brasil,4-4-2,Casemiro,CM,Ball-Winning Midfielder
+CONMEBOL,Brasil,4-4-2,Bruno Guimaraes,CM,Deep-Lying Playmaker
+CONMEBOL,Brasil,4-4-2,Raphinha,RM,Wide Playmaker
+CONMEBOL,Brasil,4-4-2,Luiz Henrique,LM,Winger
+CONMEBOL,Brasil,4-4-2,Vinicius Junior,ST,Advanced Forward
+CONMEBOL,Brasil,4-4-2,Matheus Cunha,ST,Complete Forward
+CONMEBOL,Uruguai,4-3-3,Sergio Rochet,GK,Standard Goalkeeper
+CONMEBOL,Uruguai,4-3-3,Guillermo Varela,RB,Attacking Fullback
+CONMEBOL,Uruguai,4-3-3,Jose Maria Gimenez,CB,Central Defender
+CONMEBOL,Uruguai,4-3-3,Ronald Araujo,CB,Ball-Playing Defender
+CONMEBOL,Uruguai,4-3-3,Mathias Olivera,LB,Attacking Fullback
+CONMEBOL,Uruguai,4-3-3,Manuel Ugarte,CM,Ball-Winning Midfielder
+CONMEBOL,Uruguai,4-3-3,Federico Valverde,CM,Box-to-Box Midfielder
+CONMEBOL,Uruguai,4-3-3,Rodrigo Bentancur,CM,Deep-Lying Playmaker
+CONMEBOL,Uruguai,4-3-3,Agustin Canobbio,RW,Winger
+CONMEBOL,Uruguai,4-3-3,Brian Rodriguez,LW,Inside Forward
+CONMEBOL,Uruguai,4-3-3,Darwin Nunez,ST,Advanced Forward
+CONMEBOL,Paraguai,4-4-2,Orlando Gill,GK,Standard Goalkeeper
+CONMEBOL,Paraguai,4-4-2,Juan Jose Caceres,RB,Defensive Fullback
+CONMEBOL,Paraguai,4-4-2,Gustavo Gomez,CB,Central Defender
+CONMEBOL,Paraguai,4-4-2,Omar Alderete,CB,Ball-Playing Defender
+CONMEBOL,Paraguai,4-4-2,Junior Alonso,LB,Support Fullback
+CONMEBOL,Paraguai,4-4-2,Diego Gomez,RM,Wide Midfielder
+CONMEBOL,Paraguai,4-4-2,Braian Ojeda,CM,Deep-Lying Playmaker
+CONMEBOL,Paraguai,4-4-2,Damian Bobadilla,CM,Box-to-Box Midfielder
+CONMEBOL,Paraguai,4-4-2,Miguel Almiron,LM,Inverted Winger
+CONMEBOL,Paraguai,4-4-2,Julio Enciso,ST,Deep-Lying Forward
+CONMEBOL,Paraguai,4-4-2,Gabriel Avalos,ST,Target Man
+CONMEBOL,Colômbia,4-2-3-1,Alvaro Montero,GK,Standard Goalkeeper
+CONMEBOL,Colômbia,4-2-3-1,Daniel Munoz,RB,Attacking Fullback
+CONMEBOL,Colômbia,4-2-3-1,Davinson Sanchez,CB,Central Defender
+CONMEBOL,Colômbia,4-2-3-1,Yerry Mina,CB,Target Defender
+CONMEBOL,Colômbia,4-2-3-1,Johan Mojica,LB,Wing-Back
+CONMEBOL,Colômbia,4-2-3-1,Jefferson Lerma,CDM,Ball-Winning Midfielder
+CONMEBOL,Colômbia,4-2-3-1,Richard Rios,CDM,Box-to-Box Midfielder
+CONMEBOL,Colômbia,4-2-3-1,Jhon Arias,RW,Wide Playmaker
+CONMEBOL,Colômbia,4-2-3-1,James Rodriguez,CAM,Advanced Playmaker
+CONMEBOL,Colômbia,4-2-3-1,Luis Diaz,LW,Inside Forward
+CONMEBOL,Colômbia,4-2-3-1,Luis Suarez,ST,Advanced Forward
+CONMEBOL,Argentina,4-3-3,Martinez,GK,N/A
+CONMEBOL,Argentina,4-3-3,Molina,RB,N/A
+CONMEBOL,Argentina,4-3-3,Otamendi,CB,N/A
+CONMEBOL,Argentina,4-3-3,Romero,CB,N/A
+CONMEBOL,Argentina,4-3-3,Tagliafico,LB,N/A
+CONMEBOL,Argentina,4-3-3,Mac Allister,CM,N/A
+CONMEBOL,Argentina,4-3-3,Paredes,CM,N/A
+CONMEBOL,Argentina,4-3-3,Fernandez,CM,N/A
+CONMEBOL,Argentina,4-3-3,Messi,RW,N/A
+CONMEBOL,Argentina,4-3-3,Alvarez,ST,N/A
+CONMEBOL,Argentina,4-3-3,Almada,LW,N/A
+CONMEBOL,Equador,4-3-3,Galindez,GK,N/A
+CONMEBOL,Equador,4-3-3,Preciado,RB,N/A
+CONMEBOL,Equador,4-3-3,Ordonez,CB,N/A
+CONMEBOL,Equador,4-3-3,Pacho,CB,N/A
+CONMEBOL,Equador,4-3-3,HIncapié,LB,N/A
+CONMEBOL,Equador,4-3-3,Vite,CM,N/A
+CONMEBOL,Equador,4-3-3,Caicedo,CM,N/A
+CONMEBOL,Equador,4-3-3,Castillo,CM,N/A
+CONMEBOL,Equador,4-3-3,Yeboah,RW,N/A
+CONMEBOL,Equador,4-3-3,Valencia,ST,N/A
+CONMEBOL,Equador,4-3-3,Angulo,LW,N/A
+CONCACAF,EUA,4-3-3,Matt Freese,GK,Sweeper Keeper
+CONCACAF,EUA,4-3-3,Alex Freeman,RB,Attacking Fullback
+CONCACAF,EUA,4-3-3,Chris Richards,CB,Ball-Playing Defender
+CONCACAF,EUA,4-3-3,Auston Trusty,CB,Central Defender
+CONCACAF,EUA,4-3-3,Antonee Robinson,LB,Complete Wing-Back
+CONCACAF,EUA,4-3-3,Tyler Adams,CM,Ball-Winning Midfielder
+CONCACAF,EUA,4-3-3,Weston McKennie,CM,Box-to-Box Midfielder
+CONCACAF,EUA,4-3-3,Sebastian Berhalter,CM,Deep-Lying Playmaker
+CONCACAF,EUA,4-3-3,Timothy Weah,RW,Winger
+CONCACAF,EUA,4-3-3,Christian Pulisic,LW,Inside Forward
+CONCACAF,EUA,4-3-3,Folarin Balogun,ST,Advanced Forward
+CONCACAF,Canadá,4-4-2,Maxime Crepeau,GK,Standard Goalkeeper
+CONCACAF,Canadá,4-4-2,Niko Sigur,RB,Defensive Fullback
+CONCACAF,Canadá,4-4-2,Moise Bombito,CB,Ball-Playing Defender
+CONCACAF,Canadá,4-4-2,Alfie Jones,CB,Central Defender
+CONCACAF,Canadá,4-4-2,Richie Laryea,LB,Attacking Fullback
+CONCACAF,Canadá,4-4-2,Tajon Buchanan,RM,Winger
+CONCACAF,Canadá,4-4-2,Ismael Koné,CM,Box-to-Box Midfielder
+CONCACAF,Canadá,4-4-2,Stephen Eustaquio,CM,Deep-Lying Playmaker
+CONCACAF,Canadá,4-4-2,Alphonso Davies,LM,Inverted Winger
+CONCACAF,Canadá,4-4-2,Tani Oluwaseyi,ST,Pressing Forward
+CONCACAF,Canadá,4-4-2,Jonathan David,ST,Complete Forward
+CONCACAF,México,4-3-3,Raul Rangel,GK,Standard Goalkeeper
+CONCACAF,México,4-3-3,Jorge Sanchez,RB,Attacking Fullback
+CONCACAF,México,4-3-3,Cesar Montes,CB,Central Defender
+CONCACAF,México,4-3-3,Johan Vasquez,CB,Ball-Playing Defender
+CONCACAF,México,4-3-3,Jesus Gallardo,LB,Wing-Back
+CONCACAF,México,4-3-3,Edson Alvarez,CM,Ball-Winning Midfielder
+CONCACAF,México,4-3-3,Orbelin Pineda,CM,Box-to-Box Midfielder
+CONCACAF,México,4-3-3,Alvaro Fidalgo,CM,Deep-Lying Playmaker
+CONCACAF,México,4-3-3,Alexis Vega,RW,Inside Forward
+CONCACAF,México,4-3-3,Julian Quinones,LW,Winger
+CONCACAF,México,4-3-3,Raul Jimenez,ST,Target Man
+CONCACAF,Panamá,3-4-2-1,Orlando Mosquera,GK,Sweeper Keeper
+CONCACAF,Panamá,3-4-2-1,Jose Cordoba,CB,Ball-Playing Defender
+CONCACAF,Panamá,3-4-2-1,Andres Andrade,CB,Central Defender
+CONCACAF,Panamá,3-4-2-1,Edgardo Farina,CB,Wide Center Back
+CONCACAF,Panamá,3-4-2-1,Michael Murillo,RWB,Complete Wing-Back
+CONCACAF,Panamá,3-4-2-1,Eric Davis,LWB,Wing-Back
+CONCACAF,Panamá,3-4-2-1,Adalberto Carrasquilla,CM,Advanced Playmaker
+CONCACAF,Panamá,3-4-2-1,Anibal Godoy,CM,Ball-Winning Midfielder
+CONCACAF,Panamá,3-4-2-1,Edgar Barcenas,CAM,Shadow Striker
+CONCACAF,Panamá,3-4-2-1,Ismael Diaz,CAM,Inside Forward
+CONCACAF,Panamá,3-4-2-1,Jose Fajardo,ST,Advanced Forward
+CONCACAF,Curaçao,4-3-3,Room,GK,N/A
+CONCACAF,Curaçao,4-3-3,Sambo,RB,N/A
+CONCACAF,Curaçao,4-3-3,Van Ejma,CB,N/A
+CONCACAF,Curaçao,4-3-3,Obispo,CB,N/A
+CONCACAF,Curaçao,4-3-3,Floranus,LB,N/A
+CONCACAF,Curaçao,4-3-3,J. Bacuna,CM,N/A
+CONCACAF,Curaçao,4-3-3,Comenancia,CM,N/A
+CONCACAF,Curaçao,4-3-3,L. Bacuna,CM,N/A
+CONCACAF,Curaçao,4-3-3,Chong,RW,N/A
+CONCACAF,Curaçao,4-3-3,Locadia,ST,N/A
+CONCACAF,Curaçao,4-3-3,Gorré,LW,N/A
+CONCACAF,Haiti,4-3-3,Placide,GK,N/A
+CONCACAF,Haiti,4-3-3,Arcus,RB,N/A
+CONCACAF,Haiti,4-3-3,Adé,CB,N/A
+CONCACAF,Haiti,4-3-3,Duverne,CB,N/A
+CONCACAF,Haiti,4-3-3,Expérience,LB,N/A
+CONCACAF,Haiti,4-3-3,Deedson,CM,N/A
+CONCACAF,Haiti,4-3-3,Bellegarde,CM,N/A
+CONCACAF,Haiti,4-3-3,Pierre,CM,N/A
+CONCACAF,Haiti,4-3-3,Isidor,RW,N/A
+CONCACAF,Haiti,4-3-3,Nazon,ST,N/A
+CONCACAF,Haiti,4-3-3,Providence,LW,N/A
+CAF,Senegal,4-2-3-1,Edouard Mendy,GK,Standard Goalkeeper
+CAF,Senegal,4-2-3-1,Krépin Diatta,RB,Inverted Wing-Back
+CAF,Senegal,4-2-3-1,Kalidou Koulibaly,CB,Central Defender
+CAF,Senegal,4-2-3-1,Moussa Niakhaté,CB,Ball-Playing Defender
+CAF,Senegal,4-2-3-1,Ismail Jakobs,LB,Attacking Fullback
+CAF,Senegal,4-2-3-1,Idrissa Gueye,CDM,Ball-Winning Midfielder
+CAF,Senegal,4-2-3-1,Pape Gueye,CDM,Deep-Lying Playmaker
+CAF,Senegal,4-2-3-1,Iliman Ndiaye,CAM,Advanced Playmaker
+CAF,Senegal,4-2-3-1,Ismaila Sarr,RW,Winger
+CAF,Senegal,4-2-3-1,Sadio Mané,LW,Inside Forward
+CAF,Senegal,4-2-3-1,Nicolas Jackson,ST,Advanced Forward
+CAF,Costa do Marfim,4-3-3,Yahia Fofana,GK,Sweeper Keeper
+CAF,Costa do Marfim,4-3-3,Guela Doué,RB,Attacking Fullback
+CAF,Costa do Marfim,4-3-3,Odilon Kossounou,CB,Ball-Playing Defender
+CAF,Costa do Marfim,4-3-3,Evan Ndicka,CB,Central Defender
+CAF,Costa do Marfim,4-3-3,Ghislain Konan,LB,Support Fullback
+CAF,Costa do Marfim,4-3-3,Franck Kessié,CM,Box-to-Box Midfielder
+CAF,Costa do Marfim,4-3-3,Ibrahim Sangaré,CM,Ball-Winning Midfielder
+CAF,Costa do Marfim,4-3-3,Christ Oulai,CM,Deep-Lying Playmaker
+CAF,Costa do Marfim,4-3-3,Nicolas Pepé,RW,Inside Forward
+CAF,Costa do Marfim,4-3-3,Ousmane Diomandé,LW,Winger
+CAF,Costa do Marfim,4-3-3,Evann Guessand,ST,Complete Forward
+CAF,Marrocos,4-2-3-1,Yassine Bounou,GK,Sweeper Keeper
+CAF,Marrocos,4-2-3-1,Achraf Hakimi,RB,Complete Wing-Back
+CAF,Marrocos,4-2-3-1,Issa Diop,CB,Central Defender
+CAF,Marrocos,4-2-3-1,Nayef Aguerd,CB,Ball-Playing Defender
+CAF,Marrocos,4-2-3-1,Anass Salah-Eddine,LB,Support Fullback
+CAF,Marrocos,4-2-3-1,Azzedine Ounahi,CDM,Box-to-Box Midfielder
+CAF,Marrocos,4-2-3-1,Neil El Aynaoui,CDM,Deep-Lying Playmaker
+CAF,Marrocos,4-2-3-1,Ismael Saibari,CAM,Shadow Striker
+CAF,Marrocos,4-2-3-1,Brahim Diaz,RW,Advanced Playmaker
+CAF,Marrocos,4-2-3-1,Chemsdine Talbi,LW,Winger
+CAF,Marrocos,4-2-3-1,Ayoub El Kaabi,ST,Poacher
+CAF,Tunísia,4-3-3,Aymen Dahmen,GK,Standard Goalkeeper
+CAF,Tunísia,4-3-3,Yan Valery,RB,Attacking Fullback
+CAF,Tunísia,4-3-3,Dylan Bronn,CB,Central Defender
+CAF,Tunísia,4-3-3,Montassar Talbi,CB,Ball-Playing Defender
+CAF,Tunísia,4-3-3,Ali Abdi,LB,Wing-Back
+CAF,Tunísia,4-3-3,Ellyes Skhiri,CM,Ball-Winning Midfielder
+CAF,Tunísia,4-3-3,Hannibal Mejbri,CM,Advanced Playmaker
+CAF,Tunísia,4-3-3,Ismael Gharbi,CM,Mezzala
+CAF,Tunísia,4-3-3,Elias Achouri,RW,Winger
+CAF,Tunísia,4-3-3,Sebastian Tounekti,LW,Inside Forward
+CAF,Tunísia,4-3-3,Hazem Mastouri,ST,Target Man
+CAF,África do Sul,4-2-3-1,Ronwen Williams,GK,Sweeper Keeper
+CAF,África do Sul,4-2-3-1,Khuliso Mudau,RB,Attacking Fullback
+CAF,África do Sul,4-2-3-1,Nkosinathi Sibisi,CB,Central Defender
+CAF,África do Sul,4-2-3-1,Khulumani Ndamane,CB,Ball-Playing Defender
+CAF,África do Sul,4-2-3-1,Aubrey Modiba,LB,Support Fullback
+CAF,África do Sul,4-2-3-1,Sphephelo Sithole,CDM,Ball-Winning Midfielder
+CAF,África do Sul,4-2-3-1,Teboho Mokoena,CDM,Deep-Lying Playmaker
+CAF,África do Sul,4-2-3-1,Themba Zwane,CAM,Advanced Playmaker
+CAF,África do Sul,4-2-3-1,Oswin Appollis,RW,Winger
+CAF,África do Sul,4-2-3-1,Relebohile Mofokeng,LW,Inside Forward
+CAF,África do Sul,4-2-3-1,Lyle Foster,ST,Advanced Forward
+CAF,Cabo Verde,4-2-3-1,Vozinha,GK,Sweeper Keeper
+CAF,Cabo Verde,4-2-3-1,Steven Moreira,RB,Defensive Fullback
+CAF,Cabo Verde,4-2-3-1,Roberto Lopes,CB,Central Defender
+CAF,Cabo Verde,4-2-3-1,Edilson Borges,CB,Ball-Playing Defender
+CAF,Cabo Verde,4-2-3-1,Sidny Lopes Cabral,LB,Attacking Fullback
+CAF,Cabo Verde,4-2-3-1,Kevin Pina (Lenini),CDM,Ball-Winning Midfielder
+CAF,Cabo Verde,4-2-3-1,Laros Duarte,CDM,Deep-Lying Playmaker
+CAF,Cabo Verde,4-2-3-1,Jamiro Monteiro,CAM,Advanced Playmaker
+CAF,Cabo Verde,4-2-3-1,Garry Rodrigues,RW,Winger
+CAF,Cabo Verde,4-2-3-1,Jovane Cabral,LW,Inside Forward
+CAF,Cabo Verde,4-2-3-1,Dailon Livramento,ST,Advanced Forward
+CAF,Argélia,4-2-3-1,Luca Zidane,GK,Sweeper Keeper
+CAF,Argélia,4-2-3-1,Rafik Belghali,RB,Attacking Fullback
+CAF,Argélia,4-2-3-1,Zineddine Belaid,CB,Central Defender
+CAF,Argélia,4-2-3-1,Ramy Bensebaini,CB,Ball-Playing Defender
+CAF,Argélia,4-2-3-1,Rayan Ait-Nouri,LB,Complete Wing-Back
+CAF,Argélia,4-2-3-1,Ramiz Zerrouki,CDM,Deep-Lying Playmaker
+CAF,Argélia,4-2-3-1,Hicham Boudaoui,CDM,Box-to-Box Midfielder
+CAF,Argélia,4-2-3-1,Houssem Aouar,CAM,Advanced Playmaker
+CAF,Argélia,4-2-3-1,Riyad Mahrez,RW,Inside Forward
+CAF,Argélia,4-2-3-1,Fares Chaibi,LW,Winger
+CAF,Argélia,4-2-3-1,Amine Gouiri,ST,Complete Forward
+CAF,RD Congo,4-2-3-1,Lionel Mpasi,GK,Standard Goalkeeper
+CAF,RD Congo,4-2-3-1,Aaron Wan-Bissaka,RB,Defensive Fullback
+CAF,RD Congo,4-2-3-1,Chancel Mbemba,CB,Ball-Playing Defender
+CAF,RD Congo,4-2-3-1,Axel Tuanzebe,CB,Central Defender
+CAF,RD Congo,4-2-3-1,Arthur Masuaku,LB,Attacking Fullback
+CAF,RD Congo,4-2-3-1,Charles Pickel,CDM,Ball-Winning Midfielder
+CAF,RD Congo,4-2-3-1,Samuel Moutoussamy,CDM,Box-to-Box Midfielder
+CAF,RD Congo,4-2-3-1,Gaël Kakuta,CAM,Advanced Playmaker
+CAF,RD Congo,4-2-3-1,Théo Bongonda,RW,Winger
+CAF,RD Congo,4-2-3-1,Yoane Wissa,LW,Inside Forward
+CAF,RD Congo,4-2-3-1,Cédric Bakambu,ST,Target Man
+CAF,Gana,4-2-3-1,Benjamin Asare,GK,Standard Goalkeeper
+CAF,Gana,4-2-3-1,Alidu Seidu,RB,Defensive Fullback
+CAF,Gana,4-2-3-1,Kojo Peprah Oppong,CB,Ball-Playing Defender
+CAF,Gana,4-2-3-1,Abdul Mumin,CB,Central Defender
+CAF,Gana,4-2-3-1,Gideon Mensah,LB,Attacking Fullback
+CAF,Gana,4-2-3-1,Thomas Partey,CDM,Deep-Lying Playmaker
+CAF,Gana,4-2-3-1,Caleb Yirenkyi,CDM,Box-to-Box Midfielder
+CAF,Gana,4-2-3-1,Abdul Fatawu,RW,Winger
+CAF,Gana,4-2-3-1,Ernest Nuamah,CAM,Advanced Playmaker
+CAF,Gana,4-2-3-1,Antoine Semenyo,LW,Inside Forward
+CAF,Gana,4-2-3-1,Iñaki Williams,ST,Advanced Forward
+CAF,Gana_SKIP,3-4-3,Asare,GK,N/A
+CAF,Gana_SKIP,3-4-3,Adjetei,CB,N/A
+CAF,Gana_SKIP,3-4-3,Seidu,CB,N/A
+CAF,Gana_SKIP,3-4-3,Oppong,CB,N/A
+CAF,Gana_SKIP,3-4-3,Yirenkyi,RM,N/A
+CAF,Gana_SKIP,3-4-3,Sibo,CM,N/A
+CAF,Gana_SKIP,3-4-3,Partey,CM,N/A
+CAF,Gana_SKIP,3-4-3,Mensah,LM,N/A
+CAF,Gana_SKIP,3-4-3,Sulemana,RW,N/A
+CAF,Gana_SKIP,3-4-3,Semenyo,ST,N/A
+CAF,Gana_SKIP,3-4-3,Ayew,LW,N/A
+CAF,Egito,3-4-1-2,El Shenawy,GK,N/A
+CAF,Egito,3-4-1-2,Ibrahim,CB,N/A
+CAF,Egito,3-4-1-2,Abdelmaguif,CB,N/A
+CAF,Egito,3-4-1-2,Rabia,CB,N/A
+CAF,Egito,3-4-1-2,Hany,RM,N/A
+CAF,Egito,3-4-1-2,Ateya,CM,N/A
+CAF,Egito,3-4-1-2,Lasheen,CM,N/A
+CAF,Egito,3-4-1-2,Fatouh,LM,N/A
+CAF,Egito,3-4-1-2,Ashour,CAM,N/A
+CAF,Egito,3-4-1-2,Salah,ST,N/A
+CAF,Egito,3-4-1-2,Marmoush,ST,N/A
+AFC/OFC,Coreia do Sul,4-2-3-1,Seung-gyu Kim,GK,Sweeper Keeper
+AFC/OFC,Coreia do Sul,4-2-3-1,Young-woo Seol,RB,Attacking Fullback
+AFC/OFC,Coreia do Sul,4-2-3-1,Min-jae Kim,CB,Ball-Playing Defender
+AFC/OFC,Coreia do Sul,4-2-3-1,Han-beom Lee,CB,Central Defender
+AFC/OFC,Coreia do Sul,4-2-3-1,Tae-seok Lee,LB,Support Fullback
+AFC/OFC,Coreia do Sul,4-2-3-1,Wang,CDM,Deep-Lying Playmaker (Anomalia)
+AFC/OFC,Coreia do Sul,4-2-3-1,Jens Castrop,CDM,Box-to-Box Midfielder
+AFC/OFC,Coreia do Sul,4-2-3-1,Jae-sung Lee,CAM,Advanced Playmaker
+AFC/OFC,Coreia do Sul,4-2-3-1,Kang-in Lee,RW,Inside Forward
+AFC/OFC,Coreia do Sul,4-2-3-1,Jun-ho Bae,LW,Winger
+AFC/OFC,Coreia do Sul,4-2-3-1,Heung-min Son,ST,Advanced Forward
+AFC/OFC,Catar,4-3-3,Meshaal Barsham,GK,Standard Goalkeeper
+AFC/OFC,Catar,4-3-3,Ayoub Al-Oui,RB,Defensive Fullback
+AFC/OFC,Catar,4-3-3,Boualem Khoukhi,CB,Ball-Playing Defender
+AFC/OFC,Catar,4-3-3,Pedro Miguel,CB,Central Defender
+AFC/OFC,Catar,4-3-3,Homam Al-Amin,LB,Attacking Fullback
+AFC/OFC,Catar,4-3-3,Karim Boudiaf,CM,Ball-Winning Midfielder
+AFC/OFC,Catar,4-3-3,Ahmed Fathy,CM,Deep-Lying Playmaker
+AFC/OFC,Catar,4-3-3,Issa Laye,CM,Box-to-Box Midfielder
+AFC/OFC,Catar,4-3-3,Edmilson Junior,RW,Inside Forward
+AFC/OFC,Catar,4-3-3,Akram Afif,LW,Wide Playmaker
+AFC/OFC,Catar,4-3-3,Almoez Ali,ST,Complete Forward
+AFC/OFC,Austrália,5-4-1,Mathew Ryan,GK,Standard Goalkeeper
+AFC/OFC,Austrália,5-4-1,Alessandro Circati,CB,Ball-Playing Defender
+AFC/OFC,Austrália,5-4-1,Harry Souttar,CB,Central Defender
+AFC/OFC,Austrália,5-4-1,Milos Degenek,CB,Wide Center Back
+AFC/OFC,Austrália,5-4-1,Alessandro Italiano,RWB,Wing-Back
+AFC/OFC,Austrália,5-4-1,Jordan Bos,LWB,Complete Wing-Back
+AFC/OFC,Austrália,5-4-1,Cameron Devlin,CM,Ball-Winning Midfielder
+AFC/OFC,Austrália,5-4-1,Aiden O'Neill,CM,Deep-Lying Playmaker
+AFC/OFC,Austrália,5-4-1,Connor Metcalfe,RM,Wide Midfielder
+AFC/OFC,Austrália,5-4-1,Nestory Irankunda,LM,Inside Forward
+AFC/OFC,Austrália,5-4-1,Mohamed Touré,ST,Advanced Forward
+AFC/OFC,Irã,4-2-3-1,Alireza Beyranvand,GK,Sweeper Keeper
+AFC/OFC,Irã,4-2-3-1,Aria Yousefi,RB,Attacking Fullback
+AFC/OFC,Irã,4-2-3-1,Hossein Kanaani,CB,Central Defender
+AFC/OFC,Irã,4-2-3-1,Shojae Khalilzadeh,CB,Ball-Playing Defender
+AFC/OFC,Irã,4-2-3-1,Milad Mohammadi,LB,Support Fullback
+AFC/OFC,Irã,4-2-3-1,Saeid Ezatolahi,CDM,Ball-Winning Midfielder
+AFC/OFC,Irã,4-2-3-1,Saman Ghoddos,CDM,Deep-Lying Playmaker
+AFC/OFC,Irã,4-2-3-1,Mehdi Ghayedi,CAM,Advanced Playmaker
+AFC/OFC,Irã,4-2-3-1,Alireza Jahanbakhsh,RW,Winger
+AFC/OFC,Irã,4-2-3-1,Mohammad Mohebi,LW,Inside Forward
+AFC/OFC,Irã,4-2-3-1,Mehdi Taremi,ST,Complete Forward
+AFC/OFC,Iraque,4-2-3-1,Jalal Hassan,GK,Standard Goalkeeper
+AFC/OFC,Iraque,4-2-3-1,Hussein Ali,RB,Attacking Fullback
+AFC/OFC,Iraque,4-2-3-1,Rebin Sulaka,CB,Central Defender
+AFC/OFC,Iraque,4-2-3-1,Zaid Tahseen,CB,Ball-Playing Defender
+AFC/OFC,Iraque,4-2-3-1,Merchas Doski,LB,Wing-Back
+AFC/OFC,Iraque,4-2-3-1,Amir Al-Ammari,CDM,Deep-Lying Playmaker
+AFC/OFC,Iraque,4-2-3-1,Ibrahim Bayesh,CDM,Box-to-Box Midfielder
+AFC/OFC,Iraque,4-2-3-1,Zidane Iqbal,CAM,Advanced Playmaker
+AFC/OFC,Iraque,4-2-3-1,Ali Jasim,RW,Inside Forward
+AFC/OFC,Iraque,4-2-3-1,Youssef Amyn,LW,Winger
+AFC/OFC,Iraque,4-2-3-1,Aymen Hussein,ST,Target Man
+AFC/OFC,Nova Zelândia,4-2-3-1,Max Crocombe,GK,Standard Goalkeeper
+AFC/OFC,Nova Zelândia,4-2-3-1,Tim Payne,RB,Defensive Fullback
+AFC/OFC,Nova Zelândia,4-2-3-1,Tyler Bindon,CB,Ball-Playing Defender
+AFC/OFC,Nova Zelândia,4-2-3-1,Michael Boxall,CB,Central Defender
+AFC/OFC,Nova Zelândia,4-2-3-1,Liberato Cacace,LB,Attacking Fullback
+AFC/OFC,Nova Zelândia,4-2-3-1,Marko Stamenic,CDM,Deep-Lying Playmaker
+AFC/OFC,Nova Zelândia,4-2-3-1,Joe Bell,CDM,Ball-Winning Midfielder
+AFC/OFC,Nova Zelândia,4-2-3-1,Sarpreet Singh,CAM,Advanced Playmaker
+AFC/OFC,Nova Zelândia,4-2-3-1,Callum McCowatt,RW,Winger
+AFC/OFC,Nova Zelândia,4-2-3-1,Matthew Garbett,LW,Inside Forward
+AFC/OFC,Nova Zelândia,4-2-3-1,Chris Wood,ST,Target Man
+AFC/OFC,Uzbequistão,3-4-2-1,Abduvohid Nematov,GK,Standard Goalkeeper
+AFC/OFC,Uzbequistão,3-4-2-1,Abdulla Abdullaev,CB,Central Defender
+AFC/OFC,Uzbequistão,3-4-2-1,Rustam Ashurmatov,CB,Ball-Playing Defender
+AFC/OFC,Uzbequistão,3-4-2-1,Abdukodir Khusanov,CB,Wide Center Back
+AFC/OFC,Uzbequistão,3-4-2-1,Farrukh Sayfiev,LWB,Wing-Back
+AFC/OFC,Uzbequistão,3-4-2-1,Shukurov,CM,Central Midfielder (Recuperado)
+AFC/OFC,Uzbequistão,3-4-2-1,Khamrobekov,CM,Central Midfielder (Recuperado)
+AFC/OFC,Uzbequistão,3-4-2-1,Nasrullaev,RWB / LM,Wide Midfielder (Recuperado)
+AFC/OFC,Uzbequistão,3-4-2-1,Ganiev,CAM,Attacking Midfielder (Recuperado)
+AFC/OFC,Uzbequistão,3-4-2-1,Urunov,CAM,Attacking Midfielder (Recuperado)
+AFC/OFC,Uzbequistão,3-4-2-1,Shomurodov,ST,Striker (Recuperado)
+AFC/OFC,Arábia Saudita,4-3-3,Al-Aqidi,GK,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Boushal,RB,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Tambakti,CB,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Al-Amri,CB,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Al-Harbi,LB,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Kanno,CM,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Al-Khaibari,CM,N/A
+AFC/OFC,Arábia Saudita,4-3-3,N. Al-Dawsari,CM,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Mandash,RW,N/A
+AFC/OFC,Arábia Saudita,4-3-3,Al-Buraikan,ST,N/A
+AFC/OFC,Arábia Saudita,4-3-3,S. Al-Dawsari,LW,N/A
+AFC/OFC,Jordânia,3-4-3,Abulaila,GK,N/A
+AFC/OFC,Jordânia,3-4-3,Abu Dahab,CB,N/A
+AFC/OFC,Jordânia,3-4-3,Nasib,CB,N/A
+AFC/OFC,Jordânia,3-4-3,Al-Arab,CB,N/A
+AFC/OFC,Jordânia,3-4-3,Haddad,RM,N/A
+AFC/OFC,Jordânia,3-4-3,Al-Rawahbdeh,CM,N/A
+AFC/OFC,Jordânia,3-4-3,Al-Rashdan,CM,N/A
+AFC/OFC,Jordânia,3-4-3,Abu Taha,LM,N/A
+AFC/OFC,Jordânia,3-4-3,Tamari,RW,N/A
+AFC/OFC,Jordânia,3-4-3,Olwan,ST,N/A
+AFC/OFC,Jordânia,3-4-3,Al-Mardi,LW,N/A
+AFC/OFC,Japão,3-4-2-1,Suzuki,GK,N/A
+AFC/OFC,Japão,3-4-2-1,Tomiyasu,CB,N/A
+AFC/OFC,Japão,3-4-2-1,Taniguchi,CB,N/A
+AFC/OFC,Japão,3-4-2-1,Itakura,CB,N/A
+AFC/OFC,Japão,3-4-2-1,Doan,RM,N/A
+AFC/OFC,Japão,3-4-2-1,Endo,CM,N/A
+AFC/OFC,Japão,3-4-2-1,Tanaka,CM,N/A
+AFC/OFC,Japão,3-4-2-1,Nakamura,LM,N/A
+AFC/OFC,Japão,3-4-2-1,Kubo,CAM,N/A
+AFC/OFC,Japão,3-4-2-1,Ito,CAM,N/A
+AFC/OFC,Japão,3-4-2-1,Ueda,ST,N/A
+UEFA,Dinamarca,4-3-3,Schmeichel,GK,N/A
+UEFA,Dinamarca,4-3-3,Kristensen,RB,N/A
+UEFA,Dinamarca,4-3-3,Andersen,CB,N/A
+UEFA,Dinamarca,4-3-3,Vestergaard,CB,N/A
+UEFA,Dinamarca,4-3-3,Maehle,LB,N/A
+UEFA,Dinamarca,4-3-3,Hjulmand,CM,N/A
+UEFA,Dinamarca,4-3-3,Hojberg,CM,N/A
+UEFA,Dinamarca,4-3-3,Eriksen,CM,N/A
+UEFA,Dinamarca,4-3-3,Lindstrom,RW,N/A
+UEFA,Dinamarca,4-3-3,Wind,LW,N/A
+UEFA,Dinamarca,4-3-3,Hojlund,ST,N/A
+UEFA,Ucrânia,4-3-3,Trubin,GK,N/A
+UEFA,Ucrânia,4-3-3,Konoplya,RB,N/A
+UEFA,Ucrânia,4-3-3,Zabarnyi,CB,N/A
+UEFA,Ucrânia,4-3-3,Matvienko,CB,N/A
+UEFA,Ucrânia,4-3-3,Mykolenko,LB,N/A
+UEFA,Ucrânia,4-3-3,Stepanenko,CM,N/A
+UEFA,Ucrânia,4-3-3,Shaparenko,CM,N/A
+UEFA,Ucrânia,4-3-3,Zinchenko,CM,N/A
+UEFA,Ucrânia,4-3-3,Mudryk,RW,N/A
+UEFA,Ucrânia,4-3-3,Tsygankov,LW,N/A
+UEFA,Ucrânia,4-3-3,Dovbyk,ST,N/A
+UEFA,Irlanda,4-4-2,Kelleher,GK,N/A
+UEFA,Irlanda,4-4-2,Coleman,RB,N/A
+UEFA,Irlanda,4-4-2,Duffy,CB,N/A
+UEFA,Irlanda,4-4-2,Egan,CB,N/A
+UEFA,Irlanda,4-4-2,McClean,LB,N/A
+UEFA,Irlanda,4-4-2,Cullen,CM,N/A
+UEFA,Irlanda,4-4-2,Molumby,CM,N/A
+UEFA,Irlanda,4-4-2,Doherty,RM,N/A
+UEFA,Irlanda,4-4-2,Knight,LM,N/A
+UEFA,Irlanda,4-4-2,Ogbene,ST,N/A
+UEFA,Irlanda,4-4-2,Idah,ST,N/A
+UEFA,Polônia,4-2-3-1,Szczesny,GK,N/A
+UEFA,Polônia,4-2-3-1,Cash,RB,N/A
+UEFA,Polônia,4-2-3-1,Bednarek,CB,N/A
+UEFA,Polônia,4-2-3-1,Kiwior,CB,N/A
+UEFA,Polônia,4-2-3-1,Bereszynski,LB,N/A
+UEFA,Polônia,4-2-3-1,Szymanski,CDM,N/A
+UEFA,Polônia,4-2-3-1,Bielik,CDM,N/A
+UEFA,Polônia,4-2-3-1,Zielinski,RW,N/A
+UEFA,Polônia,4-2-3-1,Frankowski,CAM,N/A
+UEFA,Polônia,4-2-3-1,Moder,LW,N/A
+UEFA,Polônia,4-2-3-1,Lewandowski,ST,N/A
+CAF,Camarões,4-3-3,Epassy,GK,N/A
+CAF,Camarões,4-3-3,Fai,RB,N/A
+CAF,Camarões,4-3-3,Castelletto,CB,N/A
+CAF,Camarões,4-3-3,Onguene,CB,N/A
+CAF,Camarões,4-3-3,Tolo,LB,N/A
+CAF,Camarões,4-3-3,Anguissa,CM,N/A
+CAF,Camarões,4-3-3,Gouet,CM,N/A
+CAF,Camarões,4-3-3,Kunde,CM,N/A
+CAF,Camarões,4-3-3,Toko Ekambi,RW,N/A
+CAF,Camarões,4-3-3,Choupo-Moting,LW,N/A
+CAF,Camarões,4-3-3,Aboubakar,ST,N/A
+CAF,Nigéria,4-2-3-1,Nwabali,GK,N/A
+CAF,Nigéria,4-2-3-1,Aarons,RB,N/A
+CAF,Nigéria,4-2-3-1,Troost-Ekong,CB,N/A
+CAF,Nigéria,4-2-3-1,Bassey,CB,N/A
+CAF,Nigéria,4-2-3-1,Aina,LB,N/A
+CAF,Nigéria,4-2-3-1,Iwobi,CDM,N/A
+CAF,Nigéria,4-2-3-1,Ndidi,CDM,N/A
+CAF,Nigéria,4-2-3-1,Lookman,RW,N/A
+CAF,Nigéria,4-2-3-1,Musa,CAM,N/A
+CAF,Nigéria,4-2-3-1,Simon,LW,N/A
+CAF,Nigéria,4-2-3-1,Osimhen,ST,N/A
+CONMEBOL,Peru,4-4-2,Gallese,GK,N/A
+CONMEBOL,Peru,4-4-2,Advíncula,RB,N/A
+CONMEBOL,Peru,4-4-2,Zambrano,CB,N/A
+CONMEBOL,Peru,4-4-2,Callens,CB,N/A
+CONMEBOL,Peru,4-4-2,Trauco,LB,N/A
+CONMEBOL,Peru,4-4-2,Tapia,CM,N/A
+CONMEBOL,Peru,4-4-2,Peña,CM,N/A
+CONMEBOL,Peru,4-4-2,Cueva,RM,N/A
+CONMEBOL,Peru,4-4-2,Yotun,LM,N/A
+CONMEBOL,Peru,4-4-2,Lapadula,ST,N/A
+CONMEBOL,Peru,4-4-2,Guerrero,ST,N/A
+CONCACAF,Jamaica,4-3-3,Lawrence,GK,N/A
+CONCACAF,Jamaica,4-3-3,Rowe,RB,N/A
+CONCACAF,Jamaica,4-3-3,Lowe,CB,N/A
+CONCACAF,Jamaica,4-3-3,Bernard,CB,N/A
+CONCACAF,Jamaica,4-3-3,Taylor,LB,N/A
+CONCACAF,Jamaica,4-3-3,Nicholson,CM,N/A
+CONCACAF,Jamaica,4-3-3,Johnson,CM,N/A
+CONCACAF,Jamaica,4-3-3,Greenidge,CM,N/A
+CONCACAF,Jamaica,4-3-3,Pinnock,RW,N/A
+CONCACAF,Jamaica,4-3-3,Palmer,LW,N/A
+CONCACAF,Jamaica,4-3-3,Brown,ST,N/A

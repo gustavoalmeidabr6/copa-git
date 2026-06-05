@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from models.simulator import MatchSimulator # Importa a sua classe original!
+from models.simulator import MatchSimulator
 
 app = FastAPI(title="World Cup Simulator API")
 
@@ -29,7 +29,7 @@ def get_roster(team_name: str):
     # Puxa os dados reais dos elencos do seu DataLoader
     squad = simulator.feature_builder.data_loader.get_real_squad_data(team_name)
     
-    # --- NOVA LÓGICA DE ORDENAÇÃO POR POSIÇÃO ---
+    # --- LÓGICA DE ORDENAÇÃO POR POSIÇÃO ---
     # Força a lista a seguir o padrão Tático do Frontend (GK -> DEF -> MID -> ATT)
     pos_order = {"Goalkeeper": 0, "Defender": 1, "Midfielder": 2, "Attacker": 3}
     
@@ -55,14 +55,17 @@ class MatchRequest(BaseModel):
     away: str
     home_excluded: list = []
     away_excluded: list = []
-    num_simulations: int = 200
+    # Mesmo se o frontend enviar 200, nós vamos ignorar isso na rota abaixo.
+    num_simulations: int = 400  
 
 # 2. Rota para rodar uma Partida Específica
 @app.post("/api/simulate_match")
 def api_simulate_match(req: MatchRequest):
+    # BLINDAGEM: Ignoramos o req.num_simulations e FORÇAMOS 400 no motor.
     resultado = simulator.simulate_match(
-        req.home, req.away, 
-        num_simulations=req.num_simulations,
+        req.home, 
+        req.away, 
+        num_simulations=400, 
         home_excluded=req.home_excluded,
         away_excluded=req.away_excluded
     )
@@ -71,5 +74,6 @@ def api_simulate_match(req: MatchRequest):
 # 3. Rota para simular a Copa Inteira
 @app.post("/api/simulate_tournament")
 def api_simulate_tournament():
-    resultado = simulator.run_full_tournament(num_tournaments=200)
+    # BLINDAGEM: Forçamos 400 no motor do torneio.
+    resultado = simulator.run_full_tournament(num_tournaments=400) 
     return resultado

@@ -2,7 +2,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, KNOWN_PLAYER_POSITIONS, Team, rosterFor, teamById, type Formation } from "@/lib/teams";
+import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, Team, rosterFor, teamById, getPlayerPosition, type Formation } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
@@ -13,13 +13,42 @@ export const Route = createFileRoute("/partida")({
   head: () => ({
     meta: [
       { title: "Simular Partida · Ultra Simulador 2026" },
-      { name: "description", content: "Escolha duas seleções, monte a escalação e simule 200 partidas no Motor Quant." },
+      { name: "description", content: "Escolha duas seleções, monte a escalação e simule 400 partidas no Motor Quant." },
     ],
   }),
   component: PartidaPage,
 });
 
 type Step = "select" | "lineup" | "result";
+
+// 48 seleções classificadas para a Copa do Mundo 2026
+// IDs devem bater com os definidos em teams.ts → GROUPS
+const WC2026_TEAM_IDS = new Set([
+  // Grupo A
+  "MEX", "RSA", "KOR", "CZE",
+  // Grupo B
+  "CAN", "BIH", "QAT", "SUI",
+  // Grupo C
+  "BRA", "MAR", "HAI", "SCO",
+  // Grupo D
+  "USA", "PAR", "AUS", "TUR",
+  // Grupo E
+  "GER", "CUW", "CIV", "ECU",
+  // Grupo F
+  "NED", "JPN", "SWE", "TUN",
+  // Grupo G
+  "BEL", "EGY", "IRN", "NZL",
+  // Grupo H
+  "ESP", "CPV", "KSA", "URU",
+  // Grupo I
+  "FRA", "SEN", "IRQ", "NOR",
+  // Grupo J
+  "ARG", "ALG", "AUT", "JOR",
+  // Grupo K
+  "POR", "COD", "UZB", "COL",
+  // Grupo L
+  "ENG", "CRO", "GHA", "PAN",
+]);
 
 export type APIResult = {
   aWinPct: number; 
@@ -41,10 +70,10 @@ function sortRoster(roster: string[]) {
   const bench = roster.slice(11);
   
   starters.sort((a, b) => {
-    const posA = KNOWN_PLAYER_POSITIONS[a];
-    const posB = KNOWN_PLAYER_POSITIONS[b];
-    const wA = posA ? POSITION_WEIGHT[posA] : 99;
-    const wB = posB ? POSITION_WEIGHT[posB] : 99;
+    const posA = getPlayerPosition(a);
+    const posB = getPlayerPosition(b);
+    const wA = posA ? (POSITION_WEIGHT[posA] ?? 99) : 99;
+    const wB = posB ? (POSITION_WEIGHT[posB] ?? 99) : 99;
     return wA - wB;
   });
   
@@ -126,7 +155,7 @@ function PartidaPage() {
                       body: JSON.stringify({
                         home: home.apiName,
                         away: away.apiName,
-                        num_simulations: 200,
+                        num_simulations: 400,
                         home_excluded: [],
                         away_excluded: []
                       })
@@ -136,7 +165,7 @@ function PartidaPage() {
                     
                     const scoreCounts: Record<string, number> = {};
                     Object.entries(data.most_likely_scores || {}).forEach(([score, pct]) => {
-                       scoreCounts[score] = Math.round(((pct as number) / 100) * 200);
+                       scoreCounts[score] = Math.round(((pct as number) / 100) * 400);
                     });
 
                     const topScorers = (data.top_scorers || []).map((s: any) => ({
@@ -221,7 +250,7 @@ function SelectStep({ home, away, setHome, setAway, onAdvance }: { home: Team | 
 
       <SectionTitle accent="48 NAÇÕES">Escolha as seleções</SectionTitle>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-        {ALL_TEAMS.map((t, i) => {
+        {ALL_TEAMS.filter((t) => WC2026_TEAM_IDS.has(t.id)).map((t, i) => {
           const picked = home?.id === t.id || away?.id === t.id;
           return (
             <motion.button
@@ -392,7 +421,7 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
   return (
     <div className="mt-6 space-y-5">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <SectionTitle accent="200 SIMULAÇÕES">Simulação Concluída (Motor Quant)</SectionTitle>
+        <SectionTitle accent="400 SIMULAÇÕES">Simulação Concluída (Motor Quant)</SectionTitle>
       </motion.div>
 
       <div className="grid gap-5 md:grid-cols-3">
@@ -426,7 +455,7 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
           </div>
           <ul className="space-y-2">
             {topScores.map(([s, n], i) => {
-              const pct = (n / 200) * 100;
+              const pct = (n / 400) * 100;
               return (
                 <li key={s} className="text-sm">
                   <div className="flex items-center justify-between">
@@ -480,11 +509,11 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
 
       <Panel>
         <div className="mb-3 flex items-center justify-between">
-          <div className="font-display text-sm uppercase tracking-[0.3em]">Log (Amostra) das 200 Simulações</div>
+          <div className="font-display text-sm uppercase tracking-[0.3em]">Log Completo das 400 Simulações</div>
           <div className="text-xs text-muted-foreground">Expected Goals: <span className="text-primary">{result.avgGoals.a.toFixed(2)}</span> – <span className="text-primary">{result.avgGoals.b.toFixed(2)}</span></div>
         </div>
-        <div className="max-h-56 overflow-y-auto pr-2 text-xs font-mono text-muted-foreground whitespace-pre-line rounded border border-border/30 bg-background/30 p-3 custom-scrollbar">
-          {result.sim_logs && result.sim_logs.length > 0 ? result.sim_logs.slice(0, 50).join("\n") : "Sem log disponível."}
+        <div className="max-h-96 overflow-y-auto pr-2 text-xs font-mono text-muted-foreground whitespace-pre-line rounded border border-border/30 bg-background/30 p-3 custom-scrollbar">
+          {result.sim_logs && result.sim_logs.length > 0 ? result.sim_logs.join("\n") : "Sem log disponível."}
         </div>
       </Panel>
 

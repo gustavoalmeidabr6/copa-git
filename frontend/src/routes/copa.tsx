@@ -77,7 +77,7 @@ function CopaPage() {
           )}
         </AnimatePresence>
       </main>
-      {sim && <SimOverlay onDone={() => {}} label="Processando 200 Copas do Mundo no XGBoost..." />}
+      {sim && <SimOverlay onDone={() => {}} label="Processando 400 Copas do Mundo no XGBoost..." />}
     </NeonChrome>
   );
 }
@@ -115,7 +115,7 @@ function GroupsStep({ onSim }: { onSim: () => void }) {
 
       <div className="flex flex-col items-center gap-4">
         <NeonButton onClick={onSim} variant="gold" className="animate-pulse-neon px-10 py-4 text-base">
-          <Trophy className="h-5 w-5" /> Iniciar Motor Quant (200 Torneios)
+          <Trophy className="h-5 w-5" /> Iniciar Motor Quant (400 Torneios)
         </NeonButton>
         <Link to="/"><NeonButton variant="ghost"><ArrowLeft className="h-4 w-4" /> Voltar ao Menu</NeonButton></Link>
       </div>

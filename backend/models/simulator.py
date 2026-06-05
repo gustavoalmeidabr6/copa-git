@@ -1,12 +1,14 @@
 """
-models/simulator.py — REESCRITA TOTAL v20 (Otimização Extrema de Memória / Fim do Gargalo)
+models/simulator.py — REESCRITA TOTAL v22 (Pura Inteligência de Dados / Zero Hardcode)
 
-MUDANÇAS v20:
-  - FIM DO GARGALO DE CPU (8% DE USO): Implementado um sistema de Cache Hash Map 
-    (Memoization) e Pré-Normalização de textos. 
-  - As 5 milhões de manipulações de strings que congelavam o processador foram 
-    eliminadas. Os nomes dos CSVs são higienizados apenas UMA VEZ na inicialização.
-  - A fase "Precalculando IA Base" agora termina em menos de 1 segundo.
+MUDANÇAS v22:
+  - ZERO GAMBIARRAS: Remoção completa de listas com nomes de jogadores (VIPs, Wingers, etc).
+  - SISTEMA ORGÂNICO DE PÊNALTIS: O simulador agora lê a coluna `PK` do arquivo da 
+    temporada 2025/2026. Jogadores que cobram pênaltis nos seus clubes (ex: Kane, Mbappé) 
+    recebem um bônus orgânico nas probabilidades de gol sem precisar de intervenção manual.
+  - SISTEMA ORGÂNICO DE PLAYMAKERS: As assistências são ditadas estritamente pela 
+    fusão do EA FC (Vision, Passing, Curve) e as assistências reais do CSV, valorizando 
+    os verdadeiros garçons da vida real.
 """
 
 import numpy as np
@@ -39,14 +41,13 @@ class MatchSimulator:
         self.models = joblib.load(MODEL_PATH)
         self.rho = -0.13   
 
-        # CACHES DE ALTA PERFORMANCE (Evitam congelamento da CPU)
         self._season_stats_norm = {}
         self._recent_goals_norm = {}
         self._player_season_cache = {}
         self._player_recent_cache = {}
         self._player_fifa_cache = {}
 
-        # ── 1. CARREGAMENTO DOS DADOS REAIS DA TEMPORADA 25/26 ──
+        # ── 1. CARREGAMENTO DOS DADOS REAIS DA TEMPORADA 25/26 (Com Pênaltis) ──
         season_csv = Path(__file__).parent.parent / "data" / "players_data-2025_2026.csv"
         if season_csv.exists():
             try:
@@ -56,6 +57,7 @@ class MatchSimulator:
                 ast_col  = next((c for c in df_season.columns if c.lower() in ['assists', 'ast', 'assistencias']), None)
                 comp_col = next((c for c in df_season.columns if c.lower() in ['comp', 'league', 'liga', 'competition', 'campeonato']), None)
                 age_col  = next((c for c in df_season.columns if c.lower() in ['age', 'idade']), None)
+                pk_col   = next((c for c in df_season.columns if c == 'PK'), None) # Busca a coluna exata de Pênaltis
                 
                 if name_col:
                     for _, row in df_season.iterrows():
@@ -63,20 +65,21 @@ class MatchSimulator:
                         norm_name = self._normalize_name(p_name)
                         g = float(row[goal_col]) if goal_col and pd.notna(row[goal_col]) else 0.0
                         a = float(row[ast_col]) if ast_col and pd.notna(row[ast_col]) else 0.0
+                        pk = float(row[pk_col]) if pk_col and pd.notna(row[pk_col]) else 0.0
                         c = str(row[comp_col]).strip().lower() if comp_col and pd.notna(row[comp_col]) else "unknown"
                         age = float(row[age_col]) if age_col and pd.notna(row[age_col]) else 25.0
-                        self._season_stats_norm[norm_name] = {'goals': g, 'assists': a, 'league': c, 'age': age}
+                        self._season_stats_norm[norm_name] = {'goals': g, 'assists': a, 'league': c, 'age': age, 'pk': pk}
                 print(f"[Motor Quântico] Dados da Temporada 25/26 carregados! ({len(self._season_stats_norm)} jogadores).")
             except Exception as e:
                 print(f"[Motor Quântico] Aviso: Falha ao carregar players_data-2025_2026.csv: {e}")
 
-        # Pré-normaliza os gols recentes históricos
         try:
             for k, v in self.feature_builder.data_loader.recent_goals_dict.items():
                 self._recent_goals_norm[self._normalize_name(k)] = v
-        except: pass
+        except: 
+            pass
 
-        # Pré-normaliza os dados de Playmaking do FIFA
+        # ── 2. CARREGAMENTO DOS ATRIBUTOS DE CRIAÇÃO DO EA FC ──
         self._fifa_pm_norm = {}
         df_fifa = self.feature_builder.data_loader.players_db
         if not df_fifa.empty and "Name" in df_fifa.columns:
@@ -90,7 +93,7 @@ class MatchSimulator:
                 else:
                     self._fifa_pm_norm[p_name] = float(row.get("OVR", 70))
 
-        # ── 2. CARREGAMENTO DO MODELO INDIVIDUAL DE JOGADORES (ML) ──
+        # ── 3. MODELO DE IA INDIVIDUAL ──
         self.ai_player_rates = {}
         self.player_models = None
         if PLAYER_ML_PATH.exists():
@@ -103,45 +106,23 @@ class MatchSimulator:
 
     @staticmethod
     def _normalize_name(n: str) -> str:
-        """Função higienizadora chamada apenas UMA VEZ por nome para poupar CPU."""
         n = n.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u').replace('ã','a').replace('õ','o').replace('ç','c').replace('-', ' ')
         return "".join(c for c in n if c.isalnum() or c.isspace()).strip()
 
     @staticmethod
     def _is_same_player_norm(n1: str, n2: str) -> bool:
-        """Comparador que recebe strings já normalizadas. Velocidade absoluta."""
         if n1 == n2: return True
-        
-        aliases = [
-            {"yamal", "lamine yamal"}, {"vinicius jr", "vini jr", "vinicius junior", "vinicius"},
-            {"raphinha", "raphael dias belloli"}, {"pedri", "pedro gonzalez lopez"},
-            {"rodri", "rodrigo hernandez cascante"}, {"nico williams", "n williams", "nicholas williams"},
-            {"bruno fernandes", "b fernandes"}, {"cristiano ronaldo", "c ronaldo", "ronaldo"},
-            {"pepe", "kepler laveran"}, {"vitinha", "vitor machado ferreira"},
-            {"son", "son heung min", "heung min son"}, {"kante", "ngolo kante", "golo kante"},
-            {"depay", "memphis depay"}, {"james", "james rodriguez"}
-        ]
-        for alias_set in aliases:
-            if n1 in alias_set and n2 in alias_set: return True
-
         p1, p2 = n1.split(), n2.split()
-        common_surnames = {"martinez", "williams", "silva", "santos", "garcia", "rodriguez", "gomez", "fernandez", "lopez", "gonzalez", "perez", "hernandez"}
-        
-        if len(p1) == 1 and len(p2) > 1:
-            if p1[0] in p2 and p1[0] not in common_surnames: return True
-        if len(p2) == 1 and len(p1) > 1:
-            if p2[0] in p1 and p2[0] not in common_surnames: return True
-
         if len(p1) > 1 and len(p2) > 1:
-            if p1[-1] == p2[-1]: 
+            if p1[-1] == p2[-1]:
                 fn1, fn2 = p1[0], p2[0]
-                if len(fn1) <= 2 or len(fn2) <= 2: 
+                if len(fn1) <= 2 or len(fn2) <= 2:
                     if fn1[0] == fn2[0]: return True
-                else: 
+                else:
                     if fn1 == fn2: return True
-        return False
+            return False
 
-    def _get_league_weight(self, league_name: str, player_name: str = "") -> float:
+    def _get_league_weight(self, league_name: str) -> float:
         base_weight = 0.80
         league_lower = league_name.lower() if league_name else "unknown"
         
@@ -150,28 +131,15 @@ class MatchSimulator:
         elif any(x in league_lower for x in ['ligue 1', 'france', 'franca']): base_weight = 0.80
         elif any(x in league_lower for x in ['portugal', 'primeira']): base_weight = 0.75
         elif any(x in league_lower for x in ['eredivisie', 'saudi', 'mls', 'brasil', 'argentina', 'championship', 'turkey']): base_weight = 0.65
-            
-        vip_exceptions = [
-            "messi", "ronaldo", "neymar", "darwin", "depay", "bono", "diomand", 
-            "paquet", "kessi", "afif", "arrascaeta", "tillman", "yilmaz", "cruz", 
-            "james", "gomez", "fofana", "paez", "hwang", "quintero", "dedic", "kante", "ederson"
-        ]
-        
-        if player_name:
-            p_lower = player_name.lower()
-            for exc in vip_exceptions:
-                if exc in p_lower: return max(base_weight, 0.85)
         return base_weight
 
-    # ── MÉTODOS DE CACHE PARA DESBLOQUEAR A CPU ──
     def _get_season_stats_cached(self, p_name: str):
         if p_name in self._player_season_cache:
             return self._player_season_cache[p_name]
-            
+
         norm_name = self._normalize_name(p_name)
-        goals, assists, league, age = 0.0, 0.0, "unknown", 25.0
-        
-        # Busca Otimizada na Memória (0.0001s)
+        goals, assists, league, age, pk = 0.0, 0.0, "unknown", 25.0, 0.0
+
         for k_norm, v in self._season_stats_norm.items():
             if self._is_same_player_norm(norm_name, k_norm):
                 if v['goals'] > goals:
@@ -179,43 +147,51 @@ class MatchSimulator:
                     assists = v['assists']
                     league = v['league']
                     age = v['age']
-                    
-        self._player_season_cache[p_name] = (goals, assists, league, age)
-        return goals, assists, league, age
+                    pk = v.get('pk', 0.0)
+
+        self._player_season_cache[p_name] = (goals, assists, league, age, pk)
+        return goals, assists, league, age, pk
 
     def _get_recent_goals_cached(self, p_name: str):
         if p_name in self._player_recent_cache:
             return self._player_recent_cache[p_name]
-            
+
         norm_name = self._normalize_name(p_name)
         goals = 0
         for k_norm, v in self._recent_goals_norm.items():
             if self._is_same_player_norm(norm_name, k_norm):
                 goals += v
-                
+
         self._player_recent_cache[p_name] = goals
         return goals
+
+    def _get_fifa_playmaking_score(self, p_name: str, fallback_rating: float) -> float:
+        norm_name = self._normalize_name(p_name)
+        for k_norm, score in self._fifa_pm_norm.items():
+            if self._is_same_player_norm(norm_name, k_norm):
+                return score
+        return fallback_rating * 10.0
 
     def _init_ai_player_rates(self):
         print("[Motor Quântico] Precalculando IA Base (xG/xA) para todos os jogadores...")
         player_features = []
         player_names = []
-        
+
         pos_mapping = {"Attacker": 3, "Midfielder": 2, "Defender": 1, "Goalkeeper": 0}
-        
+
         for team in self.teams_info.keys():
             sq = self.feature_builder.data_loader.get_real_squad_data(team)
             roster = sq.get("top_players", []) + sq.get("bench_players", [])
-            if not roster: 
+            if not roster:
                 roster = self.feature_builder.data_loader._build_minimal_squad(team)
-                
+
             for p in roster:
                 if p["name"] in self.ai_player_rates: continue
-                
-                _, _, p_league, p_age = self._get_season_stats_cached(p["name"])
-                league_w = self._get_league_weight(p_league, p["name"])
+
+                _, _, p_league, p_age, _ = self._get_season_stats_cached(p["name"])
+                league_w = self._get_league_weight(p_league)
                 pos_code = pos_mapping.get(p.get("position", "Midfielder"), 2)
-                
+
                 player_features.append({
                     "Age": p_age,
                     "Pos_Code": pos_code,
@@ -224,19 +200,19 @@ class MatchSimulator:
                 })
                 player_names.append(p["name"])
                 self.ai_player_rates[p["name"]] = {"xg": 0.05, "xa": 0.05}
-                
+
         if player_features and self.player_models:
             df_features = pd.DataFrame(player_features)
             pred_g = self.player_models["model_goals"].predict(df_features)
             pred_a = self.player_models["model_assists"].predict(df_features)
-            
+
             for i, name in enumerate(player_names):
                 self.ai_player_rates[name] = {"xg": float(pred_g[i]), "xa": float(pred_a[i])}
-                
+
         print("[Motor Quântico] Previsões individuais concluídas.")
 
     def _dixon_coles(self, x: int, y: int, lx: float, ly: float) -> float:
-        if   x == 0 and y == 0: return max(0.01, 1 - lx * ly * self.rho)
+        if x == 0 and y == 0: return max(0.01, 1 - lx * ly * self.rho)
         elif x == 0 and y == 1: return max(0.01, 1 + lx * self.rho)
         elif x == 1 and y == 0: return max(0.01, 1 + ly * self.rho)
         elif x == 1 and y == 1: return max(0.01, 1 - self.rho)
@@ -273,16 +249,16 @@ class MatchSimulator:
         hadv = HOME_ADV.get(home_team, 1.0)
 
         lh_final = float(np.clip(base_lh * modifier_home * hadv, 0.10, 4.00))
-        la_final = float(np.clip(base_la * modifier_away,        0.10, 4.00))
+        la_final = float(np.clip(base_la * modifier_away, 0.10, 4.00))
 
         return lh_final, la_final, modifier_home, modifier_away
 
     def _squad_elo_modifier(
         self,
         own_rating: float, opp_rating: float,
-        own_elo: float,    opp_elo: float,
+        own_elo: float, opp_elo: float,
     ) -> float:
-        rating_diff  = (own_rating - opp_rating) * 0.15
+        rating_diff = (own_rating - opp_rating) * 0.15
         elo_diff_pct = (own_elo - opp_elo) / 5500.0
         raw = 1.0 + rating_diff + elo_diff_pct
         return float(np.clip(raw, 0.50, 2.00))
@@ -299,41 +275,54 @@ class MatchSimulator:
     def _player_goal_rate(self, player: dict) -> float:
         name = player.get("name", "")
         pos = player.get("position", "Midfielder")
-        
+        rating = player.get("rating", 7.0)
+
+        # Base IA Predict
         ai_rate = self.ai_player_rates.get(name, {}).get("xg", 0.05)
-        
-        season_goals, _, league, _ = self._get_season_stats_cached(name)
+
+        # Estatísticas Orgânicas
+        season_goals, _, league, _, pk = self._get_season_stats_cached(name)
         recent_goals = self._get_recent_goals_cached(name)
 
-        adj_season_goals = season_goals * self._get_league_weight(league, name)
+        adj_season_goals = season_goals * self._get_league_weight(league)
         real_life_bonus = (adj_season_goals ** 0.5) * 0.015 + (recent_goals ** 0.5) * 0.010
         real_life_bonus = min(real_life_bonus, 0.10) 
-        
+
         final_rate = ai_rate + real_life_bonus
-        
+
+        # Bônus Orgânico de Pênaltis: A IA lê os dados do CSV. 
+        # Se o jogador marcou pênaltis pelo clube (ex: Kane, Mbappé), ele tem mais xG.
+        if pk > 0:
+            final_rate *= 1.25
+
+        # Trava de Segurança Defensiva Absoluta
         if pos == "Defender": final_rate = min(final_rate, 0.06)
         if pos == "Goalkeeper": final_rate = 0.001
-        
+
         return round(float(np.clip(final_rate, 0.001, 0.85)), 3)
 
     def _player_assist_rate(self, player: dict) -> float:
         name = player.get("name", "")
         pos = player.get("position", "Midfielder")
+        rating = player.get("rating", 7.0)
 
+        # Base IA Predict
         ai_rate = self.ai_player_rates.get(name, {}).get("xa", 0.05)
 
-        _, season_assists, league, _ = self._get_season_stats_cached(name)
+        # Estatísticas Orgânicas
+        _, season_assists, league, _, _ = self._get_season_stats_cached(name)
+        
+        # Inteligência Tática EA FC (Playmaking Traits)
+        pm_score = self._get_fifa_playmaking_score(name, rating)
+        fifa_playmaking_bonus = max(0.0, (pm_score - 70) * 0.003)
 
-        vip_playmakers = ["messi", "neymar", "griezmann", "de bruyne", "bruno fernandes", "james", "quintero", "yamal", "wirtz", "musiala"]
-        if any(vip in name.lower() for vip in vip_playmakers):
-            ai_rate = max(ai_rate, 0.15) 
-
-        adj_season_assists = season_assists * self._get_league_weight(league, name)
+        adj_season_assists = season_assists * self._get_league_weight(league)
         real_life_bonus = (adj_season_assists ** 0.5) * 0.025
         real_life_bonus = min(real_life_bonus, 0.08) 
-        
-        final_rate = ai_rate + real_life_bonus
-        
+
+        final_rate = ai_rate + fifa_playmaking_bonus + real_life_bonus
+
+        # Trava de Segurança Defensiva Absoluta
         if pos == "Defender": final_rate = min(final_rate, 0.06)
         if pos == "Goalkeeper": final_rate = 0.001
 
@@ -351,19 +340,19 @@ class MatchSimulator:
         pos = player.get("position", "Midfielder")
         base = player.get("rating", 7.0)
         goals_conceded = ga if is_home else gf
-        goals_scored   = gf if is_home else ga
-        noise = random.gauss(0, 0.20)   
+        goals_scored = gf if is_home else ga
+        noise = random.gauss(0, 0.20)
 
         if pos == "Goalkeeper":
-            if   goals_conceded == 0: bonus = +0.9
+            if goals_conceded == 0: bonus = +0.9
             elif goals_conceded == 1: bonus = +0.2
             elif goals_conceded == 2: bonus = -0.2
-            else:                     bonus = -0.6
+            else: bonus = -0.6
         elif pos == "Defender":
-            if   goals_conceded == 0: bonus = +0.6
+            if goals_conceded == 0: bonus = +0.6
             elif goals_conceded == 1: bonus = +0.1
             elif goals_conceded >= 3: bonus = -0.5
-            else:                     bonus = -0.1
+            else: bonus = -0.1
             if scored: bonus += 0.5
         elif pos == "Midfielder":
             bonus = 0.0
@@ -371,7 +360,7 @@ class MatchSimulator:
             if assisted: bonus += 0.25
             if goals_scored > goals_conceded: bonus += 0.15
         elif pos == "Attacker":
-            bonus = -0.15 
+            bonus = -0.15
             if scored: bonus += 0.45
             if assisted: bonus += 0.20
         else:
@@ -383,7 +372,7 @@ class MatchSimulator:
         self,
         home_team: str,
         away_team: str,
-        num_simulations: int = 200,
+        num_simulations: int = 400,
         is_friendly: int = 0,
         home_excluded: list = None,
         away_excluded: list = None,
@@ -391,13 +380,13 @@ class MatchSimulator:
         if home_excluded is None: home_excluded = []
         if away_excluded is None: away_excluded = []
 
-        feats      = self.feature_builder.build_match_features(home_team, away_team, is_friendly, home_excluded, away_excluded)
-        feats_inv  = self.feature_builder.build_match_features(away_team, home_team, is_friendly, away_excluded, home_excluded)
+        feats = self.feature_builder.build_match_features(home_team, away_team, is_friendly, home_excluded, away_excluded)
+        feats_inv = self.feature_builder.build_match_features(away_team, home_team, is_friendly, away_excluded, home_excluded)
 
         home_rating = feats["home_rating"]
         away_rating = feats["away_rating"]
-        home_elo    = feats["home_elo"]
-        away_elo    = feats["away_elo"]
+        home_elo = feats["home_elo"]
+        away_elo = feats["away_elo"]
 
         lh, la, mod_h, mod_a = self._compute_lambdas(
             home_team, away_team,
@@ -407,10 +396,10 @@ class MatchSimulator:
         )
 
         prob_matrix = self._build_prob_matrix(lh, la)
-        max_goals   = prob_matrix.shape[0]
+        max_goals = prob_matrix.shape[0]
 
-        home_win_prob = float(np.sum(np.tril(prob_matrix, -1))) * 100   
-        draw_prob     = float(np.trace(prob_matrix)) * 100
+        home_win_prob = float(np.sum(np.tril(prob_matrix, -1))) * 100
+        draw_prob = float(np.trace(prob_matrix)) * 100
         away_win_prob = float(np.sum(np.triu(prob_matrix, 1))) * 100
 
         home_players: list[dict] = feats["home_players"]
@@ -459,7 +448,7 @@ class MatchSimulator:
         for sc, cnt in score_freq.items():
             parts = sc.split(" x ")
             hg_sc, ag_sc = int(parts[0]), int(parts[1])
-            
+
             if outcome == "home" and hg_sc > ag_sc:
                 if cnt > best_count: best_count = cnt; best_score = sc
             elif outcome == "away" and ag_sc > hg_sc:
@@ -467,18 +456,18 @@ class MatchSimulator:
             elif outcome == "draw" and hg_sc == ag_sc:
                 if cnt > best_count: best_count = cnt; best_score = sc
 
-        if best_count == -1: 
+        if best_count == -1:
             best_score = max(score_freq.items(), key=lambda x: x[1])[0]
 
         expected_score_str = f"{home_team} {best_score} {away_team}"
 
-        sampled    = np.random.choice(len(flat_probs), size=num_simulations, p=flat_probs)
-        home_sims  = sampled // max_goals
-        away_sims  = sampled % max_goals
+        sampled = np.random.choice(len(flat_probs), size=num_simulations, p=flat_probs)
+        home_sims = sampled // max_goals
+        away_sims = sampled % max_goals
 
-        player_goals:      defaultdict = defaultdict(int)
-        player_assists:    defaultdict = defaultdict(int)
-        player_perf_sum:   defaultdict = defaultdict(float)
+        player_goals: defaultdict = defaultdict(int)
+        player_assists: defaultdict = defaultdict(int)
+        player_perf_sum: defaultdict = defaultdict(float)
         player_perf_count: defaultdict = defaultdict(int)
         sim_logs: list[str] = []
 
@@ -491,10 +480,10 @@ class MatchSimulator:
 
             home_log: list[str] = []
             away_log: list[str] = []
-            home_scorers: set   = set()
-            away_scorers: set   = set()
-            home_ast_set: set   = set()
-            away_ast_set: set   = set()
+            home_scorers: set = set()
+            away_scorers: set = set()
+            home_ast_set: set = set()
+            away_ast_set: set = set()
 
             if hg > 0:
                 _assign_goals_and_assists(home_players, h_rates, h_ast_rates, hg, player_goals, player_assists, home_log, home_scorers, home_ast_set)
@@ -505,27 +494,27 @@ class MatchSimulator:
             parts = []
             if home_log: parts.append(f"[{ha}] {', '.join(home_log)}")
             if away_log: parts.append(f"[{aa}] {', '.join(away_log)}")
-            if parts:    log += " | Gols: " + " - ".join(parts)
+            if parts: log += " | Gols: " + " - ".join(parts)
             sim_logs.append(log)
 
-            for p in home_players:
-                sc   = p["name"] in home_scorers
-                ast  = p["name"] in home_ast_set
-                perf = self._performance_rating(p, sc, ast, hg, ag, True)
-                player_perf_sum[p["name"]]   += perf
-                player_perf_count[p["name"]] += 1
+        for p in home_players:
+            sc = p["name"] in home_scorers
+            ast = p["name"] in home_ast_set
+            perf = self._performance_rating(p, sc, ast, hg, ag, True)
+            player_perf_sum[p["name"]] += perf
+            player_perf_count[p["name"]] += 1
 
-            for p in away_players:
-                sc   = p["name"] in away_scorers
-                ast  = p["name"] in away_ast_set
-                perf = self._performance_rating(p, sc, ast, hg, ag, False)
-                player_perf_sum[p["name"]]   += perf
-                player_perf_count[p["name"]] += 1
+        for p in away_players:
+            sc = p["name"] in away_scorers
+            ast = p["name"] in away_ast_set
+            perf = self._performance_rating(p, sc, ast, hg, ag, False)
+            player_perf_sum[p["name"]] += perf
+            player_perf_count[p["name"]] += 1
 
         top_scorers = sorted(player_goals.items(), key=lambda x: x[1], reverse=True)[:3]
         top_assists = sorted(player_assists.items(), key=lambda x: x[1], reverse=True)[:3]
-        
-        avg_perf    = {
+
+        avg_perf = {
             k: round(v / player_perf_count[k], 2)
             for k, v in player_perf_sum.items()
             if player_perf_count[k] > 0
@@ -535,59 +524,59 @@ class MatchSimulator:
         score_series = pd.Series(most_likely)
 
         return {
-            "home_win_prob":      round(home_win_prob, 1),
-            "draw_prob":          round(draw_prob, 1),
-            "away_win_prob":      round(away_win_prob, 1),
+            "home_win_prob": round(home_win_prob, 1),
+            "draw_prob": round(draw_prob, 1),
+            "away_win_prob": round(away_win_prob, 1),
             "most_likely_scores": score_series,
-            "expected_score":     expected_score_str,
-            "home_lambda":        round(lh, 2),
-            "away_lambda":        round(la, 2),
-            "modifier_home":      round(mod_h, 3),
-            "modifier_away":      round(mod_a, 3),
-            "temperature":        feats["temperature"],
-            "stadium":            feats.get("stadium", "Miami"),
-            "home_rating":        home_rating,
-            "away_rating":        away_rating,
-            "home_injuries":      feats["home_injuries"],
-            "away_injuries":      feats["away_injuries"],
-            "home_data_source":   feats["home_data_source"],
-            "away_data_source":   feats["away_data_source"],
-            "home_elo":           home_elo,
-            "away_elo":           away_elo,
-            "sim_logs":           sim_logs,
-            "top_scorers":        top_scorers,
-            "top_assists":        top_assists,  
-            "top_ratings":        top_ratings,
+            "expected_score": expected_score_str,
+            "home_lambda": round(lh, 2),
+            "away_lambda": round(la, 2),
+            "modifier_home": round(mod_h, 3),
+            "modifier_away": round(mod_a, 3),
+            "temperature": feats["temperature"],
+            "stadium": feats.get("stadium", "Miami"),
+            "home_rating": home_rating,
+            "away_rating": away_rating,
+            "home_injuries": feats["home_injuries"],
+            "away_injuries": feats["away_injuries"],
+            "home_data_source": feats["home_data_source"],
+            "away_data_source": feats["away_data_source"],
+            "home_elo": home_elo,
+            "away_elo": away_elo,
+            "sim_logs": sim_logs,
+            "top_scorers": top_scorers,
+            "top_assists": top_assists,
+            "top_ratings": top_ratings,
         }
 
     def _build_vectorized_match_cache(self) -> dict:
         print("[Motor Quântico] Coletando atributos dinâmicos dos elencos...")
         teams = list(self.teams_info.keys())
         all_pairs = list(itertools.combinations(teams, 2))
-        
+
         t_data = {}
         for t in teams:
             sq = self.feature_builder.data_loader.get_real_squad_data(t)
             top = sq.get("top_players", [])
-            if not top: 
+            if not top:
                 top = self.feature_builder.data_loader._build_minimal_squad(t)
-            
+
             elo = self.feature_builder.data_loader.get_team_elo(t)
             goals = self.feature_builder.data_loader.get_historical_goals(t)
-            rating = FeatureBuilder._calculate_weighted_rating(top) 
-            
+            rating = FeatureBuilder._calculate_weighted_rating(top)
+
             gr = [self._player_goal_rate(p) for p in top]
             ar = [self._player_assist_rate(p) for p in top]
             if sum(gr) == 0: gr = [1.0]*len(top)
             if sum(ar) == 0: ar = [1.0]*len(top)
-            
+
             t_data[t] = {"elo": elo, "goals": goals, "rating": rating, "p": top, "gr": gr, "ar": ar}
 
         print("[Motor Quântico] Vetorizando 1.128 cenários...")
         rows_p1 = []
         rows_p2 = []
         HOME_ADV_TEAMS = {"USA", "Mexico", "Canada"}
-        
+
         for h, a in all_pairs:
             rows_p1.append({
                 "home_adv": 1 if h in HOME_ADV_TEAMS else 0,
@@ -618,45 +607,45 @@ class MatchSimulator:
         la_p1 = self.models["away"].predict(df_p1)
         lh_p2 = self.models["away"].predict(df_p2)
         la_p2 = self.models["home"].predict(df_p2)
-        
+
         print("[Motor Quântico] Criptografando matrizes de Poisson em Cache...")
         match_cache = {}
         for i, (h, a) in enumerate(all_pairs):
             base_lh = (lh_p1[i] + lh_p2[i]) / 2.0
             base_la = (la_p1[i] + la_p2[i]) / 2.0
-            
+
             elo_gap = abs(t_data[h]["elo"] - t_data[a]["elo"])
             adaptive_shrinkage = float(np.interp(elo_gap, [0, 400], [0.45, 0.18]))
             base_lh = (1 - adaptive_shrinkage) * base_lh + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
             base_la = (1 - adaptive_shrinkage) * base_la + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
-            
+
             mod_h = self._squad_elo_modifier(t_data[h]["rating"], t_data[a]["rating"], t_data[h]["elo"], t_data[a]["elo"])
             mod_a = self._squad_elo_modifier(t_data[a]["rating"], t_data[h]["rating"], t_data[a]["elo"], t_data[h]["elo"])
-            
+
             hadv = 1.05 if h == "USA" else 1.06 if h == "Mexico" else 1.04 if h == "Canada" else 1.0
-            
+
             lh_final = float(np.clip(base_lh * mod_h * hadv, 0.10, 4.00))
             la_final = float(np.clip(base_la * mod_a, 0.10, 4.00))
-            
+
             mat = self._build_prob_matrix(lh_final, la_final)
             hw_prob = float(np.sum(np.tril(mat, -1))) * 100
             aw_prob = float(np.sum(np.triu(mat, 1))) * 100
-            
+
             key = tuple(sorted([h, a]))
             match_cache[key] = {
                 h: {"mat": mat, "p": t_data[h]["p"], "gr": t_data[h]["gr"], "ar": t_data[h]["ar"], "wp": hw_prob},
                 a: {"mat": mat.T, "p": t_data[a]["p"], "gr": t_data[a]["gr"], "ar": t_data[a]["ar"], "wp": aw_prob}
             }
-            
+
         return match_cache
 
-    def run_full_tournament(self, num_tournaments: int = 200) -> dict:
+    def run_full_tournament(self, num_tournaments: int = 400) -> dict:
         print("\n[Motor Quântico] Desbloqueando GIL do Python e ativando Vetorização...")
 
         import utils.data_loader
         if not getattr(utils.data_loader, "_orig_gcm_patched", False):
             _orig_gcm = utils.data_loader.get_close_matches
-            
+
             def _fast_gcm(word, possibilities, n=1, cutoff=0.6):
                 if len(possibilities) > 5000:
                     possibilities_set = set(possibilities)
@@ -664,12 +653,12 @@ class MatchSimulator:
                     return []
                 if word in possibilities: return [word]
                 return _orig_gcm(word, possibilities, n, cutoff)
-                
+
             utils.data_loader.get_close_matches = _fast_gcm
             utils.data_loader._orig_gcm_patched = True
 
         match_cache = self._build_vectorized_match_cache()
-        
+
         groups_setup: dict = {}
         for team, info in self.teams_info.items():
             g = info.get("group", "A")
@@ -677,11 +666,11 @@ class MatchSimulator:
 
         cores = multiprocessing.cpu_count()
         print(f"[Motor Quântico] Cache gerado. Disparando {num_tournaments} Copas em {cores} threads lógicas...")
-        
+
         chunks = [num_tournaments // cores] * cores
         for i in range(num_tournaments % cores):
             chunks[i] += 1
-            
+
         final_results = {
             "champions": defaultdict(int),
             "player_goals": defaultdict(int),
@@ -697,7 +686,7 @@ class MatchSimulator:
             for c in chunks:
                 if c > 0:
                     futures.append(p_exec.submit(_worker_simulate_tournament_batch, groups_setup, match_cache, c))
-                    
+
             for future in futures:
                 res = future.result()
                 for k, v in res["champions"].items(): final_results["champions"][k] += v
@@ -707,35 +696,35 @@ class MatchSimulator:
                 for k, v in res["team_goals_a"].items(): final_results["team_goals_a"][k] += v
                 for k, v in res["team_matches"].items(): final_results["team_matches"][k] += v
                 for k, v in res["team_stage_points"].items(): final_results["team_stage_points"][k] += v
-                
+
         top_champions = sorted(final_results["champions"].items(), key=lambda x: x[1], reverse=True)[:5]
         fav_list = [{"team": t, "prob": (c/num_tournaments)*100} for t, c in top_champions]
-        
+
         top_scorers = sorted(final_results["player_goals"].items(), key=lambda x: x[1], reverse=True)[:5]
         scorer_list = [{"player": p, "avg_goals": g/num_tournaments} for p, g in top_scorers]
-        
+
         top_asts = sorted(final_results["player_assists"].items(), key=lambda x: x[1], reverse=True)[:5]
         ast_list = [{"player": p, "avg_assists": a/num_tournaments} for p, a in top_asts]
-        
+
         team_stats = []
         for t in self.teams_info.keys():
             if final_results["team_matches"][t] > 0:
                 gf_avg = final_results["team_goals_f"][t] / final_results["team_matches"][t]
                 ga_avg = final_results["team_goals_a"][t] / final_results["team_matches"][t]
                 team_stats.append({"team": t, "gf": gf_avg, "ga": ga_avg, "matches": final_results["team_matches"][t]})
-                
+
         best_attack = sorted(team_stats, key=lambda x: x["gf"], reverse=True)[:5]
         best_defense = sorted([t for t in team_stats if t["matches"] >= num_tournaments * 4], key=lambda x: x["ga"])[:5]
-        
+
         zebras = []
         for t in self.teams_info.keys():
             elo = self.feature_builder.data_loader.get_team_elo(t)
-            if elo < 1780: 
+            if elo < 1780:
                 avg_stage = final_results["team_stage_points"][t] / num_tournaments
                 zebras.append({"team": t, "avg_stage_score": avg_stage, "elo": elo})
-                
+
         best_zebra = sorted(zebras, key=lambda x: x["avg_stage_score"], reverse=True)[:1]
-        
+
         return {
             "total_sims": num_tournaments,
             "favorites": fav_list,
@@ -747,15 +736,15 @@ class MatchSimulator:
         }
 
 def _assign_goals_and_assists(
-    players:      list[dict],
-    goal_rates:   list[float],
-    ast_rates:    list[float],
-    total_goals:  int,
-    goals_dict:   dict,
+    players: list[dict],
+    goal_rates: list[float],
+    ast_rates: list[float],
+    total_goals: int,
+    goals_dict: dict,
     assists_dict: dict,
-    log_list:     list[str],
-    scorer_set:   set,
-    ast_set:      set,
+    log_list: list[str],
+    scorer_set: set,
+    ast_set: set,
 ) -> None:
     available = list(range(len(players)))
     goal_count: dict[int, int] = defaultdict(int)
@@ -776,7 +765,7 @@ def _assign_goals_and_assists(
         goal_count[scorer_idx] += 1
         goals_dict[scorer["name"]] += 1
         scorer_set.add(scorer["name"])
-        
+
         log_entry = scorer["name"]
         if random.random() < 0.70:
             eligible_assistants = [i for i in available if i != scorer_idx]
@@ -784,11 +773,11 @@ def _assign_goals_and_assists(
                 w_a = [ast_rates[i] * random.uniform(0.8, 1.2) for i in eligible_assistants]
                 w_a_sum = sum(w_a)
                 probs_a = [r / w_a_sum for r in w_a] if w_a_sum > 0 else [1.0 / len(eligible_assistants)] * len(eligible_assistants)
-                
+
                 idx_ast_in_list = random.choices(range(len(eligible_assistants)), weights=probs_a, k=1)[0]
                 ast_idx = eligible_assistants[idx_ast_in_list]
                 assistant = players[ast_idx]
-                
+
                 assists_dict[assistant["name"]] += 1
                 ast_set.add(assistant["name"])
                 log_entry += f" (Ast: {assistant['name']})"
@@ -798,7 +787,7 @@ def _assign_goals_and_assists(
 def _worker_simulate_tournament_batch(groups_setup, match_cache, num_tournaments):
     np.random.seed((os.getpid() * int(time.time() * 1000)) % 123456789)
     random.seed((os.getpid() * int(time.time() * 1000)) % 123456789)
-    
+
     champions = defaultdict(int)
     player_goals = defaultdict(int)
     player_assists = defaultdict(int)
@@ -806,48 +795,48 @@ def _worker_simulate_tournament_batch(groups_setup, match_cache, num_tournaments
     team_goals_a = defaultdict(int)
     team_matches = defaultdict(int)
     team_stage_points = defaultdict(int)
-    
+
     for _ in range(num_tournaments):
         standings = {
             g: {t: {"pts": 0, "gf": 0, "ga": 0, "gd": 0} for t in teams}
             for g, teams in groups_setup.items()
         }
-        
+
         for g, teams in groups_setup.items():
             for home, away in itertools.combinations(teams, 2):
                 key = tuple(sorted([home, away]))
                 h_data, a_data = match_cache[key][home], match_cache[key][away]
-                
+
                 flat_probs = h_data["mat"].flatten()
                 sample = np.random.choice(len(flat_probs), p=flat_probs)
                 max_g = h_data["mat"].shape[0]
                 hg = int(sample // max_g)
                 ag = int(sample % max_g)
-                
+
                 team_matches[home] += 1; team_matches[away] += 1
                 team_goals_f[home] += hg; team_goals_a[home] += ag
                 team_goals_f[away] += ag; team_goals_a[away] += hg
-                
+
                 standings[g][home]["gf"] += hg; standings[g][home]["ga"] += ag; standings[g][home]["gd"] += hg - ag
                 standings[g][away]["gf"] += ag; standings[g][away]["ga"] += hg; standings[g][away]["gd"] += ag - hg
-                
+
                 if hg > ag: standings[g][home]["pts"] += 3
                 elif ag > hg: standings[g][away]["pts"] += 3
                 else: standings[g][home]["pts"] += 1; standings[g][away]["pts"] += 1
-                
+
                 if hg > 0: _assign_goals_and_assists(h_data["p"], h_data["gr"], h_data["ar"], hg, player_goals, player_assists, [], set(), set())
                 if ag > 0: _assign_goals_and_assists(a_data["p"], a_data["gr"], a_data["ar"], ag, player_goals, player_assists, [], set(), set())
-                
+
         firsts, seconds, thirds = [], [], []
         for g in standings:
             st = sorted(standings[g].items(), key=lambda x: (x[1]["pts"], x[1]["gd"], x[1]["gf"]), reverse=True)
             firsts.append(st[0][0])
             seconds.append(st[1][0])
             thirds.append(st[2][0])
-            
-            team_stage_points[st[0][0]] += 2 
-            team_stage_points[st[1][0]] += 2 
-            team_stage_points[st[2][0]] += 1 
+
+            team_stage_points[st[0][0]] += 2
+            team_stage_points[st[1][0]] += 2
+            team_stage_points[st[2][0]] += 1
             team_stage_points[st[3][0]] += 1
 
         def get_pts(t):
@@ -859,53 +848,53 @@ def _worker_simulate_tournament_batch(groups_setup, match_cache, num_tournaments
         best_thirds = thirds_sorted[:8]
         for t in best_thirds:
             team_stage_points[t] += 1
-            
+
         firsts.sort(key=lambda t: (get_pts(t)["pts"], get_pts(t)["gd"], get_pts(t)["gf"]), reverse=True)
         seconds.sort(key=lambda t: (get_pts(t)["pts"], get_pts(t)["gd"], get_pts(t)["gf"]), reverse=True)
-        
-        seeds = firsts + seconds + best_thirds 
+
+        seeds = firsts + seconds + best_thirds
         bracket_idx = [0, 31, 15, 16, 8, 23, 7, 24, 4, 27, 11, 20, 12, 19, 3, 28, 2, 29, 13, 18, 10, 21, 5, 26, 6, 25, 9, 22, 14, 17, 1, 30]
         round_32 = [seeds[i] for i in bracket_idx]
-        
+
         def play_knockout(teams: list, stage_val_points: int):
             winners = []
             for i in range(0, len(teams), 2):
                 t1, t2 = teams[i], teams[i+1]
                 key = tuple(sorted([t1, t2]))
                 h_data, a_data = match_cache[key][t1], match_cache[key][t2]
-                
+
                 flat_probs = h_data["mat"].flatten()
                 sample = np.random.choice(len(flat_probs), p=flat_probs)
                 max_g = h_data["mat"].shape[0]
                 hg = int(sample // max_g)
                 ag = int(sample % max_g)
-                
+
                 team_matches[t1] += 1; team_matches[t2] += 1
                 team_goals_f[t1] += hg; team_goals_a[t1] += ag
                 team_goals_f[t2] += ag; team_goals_a[t2] += hg
-                
+
                 if hg > ag: winner = t1
                 elif ag > hg: winner = t2
                 else:
                     p1_pen = 0.5 + ((h_data["wp"] - a_data["wp"]) / 100.0) * 0.1
                     p1_pen = np.clip(p1_pen, 0.40, 0.60)
                     winner = t1 if random.random() < p1_pen else t2
-                    
+
                 if hg > 0: _assign_goals_and_assists(h_data["p"], h_data["gr"], h_data["ar"], hg, player_goals, player_assists, [], set(), set())
                 if ag > 0: _assign_goals_and_assists(a_data["p"], a_data["gr"], a_data["ar"], ag, player_goals, player_assists, [], set(), set())
-                    
+
                 winners.append(winner)
                 team_stage_points[winner] += stage_val_points
             return winners
 
         r16 = play_knockout(round_32, 1)
-        qf  = play_knockout(r16, 1)
-        sf  = play_knockout(qf, 1)
+        qf = play_knockout(r16, 1)
+        sf = play_knockout(qf, 1)
         finalists = play_knockout(sf, 1)
         champ = play_knockout(finalists, 1)
-        
+
         champions[champ[0]] += 1
-        
+
     return {
         "champions": dict(champions),
         "player_goals": dict(player_goals),
