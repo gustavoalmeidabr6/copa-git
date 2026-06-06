@@ -3,18 +3,30 @@
 import { forwardRef, useState } from "react";
 
 const ISO2: Record<string, string> = {
+  // Grupo A
   MEX: "mx", RSA: "za", KOR: "kr", CZE: "cz",
-  CAN: "ca", AUS: "au", NOR: "no", SUI: "ch",
-  BRA: "br", MAR: "ma", SCO: "gb-sct", HAI: "ht",
-  USA: "us", PAR: "py", TUN: "tn", DEN: "dk",
-  GER: "de", ECU: "ec", CIV: "ci", KSA: "sa",
-  NED: "nl", JPN: "jp", IRN: "ir", UKR: "ua",
-  BEL: "be", EGY: "eg", IRL: "ie", NZL: "nz",
-  ESP: "es", URU: "uy", CMR: "cm", AUT: "at",
-  FRA: "fr", SEN: "sn", POL: "pl", QAT: "qa",
-  ARG: "ar", COL: "co", NGA: "ng", JAM: "jm",
-  POR: "pt", GHA: "gh", PER: "pe", PAN: "pa",
-  ENG: "gb-eng", CRO: "hr", ALG: "dz", UZB: "uz",
+  // Grupo B
+  CAN: "ca", BIH: "ba", QAT: "qa", SUI: "ch",
+  // Grupo C
+  BRA: "br", MAR: "ma", HAI: "ht", SCO: "gb-sct",
+  // Grupo D
+  USA: "us", PAR: "py", AUS: "au", TUR: "tr",
+  // Grupo E
+  GER: "de", CUW: "cw", CIV: "ci", ECU: "ec",
+  // Grupo F
+  NED: "nl", JPN: "jp", SWE: "se", TUN: "tn",
+  // Grupo G
+  BEL: "be", EGY: "eg", IRN: "ir", NZL: "nz",
+  // Grupo H
+  ESP: "es", CPV: "cv", KSA: "sa", URU: "uy",
+  // Grupo I
+  FRA: "fr", SEN: "sn", IRQ: "iq", NOR: "no",
+  // Grupo J
+  ARG: "ar", ALG: "dz", AUT: "at", JOR: "jo",
+  // Grupo K
+  POR: "pt", COD: "cd", UZB: "uz", COL: "co",
+  // Grupo L
+  ENG: "gb-eng", CRO: "hr", GHA: "gh", PAN: "pa",
 };
 
 export function flagUrl(teamId: string, size: 80 | 160 | 320 = 160): string {

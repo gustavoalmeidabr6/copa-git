@@ -1,14 +1,15 @@
 """
-models/simulator.py — REESCRITA TOTAL v22 (Pura Inteligência de Dados / Zero Hardcode)
+models/simulator.py — REESCRITA TOTAL v23 (A Curva Exponencial e a Diluição Tática)
 
-MUDANÇAS v22:
-  - ZERO GAMBIARRAS: Remoção completa de listas com nomes de jogadores (VIPs, Wingers, etc).
-  - SISTEMA ORGÂNICO DE PÊNALTIS: O simulador agora lê a coluna `PK` do arquivo da 
-    temporada 2025/2026. Jogadores que cobram pênaltis nos seus clubes (ex: Kane, Mbappé) 
-    recebem um bônus orgânico nas probabilidades de gol sem precisar de intervenção manual.
-  - SISTEMA ORGÂNICO DE PLAYMAKERS: As assistências são ditadas estritamente pela 
-    fusão do EA FC (Vision, Passing, Curve) e as assistências reais do CSV, valorizando 
-    os verdadeiros garçons da vida real.
+MUDANÇAS v23:
+  - ZERO GAMBIARRAS: Nomes hardcodados foram extintos.
+  - CURVA EXPONENCIAL DE SUPERSTARS: A taxa de gols agora eleva a nota ao cubo 
+    ((rating/7.5) ** 3). Isso cria um abismo técnico entre os "Bons Jogadores" (Nota 8.3)
+    e os "Supercraques" (Nota 9.0+). Mbappé, Kane e Vini Jr. disparam na frente.
+  - DILUIÇÃO TÁTICA (FLATTENING): Aplicado o achatador `** 0.85` na hora da roleta 
+    de gols. Isso garante que os gols de times muito coletivos (como a Espanha) sejam 
+    espalhados entre meias, pontas e volantes, impedindo que o Centroavante sugue 
+    sozinho todos os gols da partida.
 """
 
 import numpy as np
@@ -47,7 +48,6 @@ class MatchSimulator:
         self._player_recent_cache = {}
         self._player_fifa_cache = {}
 
-        # ── 1. CARREGAMENTO DOS DADOS REAIS DA TEMPORADA 25/26 (Com Pênaltis) ──
         season_csv = Path(__file__).parent.parent / "data" / "players_data-2025_2026.csv"
         if season_csv.exists():
             try:
@@ -57,7 +57,7 @@ class MatchSimulator:
                 ast_col  = next((c for c in df_season.columns if c.lower() in ['assists', 'ast', 'assistencias']), None)
                 comp_col = next((c for c in df_season.columns if c.lower() in ['comp', 'league', 'liga', 'competition', 'campeonato']), None)
                 age_col  = next((c for c in df_season.columns if c.lower() in ['age', 'idade']), None)
-                pk_col   = next((c for c in df_season.columns if c == 'PK'), None) # Busca a coluna exata de Pênaltis
+                pk_col   = next((c for c in df_season.columns if c == 'PK'), None) 
                 
                 if name_col:
                     for _, row in df_season.iterrows():
@@ -79,7 +79,6 @@ class MatchSimulator:
         except: 
             pass
 
-        # ── 2. CARREGAMENTO DOS ATRIBUTOS DE CRIAÇÃO DO EA FC ──
         self._fifa_pm_norm = {}
         df_fifa = self.feature_builder.data_loader.players_db
         if not df_fifa.empty and "Name" in df_fifa.columns:
@@ -93,7 +92,6 @@ class MatchSimulator:
                 else:
                     self._fifa_pm_norm[p_name] = float(row.get("OVR", 70))
 
-        # ── 3. MODELO DE IA INDIVIDUAL ──
         self.ai_player_rates = {}
         self.player_models = None
         if PLAYER_ML_PATH.exists():
@@ -277,42 +275,40 @@ class MatchSimulator:
         pos = player.get("position", "Midfielder")
         rating = player.get("rating", 7.0)
 
-        # Base IA Predict
         ai_rate = self.ai_player_rates.get(name, {}).get("xg", 0.05)
 
-        # Estatísticas Orgânicas
         season_goals, _, league, _, pk = self._get_season_stats_cached(name)
         recent_goals = self._get_recent_goals_cached(name)
 
         adj_season_goals = season_goals * self._get_league_weight(league)
         real_life_bonus = (adj_season_goals ** 0.5) * 0.015 + (recent_goals ** 0.5) * 0.010
-        real_life_bonus = min(real_life_bonus, 0.10) 
+        real_life_bonus = min(real_life_bonus, 0.12) 
 
-        final_rate = ai_rate + real_life_bonus
+        rate = ai_rate + real_life_bonus
 
-        # Bônus Orgânico de Pênaltis: A IA lê os dados do CSV. 
-        # Se o jogador marcou pênaltis pelo clube (ex: Kane, Mbappé), ele tem mais xG.
-        if pk > 0:
-            final_rate *= 1.25
+        # ── A MÁGICA DA CURVA EXPONENCIAL ──
+        # Substitui a escala linear. Transforma o Mbappé num Deus e rebaixa jogadores nota 8.2 para níveis normais.
+        rating_multiplier = (rating / 7.5) ** 3.0
+        final_rate = rate * rating_multiplier
 
-        # Trava de Segurança Defensiva Absoluta
+        # ── PÊNALTIS ORGÂNICOS ──
+        pk_bonus = min(0.30, pk * 0.05) 
+        final_rate *= (1.0 + pk_bonus)
+
         if pos == "Defender": final_rate = min(final_rate, 0.06)
         if pos == "Goalkeeper": final_rate = 0.001
 
-        return round(float(np.clip(final_rate, 0.001, 0.85)), 3)
+        return round(float(np.clip(final_rate, 0.001, 0.95)), 3)
 
     def _player_assist_rate(self, player: dict) -> float:
         name = player.get("name", "")
         pos = player.get("position", "Midfielder")
         rating = player.get("rating", 7.0)
 
-        # Base IA Predict
         ai_rate = self.ai_player_rates.get(name, {}).get("xa", 0.05)
 
-        # Estatísticas Orgânicas
         _, season_assists, league, _, _ = self._get_season_stats_cached(name)
         
-        # Inteligência Tática EA FC (Playmaking Traits)
         pm_score = self._get_fifa_playmaking_score(name, rating)
         fifa_playmaking_bonus = max(0.0, (pm_score - 70) * 0.003)
 
@@ -322,7 +318,6 @@ class MatchSimulator:
 
         final_rate = ai_rate + fifa_playmaking_bonus + real_life_bonus
 
-        # Trava de Segurança Defensiva Absoluta
         if pos == "Defender": final_rate = min(final_rate, 0.06)
         if pos == "Goalkeeper": final_rate = 0.001
 
@@ -719,7 +714,7 @@ class MatchSimulator:
         zebras = []
         for t in self.teams_info.keys():
             elo = self.feature_builder.data_loader.get_team_elo(t)
-            if elo < 1780:
+            if elo < 1780: 
                 avg_stage = final_results["team_stage_points"][t] / num_tournaments
                 zebras.append({"team": t, "avg_stage_score": avg_stage, "elo": elo})
 
@@ -735,6 +730,7 @@ class MatchSimulator:
             "biggest_zebra": best_zebra[0] if best_zebra else None
         }
 
+# ── A DILUIÇÃO TÁTICA (Fim da Ditadura de um só artilheiro) ──
 def _assign_goals_and_assists(
     players: list[dict],
     goal_rates: list[float],
@@ -754,7 +750,9 @@ def _assign_goals_and_assists(
         if not eligible_scorers:
             eligible_scorers = available
 
-        w_g = [goal_rates[i] * random.uniform(0.7, 1.3) for i in eligible_scorers]
+        # ** 0.85 amassa o pico do gráfico, impedindo que o Centroavante sugue 
+        # sozinho todos os gols em times de futebol muito coletivos.
+        w_g = [(goal_rates[i] ** 0.85) * random.uniform(0.7, 1.3) for i in eligible_scorers]
         w_g_sum = sum(w_g)
         probs_g = [r / w_g_sum for r in w_g] if w_g_sum > 0 else [1.0 / len(eligible_scorers)] * len(eligible_scorers)
 

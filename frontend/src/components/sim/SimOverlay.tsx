@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 export function SimOverlay({ onDone, label = "Simulando" }: { onDone: () => void; label?: string }) {
   const [n, setN] = useState(0);
   useEffect(() => {
-    const target = 200;
+    const target = 400;
     const start = Date.now();
     const dur = 1800;
     let raf = 0;
