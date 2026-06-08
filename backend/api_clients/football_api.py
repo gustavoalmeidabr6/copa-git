@@ -1,7 +1,7 @@
 """
 api_clients/football_api.py
 Clientes completos e estruturados para todas as APIs de futebol.
-Inclui tratamento seguro de cache para Windows.
+Inclui tratamento seguro de cache para Windows e leitura do .env.
 """
 import requests
 import json
@@ -9,6 +9,10 @@ import time
 import os
 from pathlib import Path
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+# Carrega as chaves do arquivo .env automaticamente
+load_dotenv()
 
 BASE_DIR = Path(__file__).parent.parent
 CACHE_DIR = BASE_DIR / "data" / "cache"
@@ -42,9 +46,9 @@ def _build_safe_cache_key(prefix: str, endpoint: str, params: dict) -> str:
 class APIFootball:
     BASE_URL = "https://v3.football.api-sports.io"
 
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.headers = {"x-rapidapi-key": api_key, "x-rapidapi-host": "v3.football.api-sports.io"}
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv("APISPORTS_KEY", "")
+        self.headers = {"x-rapidapi-key": self.api_key, "x-rapidapi-host": "v3.football.api-sports.io"}
 
     def _get(self, endpoint: str, params: dict = None) -> dict | None:
         cache_key = _build_safe_cache_key("apif", endpoint, params)
@@ -54,7 +58,6 @@ class APIFootball:
         if not self.api_key or self.api_key == "SUA_CHAVE_AQUI": return None
 
         try:
-            # Usando os dois cabeçalhos possíveis para garantir 100% de compatibilidade
             headers = {
                 "x-rapidapi-key": self.api_key, 
                 "x-rapidapi-host": "v3.football.api-sports.io",
@@ -64,20 +67,14 @@ class APIFootball:
             
             if r.status_code == 200:
                 data = r.json()
-                
-                # 1. Se o próprio JSON enviar uma lista ou dicionário de erros, aí sim abortamos.
                 if data.get('errors') and len(data['errors']) > 0: 
                     print(f"⚠️ API-Football recusou {endpoint}. Motivo: {data['errors']}")
                     return None
-                
-                # 2. Se a chave 'response' não existir no JSON, algo deu errado.
-                # Nota: Se ela existir e for [], significa "zero resultados" (ex: 0 lesões). É válido!
                 if 'response' not in data: 
-                    print(f"⚠️ API-Football não enviou 'response' para {endpoint}.")
                     return None
                 
                 _save_cache(cache_key, data)
-                time.sleep(1) # Intervalo seguro para não tomar block
+                time.sleep(1)
                 return data
             else:
                 print(f"⚠️ Erro de conexão na API: Status {r.status_code} ({endpoint})")
@@ -91,32 +88,24 @@ class APIFootball:
         return data.get("response") if data else None
 
     def get_injuries(self, team_id: int) -> list | None:
-        """Busca a lista de lesionados do time em tempo real."""
         data = self._get("injuries", {"team": team_id})
         return data.get("response") if data else None
 
     def get_last_match_players(self, team_id: int) -> list | None:
-        """Busca os jogadores que entraram em campo no ÚLTIMO JOGO OFICIAL do time."""
-        # 1. Pega o ID da última partida real que o time disputou
         fix_data = self._get("fixtures", {"team": team_id, "last": 1})
         if not fix_data or not fix_data.get('response'): return None
-        
         fixture_id = fix_data['response'][0]['fixture']['id']
-        
-        # 2. Pega o elenco, notas e posições exatas dessa partida
         players_data = self._get("fixtures/players", {"fixture": fixture_id, "team": team_id})
-        
         if players_data and players_data.get('response'):
             return players_data['response'][0].get('players')
-            
         return None
 
 class FootballDataOrg:
     BASE_URL = "https://api.football-data.org/v4"
     
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.headers = {"X-Auth-Token": api_key}
+    def __init__(self, api_key: str = None):
+        self.api_key = api_key or os.getenv("FOOTBALL_DATA_KEY", "")
+        self.headers = {"X-Auth-Token": self.api_key}
 
     def get_competition_matches(self, status: str = None) -> list | None:
         cache_key = "fdorg_matches_wc"
@@ -138,23 +127,29 @@ class TheOddsAPI:
     BASE_URL = "https://api.the-odds-api.com/v4"
     SOCCER_KEY = "soccer_fifa_world_cup"
 
-    def __init__(self, api_key: str):
-        self.api_key = api_key
+    def __init__(self, api_key: str = None):
+        # Vai ler a chave que você colocou no .env
+        self.api_key = api_key or os.getenv("ODDS_API_KEY", "")
 
     def get_world_cup_odds(self) -> list | None:
         cache_key = "odds_wc_outrights"
-        cached = _load_cache(cache_key, max_age_hours=1)
+        cached = _load_cache(cache_key, max_age_hours=1) # Cache de 1h para Odds
         if cached: return cached
         
-        if not self.api_key or self.api_key == "SUA_CHAVE_AQUI": return None
+        if not self.api_key or self.api_key == "SUA_CHAVE_AQUI": 
+            print("⚠️  Chave TheOddsAPI não detectada. O simulador rodará sem a sabedoria do mercado.")
+            return None
         
-        params = {"apiKey": self.api_key, "regions": "eu", "markets": "h2h", "oddsFormat": "decimal"}
+        params = {"apiKey": self.api_key, "regions": "eu,us", "markets": "h2h", "oddsFormat": "decimal"}
         try:
+            print("🌐 Baixando Odds em tempo real das casas de apostas (The Odds API)...")
             r = requests.get(f"{self.BASE_URL}/sports/{self.SOCCER_KEY}/odds", params=params, timeout=10)
             if r.status_code == 200:
                 data = r.json()
                 _save_cache(cache_key, data)
                 return data
+            else:
+                print(f"⚠️ Erro TheOddsAPI: Status {r.status_code}")
         except requests.RequestException:
             pass
         return None
@@ -166,7 +161,6 @@ class OpenFootball:
         cache_key = "openfootball_wc2026"
         cached = _load_cache(cache_key, max_age_hours=24)
         if cached: return cached
-
         try:
             r = requests.get(self.WC_2026_URL, timeout=15)
             if r.status_code == 200:
@@ -178,5 +172,4 @@ class OpenFootball:
         return None
 
 class EloRatings:
-    """Classe mantida para compatibilidade com o __init__.py"""
     pass

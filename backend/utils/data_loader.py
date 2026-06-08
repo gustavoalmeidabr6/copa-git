@@ -1,12 +1,14 @@
 """
-utils/data_loader.py — VERSÃO v5 (Com Matriz Tática de Escalações Oficiais)
+utils/data_loader.py — VERSÃO v6 (Bugs de Rating e Darwin Corrigidos)
 
 CORREÇÕES DESTA VERSÃO:
-  - FIM DA DITADURA DO RATING: Antes, o sistema forçava os 11 jogadores com maior
-    nota a serem titulares. Agora, implementamos a matriz `PREFERRED_STARTERS`.
-  - O sistema lê a escalação tática desejada e busca os nomes no elenco. Os 11 
-    escolhidos viram os `top_players` (Titulares), e astros lesionados/bancados 
-    como Neymar vão corretamente para os `bench_players` (Reservas).
+  - FIM DO BUG DO DARWIN NÚÑEZ: A busca de gols agora verifica se o nome do jogador
+    é substring do nome da base de dados, prevenindo acúmulo de gols por substrings curtas genéricas.
+  - O FIM DO SUMIÇO DOS CRAQUES DA FRANÇA: Implementado motor universal de normalização
+    de nomes (_normalize_name) e ALIAS_MAP global para garantir que os lookups no EA FC
+    e Transfermarkt liguem "Kylian Mbappé" com "Mbappe" de forma perfeita.
+  - MATRIZ TÁTICA RESPEITANDO ACENTOS: A seleção dos titulares foi atualizada para
+    remover acentuação no momento da busca, protegendo "Dembélé".
 """
 
 import pandas as pd
@@ -20,6 +22,110 @@ CONVOCADOS_PATH = DATA_DIR / "convocados_2026.txt"
 EAFC_CSV_PATH   = DATA_DIR / "EAFC26-Men.csv"
 TM_PLAYERS_CSV  = DATA_DIR / "players.csv"
 TM_GOALSCORERS_CSV = DATA_DIR / "goalscorers.csv"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NORMALIZAÇÃO UNIVERSAL E ALIASES (A Base para Não Perder Supercraques)
+# ─────────────────────────────────────────────────────────────────────────────
+_TRANS = str.maketrans(
+    "áéíóúãõçÁÉÍÓÚÃÕÇàèìòùÀÈÌÒÙäëïöüÄËÏÖÜ",
+    "aeiouaocAEIOUAOCaeiouAEIOUaeiouAEIOU"
+)
+
+def _normalize_name(n: str) -> str:
+    n = str(n).lower().translate(_TRANS).replace('-', ' ')
+    return " ".join(c for c in n.split() if c.isalnum() or ' ' in c)
+
+ALIAS_GROUPS = [
+    # Espanha
+    {"yamal", "lamine yamal", "lamine"},
+    {"nico williams", "n williams", "nicholas williams"},
+    {"pedri", "pedro gonzalez lopez"},
+    {"rodri", "rodrigo hernandez cascante", "rodrigo hernandez"},
+    {"ferran", "ferran torres"},
+    {"oyarzabal", "mikel oyarzabal"},
+    {"cubarsi", "pau cubarsi"},
+    {"grimaldo", "alejandro grimaldo"},
+    {"fabian", "fabian ruiz"},
+    {"llorente", "marcos llorente"},
+    {"laporte", "aymeric laporte"},
+    {"cucurella", "marc cucurella"},
+    {"zubimendi", "martin zubimendi"},
+    {"gavi", "pablo martin paez gavira", "pablo gavi"},
+    {"baena", "alex baena"},
+    {"dani olmo", "daniel olmo"},
+    # França
+    {"mbappe", "kylian mbappe"},
+    {"dembele", "ousmane dembele"},
+    {"doue", "desire doue"},
+    {"olise", "michael olise"},
+    {"tchouameni", "aurelien tchouameni"},
+    {"rabiot", "adrien rabiot"},
+    {"upamecano", "dayot upamecano"},
+    {"maignan", "mike maignan"},
+    {"kounde", "jules kounde"},
+    {"griezmann", "antoine griezmann"},
+    {"barcola", "bradley barcola"},
+    {"camavinga", "eduardo camavinga"},
+    {"hernandez", "theo hernandez", "lucas hernandez"},
+    # Inglaterra
+    {"saka", "bukayo saka"},
+    {"bellingham", "jude bellingham"},
+    {"kane", "harry kane"},
+    {"eze", "eberechi eze"},
+    {"foden", "phil foden"},
+    # Brasil
+    {"vinicius jr", "vini jr", "vinicius junior", "vinicius"},
+    {"raphinha", "raphael dias belloli"},
+    {"cunha", "matheus cunha"},
+    {"luis henrique", "luiz henrique"},
+    {"endrick", "endrick felipe"},
+    {"rodrygo", "rodrygo silva de goes"},
+    {"paqueta", "lucas paqueta"},
+    # Portugal
+    {"bruno fernandes", "b fernandes"},
+    {"cristiano ronaldo", "c ronaldo", "ronaldo"},
+    {"pepe", "kepler laveran"},
+    {"vitinha", "vitor machado ferreira"},
+    {"leao", "rafael leao"},
+    {"joao felix", "j felix"},
+    {"bernardo silva", "b silva"},
+    {"ruben dias", "r dias"},
+    # Alemanha
+    {"musiala", "jamal musiala"},
+    {"wirtz", "florian wirtz"},
+    {"havertz", "kai havertz"},
+    {"sane", "leroy sane"},
+    # Outros
+    {"son", "son heung min", "heung min son"},
+    {"kante", "ngolo kante", "golo kante"},
+    {"depay", "memphis depay"},
+    {"james", "james rodriguez"},
+    {"valencia", "enner valencia"},
+    {"caicedo", "moises caicedo"},
+    {"yeboah", "john yeboah"},
+    {"kramaric", "andrej kramaric"},
+    {"perisic", "ivan perisic"},
+    {"budimir", "ante budimir"},
+    {"gakpo", "cody gakpo"},
+    {"de jong", "frenkie de jong"},
+    {"darwin", "darwin nunez"},
+    {"messi", "lionel messi"},
+    {"alvarez", "julian alvarez"}
+]
+
+def _build_alias_map() -> dict:
+    alias_map = {}
+    for group in ALIAS_GROUPS:
+        canonical = sorted(group, key=len)[-1]  
+        for name in group:
+            alias_map[_normalize_name(name)] = _normalize_name(canonical)
+    return alias_map
+
+ALIAS_MAP = _build_alias_map()
+
+def _canonical(name_norm: str) -> str:
+    return ALIAS_MAP.get(name_norm, name_norm)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MATRIZ TÁTICA (ESCALAÇÕES TITULARES REAIS DA COPA 2026)
@@ -71,7 +177,7 @@ PREFERRED_STARTERS = {
     "Switzerland": ["Kobel", "Widmer", "Akanji", "Elvedi", "Rodriguez", "Freuler", "Xhaka", "Rieder", "Ndoye", "Embolo", "Vargas"],
     "Tunisia": ["Dahmen", "Valery", "Bronn", "Talbi", "Abdi", "Gharbi", "Skhiri", "Hannibal", "Achouri", "Mastouri", "Tounekti"],
     "Turkey": ["Cakir", "Demiral", "Kabak", "Bardakci", "Celik", "Calhanoglu", "Kokcu", "Ozer", "Guler", "Yildiz", "Akturkoglu"],
-    "Uruguay": ["Rochet", "Valera", "Gimenez", "Araujo", "Olivera", "Valverde", "Ugarte", "Bentancur", "Canobbio", "Nunez", "Rodriguez"],
+    "Uruguay": ["Rochet", "Valera", "Gimenez", "Araujo", "Olivera", "Valverde", "Ugarte", "Bentancur", "Canobbio", "Darwin Nunez", "Rodriguez"],
     "Uzbekistan": ["Nematov", "Abdullaev", "Ashurmatov", "Khusanov", "Sayfiev", "Shukurov", "Khamrobekov", "Nasrullaev", "Ganiev", "Urunov", "Shomurodov"]
 }
 
@@ -135,25 +241,6 @@ for _std, _aliases in SQUAD_NAME_ALIASES.items():
     for _alias in _aliases:
         _ALIAS_TO_STANDARD[_alias.lower().strip()] = _std
 
-EA_NATION_MAP: dict[str, str] = {
-    "Argentina": "Argentina", "Australia": "Australia", "Austria": "Austria",
-    "Belgium": "Belgium", "Bosnia and Herzegovina": "Bosnia & Herzegovina",
-    "Brazil": "Brazil", "Canada": "Canada", "Cape Verde": "Cape Verde",
-    "Colombia": "Colombia", "Croatia": "Croatia", "Czechia": "Czech Republic",
-    "Curaçao": "Curaçao", "DR Congo": "DR Congo", "Ecuador": "Ecuador",
-    "Egypt": "Egypt", "England": "England", "France": "France",
-    "Germany": "Germany", "Ghana": "Ghana", "Haiti": "Haiti",
-    "Iran": "IR Iran", "Iraq": "Iraq", "Ivory Coast": "Ivory Coast",
-    "Japan": "Japan", "Jordan": "Jordan", "Mexico": "Mexico",
-    "Morocco": "Morocco", "Netherlands": "Netherlands", "New Zealand": "New Zealand",
-    "Norway": "Norway", "Panama": "Panama", "Paraguay": "Paraguay",
-    "Portugal": "Portugal", "Qatar": "Qatar", "Saudi Arabia": "Saudi Arabia",
-    "Scotland": "Scotland", "Senegal": "Senegal", "South Africa": "South Africa",
-    "South Korea": "Korea Republic", "Spain": "Spain", "Sweden": "Sweden",
-    "Switzerland": "Switzerland", "Tunisia": "Tunisia", "Turkey": "Turkey",
-    "Uruguay": "Uruguay", "USA": "USA", "Uzbekistan": "Uzbekistan",
-    "Algeria": "Algeria",
-}
 
 GENERIC_SQUADS: dict[str, dict] = {
     "France": {
@@ -278,6 +365,32 @@ class DataLoader:
         self.recent_goals_dict = self._build_recent_goals_dict()
         self.squads_dict  = self._parse_convocados()
         self.cache: dict  = {}
+        
+        # Constrói cache O(1) com os nomes normalizados e os ALIAS
+        self._build_lookups()
+
+    def _build_lookups(self):
+        self.ea_lookup = {}
+        if not self.players_db.empty and "Name" in self.players_db.columns:
+            for _, row in self.players_db.iterrows():
+                name_norm = _normalize_name(str(row["Name"]))
+                canon = _canonical(name_norm)
+                # Salva os dois mapeamentos (direto normalizado e o canônico global)
+                self.ea_lookup[canon] = float(row.get("OVR", 70)) / 10.0
+                self.ea_lookup[name_norm] = float(row.get("OVR", 70)) / 10.0
+                
+        self.tm_lookup = {}
+        if not self.tm_players.empty:
+            name_c = "name" if "name" in self.tm_players.columns else "first_name"
+            if name_c in self.tm_players.columns and "market_value_in_eur" in self.tm_players.columns:
+                for _, row in self.tm_players.iterrows():
+                    try:
+                        name_norm = _normalize_name(str(row[name_c]))
+                        canon = _canonical(name_norm)
+                        val = float(row["market_value_in_eur"])
+                        self.tm_lookup[canon] = val
+                        self.tm_lookup[name_norm] = val
+                    except: pass
 
     def _load_csv(self, path: Path, name: str) -> pd.DataFrame:
         if not path.exists():
@@ -415,40 +528,51 @@ class DataLoader:
         base_rating        = 7.0
         market_value_bonus = 0.0
         goals_bonus        = 0.0
+        
+        # 1. Normalização Imediata (Resolve o sumiço da França)
+        p_name_norm = _normalize_name(p_name)
+        p_canon = _canonical(p_name_norm)
 
-        if not self.players_db.empty:
-            nat_col = "Nationality" if "Nationality" in self.players_db.columns else None
-            if nat_col:
-                nat_df = self.players_db[
-                    self.players_db[nat_col].str.contains(ea_nation, case=False, na=False)
-                ]
-            else:
-                nat_df = self.players_db
+        # 2. Busca O(1) Segura no Cache do EA FC (Resolve Mbappé, Dembélé, etc)
+        if p_canon in self.ea_lookup:
+            base_rating = self.ea_lookup[p_canon]
+        elif p_name_norm in self.ea_lookup:
+            base_rating = self.ea_lookup[p_name_norm]
+        else:
+            ea_keys = list(self.ea_lookup.keys())
+            matches = get_close_matches(p_canon, ea_keys, n=1, cutoff=0.75)
+            if matches:
+                base_rating = self.ea_lookup[matches[0]]
 
-            if not nat_df.empty:
-                ea_names = nat_df["Name"].dropna().tolist()
-                match_ea = get_close_matches(p_name, ea_names, n=1, cutoff=0.60)
-                if match_ea:
-                    row = nat_df[nat_df["Name"] == match_ea[0]].iloc[0]
-                    base_rating = float(row.get("OVR", 70)) / 10.0
+        # 3. Busca Segura no Cache do Transfermarkt
+        val = 0
+        if p_canon in self.tm_lookup:
+            val = self.tm_lookup[p_canon]
+        elif p_name_norm in self.tm_lookup:
+            val = self.tm_lookup[p_name_norm]
+        else:
+            tm_keys = list(self.tm_lookup.keys())
+            matches = get_close_matches(p_canon, tm_keys, n=1, cutoff=0.75)
+            if matches:
+                val = self.tm_lookup[matches[0]]
+                
+        if val >= 80_000_000: market_value_bonus = 0.8
+        elif val >= 50_000_000: market_value_bonus = 0.5
+        elif val >= 20_000_000: market_value_bonus = 0.3
+        elif val >=  5_000_000: market_value_bonus = 0.1
 
-        if not self.tm_players.empty:
-            tm_names = self.tm_players["name"].dropna().astype(str).tolist()
-            match_tm = get_close_matches(p_name, tm_names, n=1, cutoff=0.65)
-            if match_tm:
-                tm_row = self.tm_players[self.tm_players["name"] == match_tm[0]].iloc[0]
-                value = tm_row.get("market_value_in_eur", 0)
-                if pd.notna(value):
-                    v = float(value)
-                    if   v >= 80_000_000: market_value_bonus = 0.8
-                    elif v >= 50_000_000: market_value_bonus = 0.5
-                    elif v >= 20_000_000: market_value_bonus = 0.3
-                    elif v >=  5_000_000: market_value_bonus = 0.1
-
+        # 4. Busca Histórica de Gols (Resolve a Extrapolação de Darwin Núñez)
         goals_recentes = 0
         for name_key, gols in self.recent_goals_dict.items():
-            if isinstance(name_key, str) and (p_name in name_key or name_key in p_name):
-                goals_recentes += gols
+            if isinstance(name_key, str):
+                nk_norm = _normalize_name(name_key)
+                nk_canon = _canonical(nk_norm)
+                
+                # BUGFIX: Inversão implementada. Só acumula gols se o nome base do jogador
+                # for achado DENTRO da chave gerada pelo banco de dados, e não o inverso.
+                if p_canon == nk_canon or (len(p_name_norm) > 3 and p_name_norm in nk_norm):
+                    goals_recentes += gols
+
         if   goals_recentes >= 10: goals_bonus = 0.6
         elif goals_recentes >=  5: goals_bonus = 0.3
         elif goals_recentes >=  2: goals_bonus = 0.1
@@ -476,7 +600,8 @@ class DataLoader:
                 fuzzy = get_close_matches(team_name, keys, n=1, cutoff=0.80)
                 dict_team_name = fuzzy[0] if fuzzy else None
 
-        ea_nation = EA_NATION_MAP.get(team_name, team_name)
+        # Agora ea_nation é apenas repassado, mas as buscas são globais
+        ea_nation = team_name 
         official_roster: list[dict] = []
 
         if dict_team_name and dict_team_name in self.squads_dict:
@@ -502,25 +627,23 @@ class DataLoader:
 
         official_roster.sort(key=lambda x: x["rating"], reverse=True)
 
-        # ── NOVA LÓGICA DE ESCALAÇÃO: Respeito Tático (Fim da Ditadura do Rating) ──
         preferred_names = PREFERRED_STARTERS.get(dict_team_name)
         
         starters = []
         used_indices = set()
         
         if preferred_names:
-            def normalize(n):
-                return n.lower().replace('á','a').replace('é','e').replace('í','i').replace('ó','o').replace('ú','u').replace('ã','a').replace('õ','o').replace('ç','c').strip()
-
             for pref_name in preferred_names:
-                p_norm = normalize(pref_name)
+                p_norm = _normalize_name(pref_name)
+                p_canon = _canonical(p_norm)
                 best_match_idx = -1
                 
                 # 1. Tenta achar exatamente o nome
                 for i, p in enumerate(official_roster):
                     if i in used_indices: continue
-                    r_norm = normalize(p["name"])
-                    if p_norm == r_norm:
+                    r_norm = _normalize_name(p["name"])
+                    r_canon = _canonical(r_norm)
+                    if p_norm == r_norm or p_canon == r_canon:
                         best_match_idx = i
                         break
                 
@@ -528,7 +651,7 @@ class DataLoader:
                 if best_match_idx == -1:
                     for i, p in enumerate(official_roster):
                         if i in used_indices: continue
-                        r_norm = normalize(p["name"])
+                        r_norm = _normalize_name(p["name"])
                         if p_norm in r_norm or r_norm in p_norm:
                             best_match_idx = i
                             break
@@ -555,7 +678,6 @@ class DataLoader:
             bench = [p for i, p in enumerate(official_roster) if i not in used_indices]
             
         else:
-            # Fallback para seleções que não estão na matriz (pega os melhores por posição)
             gks  = [p for p in official_roster if p["position"] == "Goalkeeper"]
             defs = [p for p in official_roster if p["position"] == "Defender"]
             mids = [p for p in official_roster if p["position"] == "Midfielder"]

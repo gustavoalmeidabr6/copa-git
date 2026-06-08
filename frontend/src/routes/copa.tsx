@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GROUPS, ALL_TEAMS } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
@@ -20,7 +20,6 @@ export const Route = createFileRoute("/copa")({
 
 type Step = "groups" | "final";
 
-// TIPAGEM ATUALIZADA: Adicionado top_assists
 export type TournamentAPIResult = {
   total_sims: number;
   favorites: { team: string; prob: number }[];
@@ -123,8 +122,106 @@ function GroupsStep({ onSim }: { onSim: () => void }) {
   );
 }
 
+// Componente Wrapper para Isolamento do Auto-Scroll (Efeito Ping-Pong Individual)
+function AutoScrollList({ children, className, as: Component = "ul" }: { children: React.ReactNode, className?: string, as?: any }) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let direction = 1; // 1 = descendo, -1 = subindo
+    let isPaused = false;
+    let isInteracting = false;
+    let animationFrameId: number;
+    let pauseTimeout: NodeJS.Timeout;
+    let idleTimeout: NodeJS.Timeout;
+    let lastTime: number | null = null;
+    let exactScrollTop = el.scrollTop;
+    
+    // Velocidade constante independente dos Hz do monitor
+    const speedPerMs = 0.025; 
+
+    // Reinicia contagem de inatividade daquele painel (3 segundos)
+    const startIdleTimer = () => {
+      clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(() => {
+        isInteracting = false;
+        exactScrollTop = el.scrollTop; 
+        lastTime = null; 
+      }, 3000); 
+    };
+
+    const handleInteraction = () => {
+      isInteracting = true;
+      exactScrollTop = el.scrollTop; 
+      clearTimeout(idleTimeout);
+    };
+
+    const handleInteractionEnd = () => {
+      startIdleTimer();
+    };
+
+    el.addEventListener('pointerenter', handleInteraction);
+    el.addEventListener('pointerleave', handleInteractionEnd);
+    el.addEventListener('touchstart', handleInteraction, { passive: true });
+    el.addEventListener('touchend', handleInteractionEnd);
+
+    // Começa travado em modo de interação por 3s antes do primeiro movimento
+    isInteracting = true;
+    startIdleTimer();
+
+    const loop = (timestamp: number) => {
+      if (lastTime === null) lastTime = timestamp;
+      const dt = timestamp - lastTime;
+      lastTime = timestamp;
+
+      if (!isInteracting && !isPaused && el.scrollHeight > el.clientHeight) {
+        exactScrollTop += speedPerMs * dt * direction;
+        el.scrollTop = exactScrollTop;
+
+        // Se o usuário tentar rolar bruscamente no meio de uma falha de evento, ressincronizamos
+        if (Math.abs(el.scrollTop - exactScrollTop) > 2) {
+           exactScrollTop = el.scrollTop;
+        }
+
+        // Bateu no Fundo
+        if (direction === 1 && el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
+          direction = -1; // Prepara para subir
+          isPaused = true;
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); // Pausa de 5s
+        } 
+        // Bateu no Topo
+        else if (direction === -1 && el.scrollTop <= 1) {
+          direction = 1; // Prepara para descer
+          isPaused = true;
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); // Pausa de 5s
+        }
+      }
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    animationFrameId = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(pauseTimeout);
+      clearTimeout(idleTimeout);
+      el.removeEventListener('pointerenter', handleInteraction);
+      el.removeEventListener('pointerleave', handleInteractionEnd);
+      el.removeEventListener('touchstart', handleInteraction);
+      el.removeEventListener('touchend', handleInteractionEnd);
+    };
+  }, []);
+
+  return (
+    <Component ref={ref} className={className}>
+      {children}
+    </Component>
+  );
+}
+
 function FinalStep({ result }: { result: TournamentAPIResult }) {
-  
   const getTeam = (apiName: string) => {
     const found = ALL_TEAMS.find(t => t.apiName.toLowerCase() === apiName.toLowerCase() || t.name.toLowerCase() === apiName.toLowerCase());
     if (!found) {
@@ -141,7 +238,7 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
       <SectionTitle accent="CONCLUÍDA">Estatísticas Monte Carlo</SectionTitle>
       <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">O motor processou as probabilidades baseadas em {result.total_sims} torneios massivos</p>
 
-      {/* BLOCO 1: Grande Campeão e Top 5 Favoritos */}
+      {/* BLOCO 1: Grande Campeão e Favoritos (Top 8) */}
       <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <Panel glow="gold" className="text-center">
           <CornerTicks />
@@ -154,9 +251,9 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
         </Panel>
 
         <Panel>
-          <div className="mb-3 font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">Top 5 Favoritos</div>
-          <ul className="space-y-2">
-            {result.favorites.slice(0, 5).map((t, i) => {
+          <div className="mb-3 font-display text-xs uppercase tracking-[0.3em] text-muted-foreground">Top 8 Favoritos</div>
+          <AutoScrollList as="ul" className="space-y-2 max-h-[16rem] overflow-y-auto pr-2 custom-scrollbar">
+            {result.favorites.slice(0, 8).map((t, i) => {
               const teamData = getTeam(t.team);
               return (
                 <motion.li key={t.team} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}>
@@ -172,18 +269,18 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
                 </motion.li>
               );
             })}
-          </ul>
+          </AutoScrollList>
         </Panel>
       </div>
 
-      {/* BLOCO 2: TOP 3 Listas Completas */}
+      {/* BLOCO 2: TOP 5 Listas Completas */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         
-        {/* Top 3 Artilheiros */}
+        {/* Top 5 Artilheiros */}
         <Panel glow="gold">
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-gold">Chuteira de Ouro</div>
-          <ol className="space-y-2">
-            {(result.top_scorers || []).slice(0, 3).map((s, i) => (
+          <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
+            {(result.top_scorers || []).slice(0, 5).map((s, i) => (
               <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
                 <div className="flex items-center gap-2">
                   <span className="font-display text-gold tabular-nums">{i + 1}</span>
@@ -193,14 +290,14 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
                 <span className="font-display text-primary text-[11px] whitespace-nowrap">{s.avg_goals.toFixed(2)} G</span>
               </motion.li>
             ))}
-          </ol>
+          </AutoScrollList>
         </Panel>
 
-        {/* Top 3 Assistências */}
+        {/* Top 5 Assistências */}
         <Panel glow="neon">
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-neon">Líderes de Assist.</div>
-          <ol className="space-y-2">
-            {(result.top_assists || []).slice(0, 3).map((s, i) => (
+          <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
+            {(result.top_assists || []).slice(0, 5).map((s, i) => (
               <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
                 <div className="flex items-center gap-2">
                   <span className="font-display text-neon tabular-nums">{i + 1}</span>
@@ -213,14 +310,14 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
             {(!result.top_assists || result.top_assists.length === 0) && (
               <div className="text-xs text-muted-foreground p-3 text-center">Nenhuma assistência registrada</div>
             )}
-          </ol>
+          </AutoScrollList>
         </Panel>
 
-        {/* Top 3 Ataques */}
+        {/* Top 5 Ataques */}
         <Panel>
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Ataques</div>
-          <ol className="space-y-2">
-            {(result.best_attack || []).slice(0, 3).map((t, i) => {
+          <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
+            {(result.best_attack || []).slice(0, 5).map((t, i) => {
               const teamData = getTeam(t.team);
               return (
                 <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
@@ -233,14 +330,14 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
                 </motion.li>
               );
             })}
-          </ol>
+          </AutoScrollList>
         </Panel>
 
-        {/* Top 3 Defesas */}
+        {/* Top 5 Defesas */}
         <Panel>
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Defesas</div>
-          <ol className="space-y-2">
-            {(result.best_defense || []).slice(0, 3).map((t, i) => {
+          <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
+            {(result.best_defense || []).slice(0, 5).map((t, i) => {
               const teamData = getTeam(t.team);
               return (
                 <motion.li key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="flex items-center justify-between rounded-md border border-border/40 bg-background/30 px-3 py-2">
@@ -253,7 +350,7 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
                 </motion.li>
               );
             })}
-          </ol>
+          </AutoScrollList>
         </Panel>
       </div>
 
