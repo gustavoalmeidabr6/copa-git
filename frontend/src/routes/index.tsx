@@ -1,3 +1,4 @@
+// src/routes/index.tsx
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
@@ -26,12 +27,11 @@ function Index() {
   const teams = FAVS.map((id) => ALL_TEAMS.find((t) => t.id === id)!);
   const team = teams[active];
 
-  // Alterna a seleção automaticamente a cada 2 segundos
   useEffect(() => {
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % teams.length);
     }, 2000);
-    return () => clearInterval(timer); // Limpa o intervalo ao desmontar o componente
+    return () => clearInterval(timer);
   }, [teams.length]);
 
   return (
@@ -71,7 +71,6 @@ function Index() {
             </h1>
           </motion.div>
 
-          {/* Active team carousel */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -114,7 +113,6 @@ function Index() {
           </motion.div>
         </section>
 
-        {/* Main menu cards */}
         <section className="mx-auto mt-14 grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-3">
           {[
             { to: "/copa", title: "Simular", sub: "Copa do Mundo", glow: "gold" as const, icon: <Trophy className="h-20 w-20 text-gold drop-shadow-[0_0_24px_var(--gold)]" /> },

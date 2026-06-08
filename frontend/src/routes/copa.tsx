@@ -1,3 +1,4 @@
+// src/routes/copa.tsx
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect, useRef } from "react";
@@ -5,6 +6,7 @@ import { GROUPS, ALL_TEAMS } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
+import { SimulationTransition } from "@/components/sim/SimulationTransition";
 import { ArrowLeft, Trophy, ChevronRight, Play } from "lucide-react";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
 
@@ -20,6 +22,22 @@ export const Route = createFileRoute("/copa")({
 
 type Step = "groups" | "final";
 
+// ARQUIVOS EXATAMENTE COMO ESTÃO NA SUA PASTA "PUBLIC"
+const PLAYER_PICS = [
+  "/cristiano-ronaldo-473-390x509.png",
+  "/harry-kane-66-390x494.png",
+  "/julian-alvarez.png",
+  "/julian-alvarez-3-390x395.png",
+  "/kylian-mbappe-153-318x540.png",
+  "/lamine-yamal-4-284x540.png",
+  "/lionel-messi-392-390x381.png",
+  "/luis-diaz-15-366x540.png",
+  "/neymar-193-390x535.png",
+  "/Memphis-Depay-NL-390x407.png",
+  "/erling-braut-haland-51-390x500.png",
+  "/vinicius-junior-92-390x472.png"
+];
+
 export type TournamentAPIResult = {
   total_sims: number;
   favorites: { team: string; prob: number }[];
@@ -32,28 +50,40 @@ export type TournamentAPIResult = {
 
 function CopaPage() {
   const [step, setStep] = useState<Step>("groups");
-  const [sim, setSim] = useState(false);
+  const [simState, setSimState] = useState<"idle" | "simulating" | "transitioning" | "finishing_transition">("idle");
+  const [transitionPlayerImg, setTransitionPlayerImg] = useState(PLAYER_PICS[0]);
   const [result, setResult] = useState<TournamentAPIResult | null>(null);
 
   const start = async () => {
-    setSim(true);
+    // SORTEIO DO JOGADOR AQUI
+    const randomPic = PLAYER_PICS[Math.floor(Math.random() * PLAYER_PICS.length)];
+    setTransitionPlayerImg(randomPic);
+
+    setSimState("simulating");
+
     try {
-      const response = await fetch("http://localhost:8000/api/simulate_tournament", { method: "POST" });
+      const responsePromise = fetch("http://localhost:8000/api/simulate_tournament", { method: "POST" });
+      
+      const [response] = await Promise.all([
+        responsePromise,
+        new Promise(res => setTimeout(res, 10000))
+      ]);
+
       if (!response.ok) throw new Error("Erro na API");
       const data = await response.json();
+      
       setResult(data);
-      setStep("final"); 
+      setSimState("transitioning");
     } catch (err) {
       console.error(err);
       alert("Falha ao comunicar com o Motor em Python. Ele está ligado (porta 8000)?");
-    } finally {
-      setSim(false);
+      setSimState("idle");
     }
   };
 
   return (
     <NeonChrome>
-      <main className="mx-auto max-w-7xl px-6 py-6">
+      <main className="mx-auto max-w-7xl px-6 py-6 relative z-10">
         <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-muted-foreground">
           <div className="flex items-center gap-2">
             <Link to="/" className="text-primary/80 hover:text-primary">Menu</Link>
@@ -76,7 +106,22 @@ function CopaPage() {
           )}
         </AnimatePresence>
       </main>
-      {sim && <SimOverlay onDone={() => {}} label="Processando 400 Copas do Mundo no XGBoost..." />}
+      
+      {(simState === "simulating" || simState === "transitioning") && (
+        <SimOverlay label="SIMULANDO TORNEIO" />
+      )}
+
+      <SimulationTransition 
+        isActive={simState === "transitioning" || simState === "finishing_transition"} 
+        playerImageUrl={transitionPlayerImg}
+        onBlindSpot={() => {
+          setStep("final");
+          setSimState("finishing_transition");
+        }}
+        onComplete={() => {
+          setSimState("idle");
+        }}
+      />
     </NeonChrome>
   );
 }
@@ -122,7 +167,6 @@ function GroupsStep({ onSim }: { onSim: () => void }) {
   );
 }
 
-// Componente Wrapper para Isolamento do Auto-Scroll (Efeito Ping-Pong Individual)
 function AutoScrollList({ children, className, as: Component = "ul" }: { children: React.ReactNode, className?: string, as?: any }) {
   const ref = useRef<HTMLElement>(null);
 
@@ -130,7 +174,7 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
     const el = ref.current;
     if (!el) return;
 
-    let direction = 1; // 1 = descendo, -1 = subindo
+    let direction = 1;
     let isPaused = false;
     let isInteracting = false;
     let animationFrameId: number;
@@ -139,10 +183,8 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
     let lastTime: number | null = null;
     let exactScrollTop = el.scrollTop;
     
-    // Velocidade constante independente dos Hz do monitor
     const speedPerMs = 0.025; 
 
-    // Reinicia contagem de inatividade daquele painel (3 segundos)
     const startIdleTimer = () => {
       clearTimeout(idleTimeout);
       idleTimeout = setTimeout(() => {
@@ -167,7 +209,6 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
     el.addEventListener('touchstart', handleInteraction, { passive: true });
     el.addEventListener('touchend', handleInteractionEnd);
 
-    // Começa travado em modo de interação por 3s antes do primeiro movimento
     isInteracting = true;
     startIdleTimer();
 
@@ -180,22 +221,19 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
         exactScrollTop += speedPerMs * dt * direction;
         el.scrollTop = exactScrollTop;
 
-        // Se o usuário tentar rolar bruscamente no meio de uma falha de evento, ressincronizamos
         if (Math.abs(el.scrollTop - exactScrollTop) > 2) {
            exactScrollTop = el.scrollTop;
         }
 
-        // Bateu no Fundo
         if (direction === 1 && el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
-          direction = -1; // Prepara para subir
+          direction = -1; 
           isPaused = true;
-          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); // Pausa de 5s
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); 
         } 
-        // Bateu no Topo
         else if (direction === -1 && el.scrollTop <= 1) {
-          direction = 1; // Prepara para descer
+          direction = 1; 
           isPaused = true;
-          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); // Pausa de 5s
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); 
         }
       }
       animationFrameId = requestAnimationFrame(loop);
@@ -238,7 +276,6 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
       <SectionTitle accent="CONCLUÍDA">Estatísticas Monte Carlo</SectionTitle>
       <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">O motor processou as probabilidades baseadas em {result.total_sims} torneios massivos</p>
 
-      {/* BLOCO 1: Grande Campeão e Favoritos (Top 8) */}
       <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <Panel glow="gold" className="text-center">
           <CornerTicks />
@@ -273,10 +310,8 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
         </Panel>
       </div>
 
-      {/* BLOCO 2: TOP 5 Listas Completas */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         
-        {/* Top 5 Artilheiros */}
         <Panel glow="gold">
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-gold">Chuteira de Ouro</div>
           <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
@@ -293,7 +328,6 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
           </AutoScrollList>
         </Panel>
 
-        {/* Top 5 Assistências */}
         <Panel glow="neon">
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-neon">Líderes de Assist.</div>
           <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
@@ -313,7 +347,6 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
           </AutoScrollList>
         </Panel>
 
-        {/* Top 5 Ataques */}
         <Panel>
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Ataques</div>
           <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
@@ -333,7 +366,6 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
           </AutoScrollList>
         </Panel>
 
-        {/* Top 5 Defesas */}
         <Panel>
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Melhores Defesas</div>
           <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
@@ -354,7 +386,6 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
         </Panel>
       </div>
 
-      {/* BLOCO 3: Painel Extra - A Cinderela / Zebra */}
       {result.biggest_zebra && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Panel glow="neon" className="flex flex-col sm:flex-row items-center justify-between gap-4 border-dashed border-neon/50 bg-neon/5">

@@ -215,3 +215,120 @@
   0%   { background-position: 0% center; }
   100% { background-position: 200% center; }
 }
+
+
+/* =============== TRANSIÇÃO MODERNA DE SIMULAÇÃO =============== */
+.sim-transition-container {
+  position: fixed;
+  top: 0;
+  left: -20%; /* Esticado para cobrir a inclinação */
+  width: 140%;
+  height: 100vh;
+  pointer-events: none; /* Para não bloquear cliques acidentais se travar */
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* As 3 camadas de cores que dão a sensação de velocidade */
+.sim-wipe-layer-1, 
+.sim-wipe-layer-2, 
+.sim-wipe-layer-3 {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%) skewX(-15deg); /* Começa fora da tela, inclinado */
+}
+
+.sim-wipe-layer-1 {
+  background-color: #facc15; /* Amarelo */
+  animation: simWipe 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.sim-wipe-layer-2 {
+  background-color: #16a34a; /* Verde */
+  animation: simWipe 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards 0.1s;
+}
+
+.sim-wipe-layer-3 {
+  background-color: #1e3a8a; /* Azul Profundo */
+  animation: simWipe 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: -15px 0 30px rgba(0,0,0,0.5);
+}
+
+/* Como a tela está inclinada (-15deg), precisamos desinclinar o conteúdo interno (+15deg) */
+.sim-unskew-wrapper {
+  transform: skewX(15deg);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Animação das telas varrendo */
+@keyframes simWipe {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  35% { transform: translateX(0) skewX(-15deg); } /* Entra */
+  65% { transform: translateX(0) skewX(-15deg); } /* Segura no meio */
+  100% { transform: translateX(100%) skewX(-15deg); } /* Sai pela direita */
+}
+
+/* Estilo do Jogador Animado */
+.sim-player-anim {
+  position: absolute;
+  bottom: -5vh;
+  height: 90vh; /* Fica grande e impactante */
+  object-fit: contain;
+  opacity: 0;
+  transform: translateX(-50vw);
+  /* Atraso de 0.3s para o jogador entrar depois do fundo azul */
+  animation: simPlayerAction 2s ease-in-out forwards 0.3s; 
+  filter: drop-shadow(15px 15px 20px rgba(0,0,0,0.7));
+}
+
+/* A mágica do jogador: Entra, dá o efeito 'Glitch' rápido, e sai vazado */
+@keyframes simPlayerAction {
+  0% { transform: translateX(-30vw) scale(0.9); opacity: 0; }
+  
+  /* 1. Entrada Rápida */
+  15% { transform: translateX(-5vw) scale(1); opacity: 1; filter: brightness(1) drop-shadow(10px 10px 20px rgba(0,0,0,0.5)); }
+  
+  /* 2. Efeito Glitch (Pisca, vai pra frente e pra trás e brilha muito) */
+  17% { transform: translateX(3vw) scale(1.05); opacity: 1; filter: brightness(1.5) drop-shadow(0px 0px 40px #facc15); }
+  19% { transform: translateX(-1vw) scale(1.05); opacity: 0.3; }
+  21% { transform: translateX(4vw) scale(1.05); opacity: 1; filter: brightness(1.2); }
+  23% { transform: translateX(1vw) scale(1.05); opacity: 0.3; }
+  25% { transform: translateX(5vw) scale(1.05); opacity: 1; filter: brightness(1) drop-shadow(10px 10px 20px rgba(0,0,0,0.5)); }
+  
+  /* 3. Pausa Dramática em Câmera Lenta (Deslizando devagar) */
+  75% { transform: translateX(8vw) scale(1.08); opacity: 1; }
+  
+  /* 4. Saída Explosiva pela Direita */
+  90% { transform: translateX(70vw) scale(1.2); opacity: 0; }
+  100% { transform: translateX(70vw) scale(1.2); opacity: 0; }
+}
+
+/* Opcional: Texto grande passando rápido atrás do jogador */
+.sim-text-bg {
+  position: absolute;
+  font-weight: 900;
+  font-size: 10vw;
+  color: white;
+  text-transform: uppercase;
+  font-style: italic;
+  opacity: 0.05;
+  white-space: nowrap;
+  animation: simTextSlide 2.5s linear forwards 0.2s;
+}
+
+@keyframes simTextSlide {
+  0% { transform: translateX(50vw); }
+  100% { transform: translateX(-50vw); }
+}

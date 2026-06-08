@@ -2,10 +2,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, Team, rosterFor, teamById, getPlayerPosition, type Formation } from "@/lib/teams";
+import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, Team, rosterFor, getPlayerPosition, type Formation } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
+import { SimulationTransition } from "@/components/sim/SimulationTransition";
 import { ArrowLeft, Play, Trash2, ChevronRight, BarChart3 } from "lucide-react";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
 
@@ -21,34 +22,30 @@ export const Route = createFileRoute("/partida")({
 
 type Step = "select" | "lineup" | "result";
 
-// 48 seleções classificadas para a Copa do Mundo 2026
-// IDs devem bater com os definidos em teams.ts → GROUPS
 const WC2026_TEAM_IDS = new Set([
-  // Grupo A
-  "MEX", "RSA", "KOR", "CZE",
-  // Grupo B
-  "CAN", "BIH", "QAT", "SUI",
-  // Grupo C
-  "BRA", "MAR", "HAI", "SCO",
-  // Grupo D
-  "USA", "PAR", "AUS", "TUR",
-  // Grupo E
-  "GER", "CUW", "CIV", "ECU",
-  // Grupo F
-  "NED", "JPN", "SWE", "TUN",
-  // Grupo G
-  "BEL", "EGY", "IRN", "NZL",
-  // Grupo H
-  "ESP", "CPV", "KSA", "URU",
-  // Grupo I
-  "FRA", "SEN", "IRQ", "NOR",
-  // Grupo J
-  "ARG", "ALG", "AUT", "JOR",
-  // Grupo K
-  "POR", "COD", "UZB", "COL",
-  // Grupo L
-  "ENG", "CRO", "GHA", "PAN",
+  "MEX", "RSA", "KOR", "CZE", "CAN", "BIH", "QAT", "SUI",
+  "BRA", "MAR", "HAI", "SCO", "USA", "PAR", "AUS", "TUR",
+  "GER", "CUW", "CIV", "ECU", "NED", "JPN", "SWE", "TUN",
+  "BEL", "EGY", "IRN", "NZL", "ESP", "CPV", "KSA", "URU",
+  "FRA", "SEN", "IRQ", "NOR", "ARG", "ALG", "AUT", "JOR",
+  "POR", "COD", "UZB", "COL", "ENG", "CRO", "GHA", "PAN",
 ]);
+
+// ARQUIVOS EXATAMENTE COMO ESTÃO NA SUA PASTA "PUBLIC"
+const PLAYER_PICS = [
+  "/cristiano-ronaldo-473-390x509.png",
+  "/harry-kane-66-390x494.png",
+  "/julian-alvarez.png",
+  "/julian-alvarez-3-390x395.png",
+  "/kylian-mbappe-153-318x540.png",
+  "/lamine-yamal-4-284x540.png",
+  "/lionel-messi-392-390x381.png",
+  "/luis-diaz-15-366x540.png",
+  "/neymar-193-390x535.png",
+  "/Memphis-Depay-NL-390x407.png",
+  "/erling-braut-haland-51-390x500.png",
+  "/vinicius-junior-92-390x472.png"
+];
 
 export type APIResult = {
   aWinPct: number; 
@@ -62,8 +59,6 @@ export type APIResult = {
   sim_logs: string[];
 };
 
-// O segredo: Ordena os titulares de acordo com o dicionário de conhecimento. 
-// Isso força cada jogador que chega da API para o seu "Slot" ideal no campinho.
 function sortRoster(roster: string[]) {
   if (!roster || roster.length === 0) return [];
   const starters = roster.slice(0, 11);
@@ -86,7 +81,10 @@ function PartidaPage() {
   const [away, setAway] = useState<Team | null>(null);
   const [formA, setFormA] = useState<Formation>("4-2-3-1");
   const [formB, setFormB] = useState<Formation>("4-3-3");
-  const [simulating, setSimulating] = useState(false);
+  
+  const [simState, setSimState] = useState<"idle" | "simulating" | "transitioning" | "finishing_transition">("idle");
+  const [transitionPlayerImg, setTransitionPlayerImg] = useState(PLAYER_PICS[0]);
+
   const [result, setResult] = useState<APIResult | null>(null);
   const [rosterA, setRosterA] = useState<string[]>([]);
   const [rosterB, setRosterB] = useState<string[]>([]);
@@ -117,7 +115,7 @@ function PartidaPage() {
 
   return (
     <NeonChrome>
-      <main className="mx-auto max-w-7xl px-6 py-6">
+      <main className="mx-auto max-w-7xl px-6 py-6 relative z-10">
         <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-muted-foreground">
           <div className="flex items-center gap-2">
             <Link to="/" className="text-primary/80 hover:text-primary">Menu</Link>
@@ -147,9 +145,14 @@ function PartidaPage() {
                 setRosterA={setRosterA} setRosterB={setRosterB}
                 onBack={() => setStep("select")}
                 onSimulate={async () => {
-                  setSimulating(true);
+                  // SORTEIO DO JOGADOR AQUI
+                  const randomPic = PLAYER_PICS[Math.floor(Math.random() * PLAYER_PICS.length)];
+                  setTransitionPlayerImg(randomPic);
+                  
+                  setSimState("simulating"); 
+
                   try {
-                    const response = await fetch("http://localhost:8000/api/simulate_match", {
+                    const responsePromise = fetch("http://localhost:8000/api/simulate_match", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -160,6 +163,12 @@ function PartidaPage() {
                         away_excluded: []
                       })
                     });
+
+                    const [response] = await Promise.all([
+                      responsePromise,
+                      new Promise(res => setTimeout(res, 2000))
+                    ]);
+
                     if (!response.ok) throw new Error("Erro na API");
                     const data = await response.json();
                     
@@ -168,31 +177,25 @@ function PartidaPage() {
                        scoreCounts[score] = Math.round(((pct as number) / 100) * 400);
                     });
 
-                    const topScorers = (data.top_scorers || []).map((s: any) => ({
-                      player: s[0], team: home.id, goals: s[1]
-                    }));
-
-                    const topAssists = (data.top_assists || []).map((s: any) => ({
-                      player: s[0], team: home.id, assists: s[1]
-                    }));
-
-                    setResult({
+                    const mappedResult = {
                       aWinPct: data.home_win_prob || 0,
                       drawPct: data.draw_prob || 0,
                       bWinPct: data.away_win_prob || 0,
                       expectedScore: data.expected_score || "N/A",
-                      topScorers: topScorers,
-                      topAssists: topAssists,
+                      topScorers: (data.top_scorers || []).map((s: any) => ({ player: s[0], team: home.id, goals: s[1] })),
+                      topAssists: (data.top_assists || []).map((s: any) => ({ player: s[0], team: home.id, assists: s[1] })),
                       avgGoals: { a: data.home_lambda || 0, b: data.away_lambda || 0 },
                       scoreCounts: scoreCounts,
                       sim_logs: data.sim_logs || []
-                    });
-                    setStep("result");
+                    };
+                    
+                    setResult(mappedResult);
+                    setSimState("transitioning"); 
+
                   } catch (err) {
                     console.error(err);
                     alert("Erro ao conectar ao servidor FastAPI.");
-                  } finally {
-                    setSimulating(false);
+                    setSimState("idle");
                   }
                 }}
               />
@@ -205,7 +208,21 @@ function PartidaPage() {
           )}
         </AnimatePresence>
 
-        {simulating && <SimOverlay onDone={() => {}} label="Processando XGBoost na GPU..." />}
+        {(simState === "simulating" || simState === "transitioning") && (
+          <SimOverlay label="SIMULANDO PARTIDA" />
+        )}
+
+        <SimulationTransition 
+          isActive={simState === "transitioning" || simState === "finishing_transition"}
+          playerImageUrl={transitionPlayerImg}
+          onBlindSpot={() => {
+             setStep("result");
+             setSimState("finishing_transition"); 
+          }}
+          onComplete={() => {
+             setSimState("idle");
+          }}
+        />
       </main>
     </NeonChrome>
   );
@@ -304,7 +321,6 @@ function Pitch({ teamA, teamB, formA, formB, rosterA, rosterB }: { teamA: Team; 
   const startersA = rosterA.slice(0, 11);
   const startersB = rosterB.slice(0, 11);
   
-  // Extrai as coordenadas dinâmicas e o label correto de posição para as formações atuais
   const posA = FORMATIONS[formA].coords;
   const labelsA = FORMATIONS[formA].positions;
   const posB = FORMATIONS[formB].coords;
