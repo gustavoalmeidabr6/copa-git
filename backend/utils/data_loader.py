@@ -711,11 +711,27 @@ class DataLoader:
             used_names = {p["name"] for p in starters}
             bench = [p for p in official_roster if p["name"] not in used_names]
 
+        # --- Calculate Confidence ---
+        matched_count = 0
+        for p in starters:
+            n_norm = _normalize_name(p["name"])
+            c_norm = _canonical(n_norm)
+            if c_norm in self.ea_lookup or n_norm in self.ea_lookup or c_norm in self.tm_lookup or n_norm in self.tm_lookup:
+                matched_count += 1
+            else:
+                ea_keys = list(self.ea_lookup.keys())
+                tm_keys = list(self.tm_lookup.keys())
+                if get_close_matches(c_norm, ea_keys, n=1, cutoff=0.75) or get_close_matches(c_norm, tm_keys, n=1, cutoff=0.75):
+                    matched_count += 1
+                    
+        confidence = matched_count / len(starters) if starters else 1.0
+        
         avg_rating = sum(p["rating"] for p in starters) / len(starters) if starters else 7.0
 
         base_data["squad_rating"]  = round(avg_rating, 2)
         base_data["top_players"]   = starters
         base_data["bench_players"] = bench
+        base_data["confidence"]    = confidence
         self.cache[team_name]      = base_data
         return base_data
     

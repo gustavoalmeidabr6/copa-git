@@ -371,12 +371,28 @@ class MatchSimulator:
         elif x == 1 and y == 1: return max(0.01, 1 - self.rho)
         return 1.0
 
-    def _squad_elo_modifier(self, own_rating: float, opp_rating: float) -> float:
-        rating_diff = (own_rating - opp_rating) * 0.15 
+    def _squad_elo_modifier(self, own_rating: float, opp_rating: float, own_elo: float, opp_elo: float, own_conf: float, opp_conf: float) -> float:
+        def elo_to_rating(elo):
+            return np.clip(6.5 + (elo - 1400) / (2200 - 1400) * 3.0, 6.5, 9.5)
+            
+        own_expected = elo_to_rating(own_elo)
+        opp_expected = elo_to_rating(opp_elo)
+        
+        # Ancoragem de Divergência com Confiança
+        own_eff = own_rating * own_conf + own_expected * (1 - own_conf)
+        opp_eff = opp_rating * opp_conf + opp_expected * (1 - opp_conf)
+        
+        # Se mesmo com a mistura eles ainda estão muito abaixo do esperado pelo Elo (times subestimados)
+        if own_eff < own_expected:
+            own_eff += (own_expected - own_eff) * 0.5 * (1 - own_conf)
+        if opp_eff < opp_expected:
+            opp_eff += (opp_expected - opp_eff) * 0.5 * (1 - opp_conf)
+            
+        rating_diff = (own_eff - opp_eff) * 0.06 
         raw = 1.0 + rating_diff
         return float(np.clip(raw, 0.50, 1.50))
 
-    def _compute_lambdas(self, home_team: str, away_team: str, home_rating: float, away_rating: float, home_elo: float, away_elo: float, df_home: object, df_away: object) -> tuple[float, float, float, float]:
+    def _compute_lambdas(self, home_team: str, away_team: str, home_rating: float, away_rating: float, home_elo: float, away_elo: float, home_conf: float, away_conf: float, df_home: object, df_away: object) -> tuple[float, float, float, float]:
         lh_p1 = float(self.models["home"].predict(df_home)[0])
         la_p1 = float(self.models["away"].predict(df_home)[0])
         lh_p2 = float(self.models["away"].predict(df_away)[0])
@@ -394,13 +410,13 @@ class MatchSimulator:
         base_lh = (1 - adaptive_shrinkage) * base_lh + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
         base_la = (1 - adaptive_shrinkage) * base_la + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
 
-        modifier_home = self._squad_elo_modifier(home_rating, away_rating)
-        modifier_away = self._squad_elo_modifier(away_rating, home_rating)
+        modifier_home = self._squad_elo_modifier(home_rating, away_rating, home_elo, away_elo, home_conf, away_conf)
+        modifier_away = self._squad_elo_modifier(away_rating, home_rating, away_elo, home_elo, away_conf, home_conf)
 
         HOME_ADV = {"USA": 1.05, "Mexico": 1.06, "Canada": 1.04}
         hadv = HOME_ADV.get(home_team, 1.0)
 
-        GOAL_BOOST = 1.30
+        GOAL_BOOST = 1.0
 
         lh_final = float(np.clip(base_lh * modifier_home * hadv, 0.25, 3.20)) * GOAL_BOOST
         la_final = float(np.clip(base_la * modifier_away, 0.25, 3.20)) * GOAL_BOOST
@@ -546,9 +562,11 @@ class MatchSimulator:
         away_rating = feats["away_rating"]
         home_elo = feats["home_elo"]
         away_elo = feats["away_elo"]
+        home_conf = feats.get("home_confidence", 1.0)
+        away_conf = feats.get("away_confidence", 1.0)
 
         lh, la, mod_h, mod_a = self._compute_lambdas(
-            home_team, away_team, home_rating, away_rating, home_elo, away_elo, feats["df_ml"], feats_inv["df_ml"],
+            home_team, away_team, home_rating, away_rating, home_elo, away_elo, home_conf, away_conf, feats["df_ml"], feats_inv["df_ml"],
         )
 
         prob_matrix = self._build_prob_matrix(lh, la)
@@ -695,6 +713,7 @@ class MatchSimulator:
             "away_data_source": feats["away_data_source"],
             "home_elo": home_elo,
             "away_elo": away_elo,
+            "has_vegas_odds": self.vegas_probs.get((home_team, away_team)) is not None,
             "sim_logs": sim_logs,
             "top_scorers": top_scorers,
             "top_assists": top_assists,
@@ -718,12 +737,13 @@ class MatchSimulator:
             elo = self.feature_builder.data_loader.get_team_elo(t)
             goals = self.feature_builder.data_loader.get_historical_goals(t)
             rating = FeatureBuilder._calculate_weighted_rating(top)
+            conf = sq.get("confidence", 1.0)
 
             gr, ar = self._calculate_team_dynamics(roster)
             if sum(gr) == 0: gr = [1.0]*len(roster)
             if sum(ar) == 0: ar = [1.0]*len(roster)
 
-            t_data[t] = {"elo": elo, "goals": goals, "rating": rating, "p": roster, "gr": gr, "ar": ar}
+            t_data[t] = {"elo": elo, "goals": goals, "rating": rating, "conf": conf, "p": roster, "gr": gr, "ar": ar}
 
         rows_p1 = []
         rows_p2 = []
@@ -770,12 +790,12 @@ class MatchSimulator:
             base_lh = (1 - adaptive_shrinkage) * base_lh + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
             base_la = (1 - adaptive_shrinkage) * base_la + adaptive_shrinkage * _LAMBDA_WORLD_CUP_AVG
 
-            mod_h = self._squad_elo_modifier(t_data[h]["rating"], t_data[a]["rating"])
-            mod_a = self._squad_elo_modifier(t_data[a]["rating"], t_data[h]["rating"])
+            mod_h = self._squad_elo_modifier(t_data[h]["rating"], t_data[a]["rating"], t_data[h]["elo"], t_data[a]["elo"], t_data[h]["conf"], t_data[a]["conf"])
+            mod_a = self._squad_elo_modifier(t_data[a]["rating"], t_data[h]["rating"], t_data[a]["elo"], t_data[h]["elo"], t_data[a]["conf"], t_data[h]["conf"])
 
             hadv = 1.05 if h == "USA" else 1.06 if h == "Mexico" else 1.04 if h == "Canada" else 1.0
 
-            GOAL_BOOST = 1.30
+            GOAL_BOOST = 1.0
 
             lh_final = float(np.clip(base_lh * mod_h * hadv, 0.25, 3.20)) * GOAL_BOOST
             la_final = float(np.clip(base_la * mod_a, 0.25, 3.20)) * GOAL_BOOST
@@ -893,7 +913,7 @@ def _assign_goals_and_assists(players: list[dict], goal_rates: list[float], ast_
         eligible_scorers = [i for i in available if goal_count[i] < 3]
         if not eligible_scorers: eligible_scorers = available
 
-        w_g = [( (goal_rates[i] ** 1.05) * random.uniform(0.9, 1.1) ) + 0.05 for i in eligible_scorers]
+        w_g = [( (goal_rates[i] ** 1.4) * random.uniform(0.9, 1.1) ) + 0.01 for i in eligible_scorers]
         w_g_sum = sum(w_g)
         probs_g = [r / w_g_sum for r in w_g] if w_g_sum > 0 else [1.0 / len(eligible_scorers)] * len(eligible_scorers)
 
@@ -909,7 +929,7 @@ def _assign_goals_and_assists(players: list[dict], goal_rates: list[float], ast_
         if random.random() < 0.70:
             eligible_assistants = [i for i in available if i != scorer_idx]
             if eligible_assistants:
-                w_a = [( (ast_rates[i] ** 1.05) * random.uniform(0.9, 1.1) ) + 0.05 for i in eligible_assistants]
+                w_a = [( (ast_rates[i] ** 1.25) * random.uniform(0.9, 1.1) ) + 0.02 for i in eligible_assistants]
                 w_a_sum = sum(w_a)
                 probs_a = [r / w_a_sum for r in w_a] if w_a_sum > 0 else [1.0 / len(eligible_assistants)] * len(eligible_assistants)
 

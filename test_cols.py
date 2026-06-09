@@ -13,8 +13,10 @@ def test():
 
     home_rating = feats["home_rating"]
     away_rating = feats["away_rating"]
-    print(f"Germany Rating: {home_rating}")
-    print(f"Brazil Rating: {away_rating}")
+    home_conf = feats.get("home_confidence", 0)
+    away_conf = feats.get("away_confidence", 0)
+    print(f"Germany Rating: {home_rating} (Conf: {home_conf})")
+    print(f"Brazil Rating: {away_rating} (Conf: {away_conf})")
     print(f"Brazil Squad size: {len(feats['away_players'])}")
     for p in feats['away_players'][:11]:
         print(f" - {p['name']} (Rating: {p['rating']})")

@@ -56,6 +56,7 @@ export type APIResult = {
   avgGoals: { a: number; b: number };
   scoreCounts: Record<string, number>;
   sim_logs: string[];
+  hasVegasOdds?: boolean;
 };
 
 function smartSort(roster: string[]) {
@@ -201,7 +202,8 @@ function PartidaPage() {
                       topAssists: (data.top_assists || []).map((s: any) => ({ player: s[0], team: home.id, assists: s[1] })),
                       avgGoals: { a: data.home_lambda || 0, b: data.away_lambda || 0 },
                       scoreCounts: scoreCounts,
-                      sim_logs: data.sim_logs || []
+                      sim_logs: data.sim_logs || [],
+                      hasVegasOdds: data.has_vegas_odds || false
                     };
 
                     setResult(mappedResult);
@@ -666,10 +668,17 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
 
       <div className="grid gap-5 md:grid-cols-3">
         <Panel className="md:col-span-1">
-          <div className="mb-4 rounded-md border border-neon/30 bg-neon/5 p-3 text-center">
-            <div className="font-display text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Placar Exato Médio</div>
-            <div className="mt-1 font-display text-lg text-neon">{result.expectedScore}</div>
-          </div>
+          {result.hasVegasOdds ? (
+            <div className="mb-4 rounded-md border border-gold/50 bg-gold/10 p-3 text-center shadow-[0_0_20px_rgba(255,215,0,0.2)]">
+              <div className="font-display text-[10px] uppercase tracking-[0.2em] text-gold/90">🔮 Previsão do Mercado (Casas de Aposta)</div>
+              <div className="mt-1 font-display text-lg text-gold">{result.expectedScore}</div>
+            </div>
+          ) : (
+            <div className="mb-4 rounded-md border border-neon/30 bg-neon/5 p-3 text-center">
+              <div className="font-display text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Placar Exato Médio</div>
+              <div className="mt-1 font-display text-lg text-neon">{result.expectedScore}</div>
+            </div>
+          )}
 
           <div className="mb-3 flex items-center justify-between">
             <div className="font-display text-sm uppercase tracking-[0.3em] text-foreground/90">Mais prováveis</div>

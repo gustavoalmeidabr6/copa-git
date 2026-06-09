@@ -247,6 +247,8 @@ class FeatureBuilder:
             "away_modifiers":  1.0,  
             "home_elo":        home_elo,   
             "away_elo":        away_elo,   
+            "home_confidence": home_squad.get("confidence", 1.0),
+            "away_confidence": away_squad.get("confidence", 1.0),
             "home_injuries":   home_squad.get("injured_count", 0),
             "away_injuries":   away_squad.get("injured_count", 0),
             "home_rating":     final_home_rating,
