@@ -1,0 +1,34 @@
+{
+  "get": "teams",
+  "parameters": {
+    "search": "DR Congo"
+  },
+  "errors": [],
+  "results": 1,
+  "paging": {
+    "current": 1,
+    "total": 1
+  },
+  "response": [
+    {
+      "team": {
+        "id": 27739,
+        "name": "DR Congo U17",
+        "code": null,
+        "country": "Congo-DR",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27739.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    }
+  ]
+}

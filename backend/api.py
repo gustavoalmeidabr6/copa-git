@@ -26,28 +26,27 @@ def get_teams():
 
 @app.get("/api/roster/{team_name}")
 def get_roster(team_name: str):
-    # Puxa os dados reais dos elencos do seu DataLoader
+    # Puxa os dados reais dos elencos do DataLoader
     squad = simulator.feature_builder.data_loader.get_real_squad_data(team_name)
     
-    # --- LÓGICA DE ORDENAÇÃO POR POSIÇÃO ---
-    # Força a lista a seguir o padrão Tático do Frontend (GK -> DEF -> MID -> ATT)
-    pos_order = {"Goalkeeper": 0, "Defender": 1, "Midfielder": 2, "Attacker": 3}
+    # ─── CORREÇÃO TÁTICA ───
+    # NÃO podemos ordenar os titulares por nota, senão destruímos o esquema tático.
+    # A ordem que vem do DataLoader (API ou PREFERRED_STARTERS) já é a correta.
+    top_players = [p["name"] for p in squad.get("top_players", [])]
     
-    # Ordena primeiro pela posição no campo, e como critério de desempate, pela maior nota (rating)
-    top_players_data = sorted(
-        squad.get("top_players", []),
-        key=lambda x: (pos_order.get(x.get("position", "Midfielder"), 2), -x.get("rating", 7.0))
-    )
-    
+    # Os reservas sim, podemos ordenar por nota para o banco ficar organizado:
     bench_players_data = sorted(
         squad.get("bench_players", []),
-        key=lambda x: (pos_order.get(x.get("position", "Midfielder"), 2), -x.get("rating", 7.0))
+        key=lambda x: -x.get("rating", 7.0)
     )
-
-    top_players = [p["name"] for p in top_players_data]
     bench_players = [p["name"] for p in bench_players_data]
     
     return {"starters": top_players, "bench": bench_players}
+
+@app.get("/api/weather")
+def get_weather(stadium: str):
+    temp = simulator.feature_builder.get_weather(stadium)
+    return {"stadium": stadium, "temperature": temp}
 
 # Modelo de dados que o frontend vai enviar
 class MatchRequest(BaseModel):
@@ -55,21 +54,31 @@ class MatchRequest(BaseModel):
     away: str
     home_excluded: list = []
     away_excluded: list = []
-    # Mesmo se o frontend enviar 200, nós vamos ignorar isso na rota abaixo.
+    home_starters: list = None
+    away_starters: list = None
+    stadium: str | None = None  # <-- ADICIONE ISTO
     num_simulations: int = 400  
 
 # 2. Rota para rodar uma Partida Específica
 @app.post("/api/simulate_match")
 def api_simulate_match(req: MatchRequest):
-    # BLINDAGEM: Ignoramos o req.num_simulations e FORÇAMOS 400 no motor.
     resultado = simulator.simulate_match(
         req.home, 
         req.away, 
-        num_simulations=400, 
+        num_simulations=req.num_simulations, 
         home_excluded=req.home_excluded,
-        away_excluded=req.away_excluded
+        away_excluded=req.away_excluded,
+        stadium=req.stadium,
+        home_starters=req.home_starters,
+        away_starters=req.away_starters
     )
     return resultado
+
+@app.on_event("startup")
+def startup_event():
+    # Removido: O loop agressivo na API no startup foi desligado. 
+    # Agora a atualização ocorre magicamente e sob-demanda apenas ao clicar no botão "Última (API)".
+    print("🚀 Servidor Quantizado online com motor de API sob-demanda!")
 
 # 3. Rota para simular a Copa Inteira
 @app.post("/api/simulate_tournament")

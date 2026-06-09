@@ -1,0 +1,134 @@
+{
+  "get": "teams",
+  "parameters": {
+    "search": "South Korea"
+  },
+  "errors": [],
+  "results": 6,
+  "paging": {
+    "current": 1,
+    "total": 1
+  },
+  "response": [
+    {
+      "team": {
+        "id": 17,
+        "name": "South Korea",
+        "code": "KOR",
+        "country": "South-Korea",
+        "founded": 1933,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/17.png"
+      },
+      "venue": {
+        "id": 22429,
+        "name": "Seoul World Cup Stadium",
+        "address": "240 World Cup-ro, Mapo-gu",
+        "city": "Seoul",
+        "capacity": 66704,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22429.png"
+      }
+    },
+    {
+      "team": {
+        "id": 1728,
+        "name": "South Korea W",
+        "code": null,
+        "country": "South-Korea",
+        "founded": 1933,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/1728.png"
+      },
+      "venue": {
+        "id": 22429,
+        "name": "Yongin Mireu Stadium",
+        "address": "61 Dongbaekjukjeondaero",
+        "city": "Yongin",
+        "capacity": 37155,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22429.png"
+      }
+    },
+    {
+      "team": {
+        "id": 22592,
+        "name": "South Korea U18",
+        "code": null,
+        "country": "South-Korea",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22592.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 23621,
+        "name": "South Korea U17 W",
+        "code": null,
+        "country": "South-Korea",
+        "founded": 1933,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/23621.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 25362,
+        "name": "South Korea U16",
+        "code": null,
+        "country": null,
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/25362.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 27071,
+        "name": "South Korea U22",
+        "code": null,
+        "country": "South-Korea",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27071.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    }
+  ]
+}

@@ -1,1 +1,1 @@
-from .football_api import APIFootball, FootballDataOrg, TheOddsAPI, OpenFootball, EloRatings
+from .football_api import FootballDataOrg, TheOddsAPI, OpenFootball, EloRatings

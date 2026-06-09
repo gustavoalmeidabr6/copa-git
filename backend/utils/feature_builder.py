@@ -46,6 +46,25 @@ GROUP_STADIUMS = {
     "J": "Philadelphia",  "K": "Atlanta",       "L": "San Francisco",
 }
 
+# Climas Nativos
+# COLD: < 15°C | MODERATE: 15°C - 25°C | HOT: > 25°C
+TEAM_NATIVE_CLIMATE = {
+    # Américas Quentes
+    "Brazil": "HOT", "Colombia": "HOT", "Ecuador": "HOT", "Paraguay": "HOT", "Venezuela": "HOT",
+    "Mexico": "HOT", "Panama": "HOT", "Costa Rica": "HOT", "Jamaica": "HOT", "Haiti": "HOT", "Curacao": "HOT",
+    # África / Oriente Médio Quentes
+    "Morocco": "HOT", "Senegal": "HOT", "Egypt": "HOT", "Algeria": "HOT", "Nigeria": "HOT",
+    "Ghana": "HOT", "Tunisia": "HOT", "Mali": "HOT", "Cameroon": "HOT", "Ivory Coast": "HOT", "South Africa": "HOT",
+    "DR Congo": "HOT", "Cape Verde": "HOT",
+    "Saudi Arabia": "HOT", "Qatar": "HOT", "UAE": "HOT", "Iran": "HOT", "Iraq": "HOT", "Jordan": "HOT",
+    # Frios
+    "Canada": "COLD", "Sweden": "COLD", "Norway": "COLD", "Scotland": "COLD", "Switzerland": "COLD",
+    "Denmark": "COLD", "Finland": "COLD", "Iceland": "COLD", "Russia": "COLD", "Poland": "COLD",
+    "Bosnia and Herzegovina": "COLD", "Croatia": "COLD", "Serbia": "COLD", "Austria": "COLD",
+    "Czech Republic": "COLD", "Wales": "COLD", "Ireland": "COLD", "Northern Ireland": "COLD",
+    # Default (resto é MODERATE)
+}
+
 
 class FeatureBuilder:
     def __init__(self):
@@ -112,7 +131,33 @@ class FeatureBuilder:
             
         return round(total_score / total_weight, 2)
 
-    def build_match_features(self, home_team: str, away_team: str, is_friendly: int = 0, home_excluded: list = None, away_excluded: list = None) -> dict:
+    def _apply_custom_starters(self, squad_data: dict, custom_starters: list) -> dict:
+        if not custom_starters:
+            return squad_data
+        
+        all_players = squad_data.get("top_players", []) + squad_data.get("bench_players", [])
+        new_top = []
+        new_bench = []
+        
+        # 1. Pega os jogadores requisitados pelo frontend
+        for name in custom_starters:
+            found = next((p for p in all_players if p["name"] == name), None)
+            if found:
+                new_top.append(found)
+            else:
+                new_top.append({"name": name, "rating": 7.0, "position": "Midfielder"})
+                
+        # 2. O resto vai pro banco
+        used_names = {p["name"] for p in new_top}
+        for p in all_players:
+            if p["name"] not in used_names:
+                new_bench.append(p)
+                
+        squad_data["top_players"] = new_top
+        squad_data["bench_players"] = new_bench
+        return squad_data
+
+    def build_match_features(self, home_team: str, away_team: str, is_friendly: int = 0, home_excluded: list = None, away_excluded: list = None, stadium: str = None, home_starters: list = None, away_starters: list = None) -> dict:
         if home_excluded is None: home_excluded = []
         if away_excluded is None: away_excluded = []
 
@@ -143,6 +188,11 @@ class FeatureBuilder:
         home_squad = copy.deepcopy(self.data_loader.get_real_squad_data(home_team))
         away_squad = copy.deepcopy(self.data_loader.get_real_squad_data(away_team))
 
+        if home_starters:
+            home_squad = self._apply_custom_starters(home_squad, home_starters)
+        if away_starters:
+            away_squad = self._apply_custom_starters(away_squad, away_starters)
+
         # ── EXCLUSÕES MANUAIS (Simulação do Menu de Lesões) ───────────────────
         if home_excluded:
             home_squad = self._apply_manual_exclusions(home_squad, home_excluded)
@@ -164,8 +214,26 @@ class FeatureBuilder:
         final_away_rating = self._calculate_weighted_rating(away_players)
 
         # ── 6. Clima da sede ──────────────────────────────────────────────────
-        stadium_city = self._get_stadium_for_match(home_team)
+        stadium_city = stadium if stadium else self._get_stadium_for_match(home_team)
         temp = self.get_weather(stadium_city)
+
+        # ── 6.5 Impacto do Clima (Debuff) ─────────────────────────────────────
+        # Times adaptados ao frio sofrendo no calor extremo (>26) e vice-versa (<15)
+        home_climate = TEAM_NATIVE_CLIMATE.get(home_team, "MODERATE")
+        away_climate = TEAM_NATIVE_CLIMATE.get(away_team, "MODERATE")
+
+        home_modifier = 1.0
+        away_modifier = 1.0
+
+        if temp >= 26.0:
+            if home_climate == "COLD": home_modifier = 0.975
+            if away_climate == "COLD": away_modifier = 0.975
+        elif temp <= 15.0:
+            if home_climate == "HOT": home_modifier = 0.975
+            if away_climate == "HOT": away_modifier = 0.975
+
+        final_home_rating *= home_modifier
+        final_away_rating *= away_modifier
 
         # ── 7. Diagnóstico ────────────────────────────────────────────────────
         _verify_squad(home_team, home_players)
@@ -185,6 +253,8 @@ class FeatureBuilder:
             "away_rating":     final_away_rating,
             "home_players":    home_players,
             "away_players":    away_players,
+            "home_bench":      home_squad.get("bench_players", []),
+            "away_bench":      away_squad.get("bench_players", []),
             "home_data_source": home_squad.get("data_source", "Desconhecido"),
             "away_data_source": away_squad.get("data_source", "Desconhecido"),
         }

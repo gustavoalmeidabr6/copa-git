@@ -372,9 +372,9 @@ class MatchSimulator:
         return 1.0
 
     def _squad_elo_modifier(self, own_rating: float, opp_rating: float) -> float:
-        rating_diff = (own_rating - opp_rating) * 0.07 
+        rating_diff = (own_rating - opp_rating) * 0.15 
         raw = 1.0 + rating_diff
-        return float(np.clip(raw, 0.85, 1.15))
+        return float(np.clip(raw, 0.50, 1.50))
 
     def _compute_lambdas(self, home_team: str, away_team: str, home_rating: float, away_rating: float, home_elo: float, away_elo: float, df_home: object, df_away: object) -> tuple[float, float, float, float]:
         lh_p1 = float(self.models["home"].predict(df_home)[0])
@@ -535,12 +535,12 @@ class MatchSimulator:
 
         return round(float(np.clip(base + bonus + noise, 4.5, 9.5)), 2)
 
-    def simulate_match(self, home_team: str, away_team: str, num_simulations: int = 400, is_friendly: int = 0, home_excluded: list = None, away_excluded: list = None) -> dict:
+    def simulate_match(self, home_team: str, away_team: str, num_simulations: int = 400, is_friendly: int = 0, home_excluded: list = None, away_excluded: list = None, stadium: str = None, home_starters: list = None, away_starters: list = None) -> dict:
         if home_excluded is None: home_excluded = []
         if away_excluded is None: away_excluded = []
 
-        feats = self.feature_builder.build_match_features(home_team, away_team, is_friendly, home_excluded, away_excluded)
-        feats_inv = self.feature_builder.build_match_features(away_team, home_team, is_friendly, away_excluded, home_excluded)
+        feats = self.feature_builder.build_match_features(home_team, away_team, is_friendly, home_excluded, away_excluded, stadium=stadium, home_starters=home_starters, away_starters=away_starters)
+        feats_inv = self.feature_builder.build_match_features(away_team, home_team, is_friendly, away_excluded, home_excluded, stadium=stadium, home_starters=away_starters, away_starters=home_starters)
 
         home_rating = feats["home_rating"]
         away_rating = feats["away_rating"]
@@ -558,11 +558,8 @@ class MatchSimulator:
         draw_prob = float(np.trace(prob_matrix)) * 100
         away_win_prob = float(np.sum(np.triu(prob_matrix, 1))) * 100
 
-        home_sq_full = self.feature_builder.data_loader.get_real_squad_data(home_team)
-        away_sq_full = self.feature_builder.data_loader.get_real_squad_data(away_team)
-        
-        home_bench = [p for p in home_sq_full.get("bench_players", []) if p["name"] not in home_excluded]
-        away_bench = [p for p in away_sq_full.get("bench_players", []) if p["name"] not in away_excluded]
+        home_bench = feats.get("home_bench", [])
+        away_bench = feats.get("away_bench", [])
 
         home_roster = feats["home_players"] + home_bench
         away_roster = feats["away_players"] + away_bench

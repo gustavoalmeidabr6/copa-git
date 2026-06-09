@@ -43,62 +43,7 @@ def _build_safe_cache_key(prefix: str, endpoint: str, params: dict) -> str:
     param_str = "_".join(param_parts)
     return f"{prefix}_{safe_endpoint}_{param_str}"
 
-class APIFootball:
-    BASE_URL = "https://v3.football.api-sports.io"
 
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.getenv("APISPORTS_KEY", "")
-        self.headers = {"x-rapidapi-key": self.api_key, "x-rapidapi-host": "v3.football.api-sports.io"}
-
-    def _get(self, endpoint: str, params: dict = None) -> dict | None:
-        cache_key = _build_safe_cache_key("apif", endpoint, params)
-        cached = _load_cache(cache_key)
-        if cached: return cached
-
-        if not self.api_key or self.api_key == "SUA_CHAVE_AQUI": return None
-
-        try:
-            headers = {
-                "x-rapidapi-key": self.api_key, 
-                "x-rapidapi-host": "v3.football.api-sports.io",
-                "x-apisports-key": self.api_key 
-            }
-            r = requests.get(f"{self.BASE_URL}/{endpoint}", headers=headers, params=params, timeout=10)
-            
-            if r.status_code == 200:
-                data = r.json()
-                if data.get('errors') and len(data['errors']) > 0: 
-                    print(f"⚠️ API-Football recusou {endpoint}. Motivo: {data['errors']}")
-                    return None
-                if 'response' not in data: 
-                    return None
-                
-                _save_cache(cache_key, data)
-                time.sleep(1)
-                return data
-            else:
-                print(f"⚠️ Erro de conexão na API: Status {r.status_code} ({endpoint})")
-        except requests.RequestException as e:
-            print(f"⚠️ Falha de rede ao chamar a API: {e}")
-            
-        return None
-    
-    def get_team_statistics(self, team_id: int, season: int) -> dict | None:
-        data = self._get("teams/statistics", {"league": 1, "team": team_id, "season": season})
-        return data.get("response") if data else None
-
-    def get_injuries(self, team_id: int) -> list | None:
-        data = self._get("injuries", {"team": team_id})
-        return data.get("response") if data else None
-
-    def get_last_match_players(self, team_id: int) -> list | None:
-        fix_data = self._get("fixtures", {"team": team_id, "last": 1})
-        if not fix_data or not fix_data.get('response'): return None
-        fixture_id = fix_data['response'][0]['fixture']['id']
-        players_data = self._get("fixtures/players", {"fixture": fixture_id, "team": team_id})
-        if players_data and players_data.get('response'):
-            return players_data['response'][0].get('players')
-        return None
 
 class FootballDataOrg:
     BASE_URL = "https://api.football-data.org/v4"
@@ -133,7 +78,7 @@ class TheOddsAPI:
 
     def get_world_cup_odds(self) -> list | None:
         cache_key = "odds_wc_outrights"
-        cached = _load_cache(cache_key, max_age_hours=1) # Cache de 1h para Odds
+        cached = _load_cache(cache_key, max_age_hours=10) # Cache de 10h para Odds
         if cached: return cached
         
         if not self.api_key or self.api_key == "SUA_CHAVE_AQUI": 

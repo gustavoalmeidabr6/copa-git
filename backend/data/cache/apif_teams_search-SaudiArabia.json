@@ -1,0 +1,254 @@
+{
+  "get": "teams",
+  "parameters": {
+    "search": "Saudi Arabia"
+  },
+  "errors": [],
+  "results": 12,
+  "paging": {
+    "current": 1,
+    "total": 1
+  },
+  "response": [
+    {
+      "team": {
+        "id": 23,
+        "name": "Saudi Arabia",
+        "code": "KSA",
+        "country": "Saudi-Arabia",
+        "founded": 1956,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/23.png"
+      },
+      "venue": {
+        "id": 22434,
+        "name": "King Fahd Sports City Stadium",
+        "address": "Prince Bandar Bin Abdulaziz Street",
+        "city": "Riyadh",
+        "capacity": 68752,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22434.png"
+      }
+    },
+    {
+      "team": {
+        "id": 10301,
+        "name": "Saudi Arabia U20",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": 1956,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/10301.png"
+      },
+      "venue": {
+        "id": 22699,
+        "name": "30 June Air Defence Stadium",
+        "address": "Na Axis",
+        "city": "al-Qāhirah (Cairo)",
+        "capacity": 30000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22699.png"
+      }
+    },
+    {
+      "team": {
+        "id": 10955,
+        "name": "Saudi Arabia U23",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/10955.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 20453,
+        "name": "Saudi Arabia W",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": 0,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/20453.png"
+      },
+      "venue": {
+        "id": 12236,
+        "name": "Sport Hall Stadium in King Abdullah sport city",
+        "address": null,
+        "city": "Jeddah",
+        "capacity": 5000,
+        "surface": "artificial turf",
+        "image": "https://media.api-sports.io/football/venues/12236.png"
+      }
+    },
+    {
+      "team": {
+        "id": 21444,
+        "name": "Saudi Arabia U17",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": 1956,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/21444.png"
+      },
+      "venue": {
+        "id": 22584,
+        "name": "Prince Saud bin Jalawi Stadium",
+        "address": "Damman Al-Khobar Coastal Road",
+        "city": "al-Khobar (Khobar)",
+        "capacity": 20100,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22584.png"
+      }
+    },
+    {
+      "team": {
+        "id": 22436,
+        "name": "Saudi Arabia U19",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22436.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 23542,
+        "name": "Saudi Arabia U21",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/23542.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 25361,
+        "name": "Saudi Arabia U16",
+        "code": null,
+        "country": null,
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/25361.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 26292,
+        "name": "Saudi Arabia U20 W",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/26292.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 27070,
+        "name": "Saudi Arabia U18",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27070.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 27175,
+        "name": "Saudi Arabia U17 W",
+        "code": null,
+        "country": null,
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27175.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 27361,
+        "name": "Team Saudi Arabia",
+        "code": null,
+        "country": "Saudi-Arabia",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27361.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    }
+  ]
+}

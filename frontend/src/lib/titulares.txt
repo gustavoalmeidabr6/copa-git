@@ -114,7 +114,7 @@ UEFA,Noruega,4-3-3,Julian Ryerson,RB,Defensive Fullback
 UEFA,Noruega,4-3-3,Colin Heggem,CB,Central Defender
 UEFA,Noruega,4-3-3,Leo Ostigard,CB,Ball-Playing Defender
 UEFA,Noruega,4-3-3,David Møller Wolfe,LB,Attacking Fullback
-UEFA,Noruega,4-3-3,Kristian Thorstvedt,CM,Box-to-Box Midfielder
+UEFA,Noruega,4-3-3,Martin Ødegaard,CM,Box-to-Box Midfielder
 UEFA,Noruega,4-3-3,Patrick Berg,CM,Deep-Lying Playmaker
 UEFA,Noruega,4-3-3,Sander Berge,CM,Ball-Winning Midfielder
 UEFA,Noruega,4-3-3,Alexander Sorloth,RW,Target Man (Wide)

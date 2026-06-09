@@ -1,0 +1,2334 @@
+{
+  "get": "teams",
+  "parameters": {
+    "search": "Uruguay"
+  },
+  "errors": [],
+  "results": 116,
+  "paging": {
+    "current": 1,
+    "total": 1
+  },
+  "response": [
+    {
+      "team": {
+        "id": 7,
+        "name": "Uruguay",
+        "code": "URU",
+        "country": "Uruguay",
+        "founded": 1900,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/7.png"
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "address": "Parque Batlle",
+        "city": "Montevideo",
+        "capacity": 60235,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1624.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2058,
+        "name": "CS Uruguay",
+        "code": "CSU",
+        "country": "Costa-Rica",
+        "founded": 1936,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2058.png"
+      },
+      "venue": {
+        "id": 410,
+        "name": "Estadio Municipal El Labrador de Coronado",
+        "address": "Ipis",
+        "city": "San Jose",
+        "capacity": 3200,
+        "surface": "artificial turf",
+        "image": "https://media.api-sports.io/football/venues/410.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2347,
+        "name": "SUD America",
+        "code": "SUD",
+        "country": "Uruguay",
+        "founded": 1914,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2347.png"
+      },
+      "venue": {
+        "id": 1627,
+        "name": "Parque Palermo",
+        "address": "Avenida Dr. Américo Ricoldoni 2875",
+        "city": "Montevideo",
+        "capacity": 5500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1627.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2348,
+        "name": "Penarol",
+        "code": "PEN",
+        "country": "Uruguay",
+        "founded": 1891,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2348.png"
+      },
+      "venue": {
+        "id": 1640,
+        "name": "Estadio Campeón del Siglo",
+        "address": "Camino de los Siete Cerros, Vila Don Bosco",
+        "city": "Montevideo",
+        "capacity": 40005,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1640.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2349,
+        "name": "El Tanque Sisley",
+        "code": "SIS",
+        "country": "Uruguay",
+        "founded": 1941,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2349.png"
+      },
+      "venue": {
+        "id": 1625,
+        "name": "Estadio Campeones Olímpicos",
+        "address": "Avenida Zelmar Michelinni",
+        "city": "Ciudad de Florida",
+        "capacity": 5000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1625.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2350,
+        "name": "Defensor Sporting",
+        "code": "DEF",
+        "country": "Uruguay",
+        "founded": 1913,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2350.png"
+      },
+      "venue": {
+        "id": 1632,
+        "name": "Estadio Luis Franzini",
+        "address": "Avenida Dr. Julio Herrera y Reissig 687 esq. Avenida Sarmiento, Parque Rodó",
+        "city": "Montevideo",
+        "capacity": 18000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1632.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2351,
+        "name": "CA River Plate",
+        "code": "RIV",
+        "country": "Uruguay",
+        "founded": 1932,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2351.png"
+      },
+      "venue": {
+        "id": 1645,
+        "name": "Parque Federico Omar Saroldi",
+        "address": "Avenida 19 de Abril 1145 entre Atilio Pelossi y Lucas Obes, Prado",
+        "city": "Montevideo",
+        "capacity": 5624,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1645.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2352,
+        "name": "Danubio",
+        "code": "DAN",
+        "country": "Uruguay",
+        "founded": 1932,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2352.png"
+      },
+      "venue": {
+        "id": 1631,
+        "name": "Estadio Jardines del Hipódromo",
+        "address": "Avenida Dr. Carlos Nery esq. Avenida Acrópolis",
+        "city": "Montevideo",
+        "capacity": 14401,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1631.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2353,
+        "name": "Juventud",
+        "code": "JUV",
+        "country": "Uruguay",
+        "founded": 1935,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2353.png"
+      },
+      "venue": {
+        "id": 1635,
+        "name": "Estadio Municipal Parque Artigas",
+        "address": "Avenida José Artigas S/N y Blandengues",
+        "city": "Las Piedras",
+        "capacity": 5500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1635.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2354,
+        "name": "Rampla Juniors",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1914,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2354.png"
+      },
+      "venue": {
+        "id": 1644,
+        "name": "Estadio Olímpico",
+        "address": "Avenida Turquía 3302 entre Inglaterra y México, Barrio Villa del Cerro",
+        "city": "Montevideo",
+        "capacity": 6929,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1644.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2355,
+        "name": "Plaza Colonia",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1917,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2355.png"
+      },
+      "venue": {
+        "id": 1641,
+        "name": "Parque Cincuentenario Juan Gaspar Prandi",
+        "address": "Avenida González Moreno y Aparicio Saravia",
+        "city": "Colonia del Sacramento",
+        "capacity": 2200,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1641.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2356,
+        "name": "Club Nacional",
+        "code": "CLU",
+        "country": "Uruguay",
+        "founded": 1899,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2356.png"
+      },
+      "venue": {
+        "id": 1639,
+        "name": "Estadio Gran Parque Central",
+        "address": "Avenida Carlos Anaya 2900 y Tristán Azambuya",
+        "city": "Montevideo",
+        "capacity": 34000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1639.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2357,
+        "name": "Fenix",
+        "code": "FEN",
+        "country": "Uruguay",
+        "founded": 1916,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2357.png"
+      },
+      "venue": {
+        "id": 1634,
+        "name": "Parque Capurro",
+        "address": "Avenida Juan María Gutiérrez 3454 esq. Avenida Capurro 874, Barrio Capurro",
+        "city": "Montevideo",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1634.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2358,
+        "name": "Liverpool Montevideo",
+        "code": "LIV",
+        "country": "Uruguay",
+        "founded": 1915,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2358.png"
+      },
+      "venue": {
+        "id": 1636,
+        "name": "Estadio Belvedere",
+        "address": "Avenida Julián Laguna 4401 entre José Mármol y Carlos María Ramírez, Barrio Belvedere",
+        "city": "Montevideo",
+        "capacity": 8384,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1636.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2359,
+        "name": "Racing Montevideo",
+        "code": "RAC",
+        "country": "Uruguay",
+        "founded": 1919,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2359.png"
+      },
+      "venue": {
+        "id": 1643,
+        "name": "Parque Osvaldo Roberto",
+        "address": "Avenida Millán 4712 entre Avenida Sayago y Vedia, Barrio Sayago",
+        "city": "Montevideo",
+        "capacity": 8500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1643.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2360,
+        "name": "Wanderers",
+        "code": "WAN",
+        "country": "Uruguay",
+        "founded": 1902,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2360.png"
+      },
+      "venue": {
+        "id": 1638,
+        "name": "Parque Alfredo Víctor Viera",
+        "address": "Avenida Buschental entre Atilio Pelossi y Lucas Obes, Barrio Prado",
+        "city": "Montevideo",
+        "capacity": 7420,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1638.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2361,
+        "name": "Boston River",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1939,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2361.png"
+      },
+      "venue": {
+        "id": 1625,
+        "name": "Estadio Campeones Olímpicos",
+        "address": "Avenida Zelmar Michelinni",
+        "city": "Ciudad de Florida",
+        "capacity": 5000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1625.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2362,
+        "name": "Cerro",
+        "code": "CER",
+        "country": "Uruguay",
+        "founded": 1922,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2362.png"
+      },
+      "venue": {
+        "id": 1629,
+        "name": "Estadio Monumental Luis Tróccoli",
+        "address": "Avenida Dr. Santín Carlos Rossi 4702 esq. Camina La Paloma, Barrio La Paloma",
+        "city": "Montevideo",
+        "capacity": 25000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1629.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2363,
+        "name": "Progreso",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1917,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2363.png"
+      },
+      "venue": {
+        "id": 1642,
+        "name": "Parque Abraham Paladino",
+        "address": "Avenida Emilio Romero",
+        "city": "Montevideo",
+        "capacity": 7500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1642.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2364,
+        "name": "Atenas",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1928,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2364.png"
+      },
+      "venue": {
+        "id": 1962,
+        "name": "Estadio Atenas",
+        "address": "Avenida Jose “Pepe” Frade",
+        "city": "San Carlos",
+        "capacity": 6000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1962.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2365,
+        "name": "Atletico Torque",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 2007,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2365.png"
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "address": "Avenida Dr. Alfredo Navarro y Dr. Américo Ricaldoni, Parque Batlle",
+        "city": "Montevideo",
+        "capacity": 60235,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1624.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2366,
+        "name": "Villa Teresa",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1941,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2366.png"
+      },
+      "venue": {
+        "id": 1744,
+        "name": "Parque José Nasazzi",
+        "address": "Avenida Leon Ribeiro",
+        "city": "Montevideo",
+        "capacity": 15000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1744.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2367,
+        "name": "Cerrito",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1929,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2367.png"
+      },
+      "venue": {
+        "id": 1628,
+        "name": "Parque Maracaná",
+        "address": "Boulevard Aparicio Saravia 1327 y Avenida Camino Burgués",
+        "city": "Montevideo",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1628.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2368,
+        "name": "Central Espanol",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1905,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2368.png"
+      },
+      "venue": {
+        "id": 1627,
+        "name": "Parque Palermo",
+        "address": "Avenida Dr. Américo Ricoldoni 2875",
+        "city": "Montevideo",
+        "capacity": 5500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1627.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2369,
+        "name": "Cerro Largo",
+        "code": "CER",
+        "country": "Uruguay",
+        "founded": 2002,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2369.png"
+      },
+      "venue": {
+        "id": 1630,
+        "name": "Estadio Municipal Arquitecto Antonio Eleuterio Ubilla",
+        "address": "Calle José Batlle y Ordóñez 695 esc. 101",
+        "city": "Melo",
+        "capacity": 15000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1630.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2370,
+        "name": "Deportivo Maldonado",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1928,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2370.png"
+      },
+      "venue": {
+        "id": 1633,
+        "name": "Estadio Domingo Burgueño Miguel",
+        "address": null,
+        "city": "Maldonado",
+        "capacity": 28000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1633.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2371,
+        "name": "Rentistas",
+        "code": "REN",
+        "country": "Uruguay",
+        "founded": 1933,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2371.png"
+      },
+      "venue": {
+        "id": 1626,
+        "name": "Complejo Deportivo Rentistas",
+        "address": "Avenida Pedro de Mendoza 6580 entre Camino Rígel y Camino La Paz, Mendoza",
+        "city": "Montevideo",
+        "capacity": 10600,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1626.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2372,
+        "name": "Villa Espanola",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1940,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2372.png"
+      },
+      "venue": {
+        "id": 1647,
+        "name": "Estadio Obdulio Varela",
+        "address": "Calle Tupan",
+        "city": "Montevideo",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1647.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2373,
+        "name": "Miramar",
+        "code": "MIR",
+        "country": "Uruguay",
+        "founded": 1906,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2373.png"
+      },
+      "venue": {
+        "id": 1627,
+        "name": "Parque Palermo",
+        "address": "Avenida Dr. Américo Ricoldoni 2875",
+        "city": "Montevideo",
+        "capacity": 5500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1627.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2374,
+        "name": "Tacuarembo",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1999,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2374.png"
+      },
+      "venue": {
+        "id": 1646,
+        "name": "Estadio Raúl Saturnino Goyenola",
+        "address": "Avenida General Antigas 206",
+        "city": "Tacuarembó",
+        "capacity": 8600,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1646.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2375,
+        "name": "Canadian",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 2010,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2375.png"
+      },
+      "venue": {
+        "id": 2848,
+        "name": "Estadio Batalla de Sarandí",
+        "address": null,
+        "city": "Sarandí Grande",
+        "capacity": 2000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/2848.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2376,
+        "name": "Oriental",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1924,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2376.png"
+      },
+      "venue": {
+        "id": 1862,
+        "name": "Parque Oriental",
+        "address": "Avenida Venus 3643 esquina Camino José Batlle y Ordoñez",
+        "city": "La Paz",
+        "capacity": 1500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1862.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2377,
+        "name": "Sportivo Huracan",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1937,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2377.png"
+      },
+      "venue": {
+        "id": 2849,
+        "name": "Parque Pedro Alejandro Bossio",
+        "address": "Dr. Alfredo Moreno y Camino Cibils, Barrio Paso de la Arena",
+        "city": "Montevideo",
+        "capacity": 2500,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/2849.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2378,
+        "name": "Albion FC",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1891,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2378.png"
+      },
+      "venue": {
+        "id": 1924,
+        "name": "Parque Dr. Enrique Falco Lichtemberger",
+        "address": "Menorca 2111 entre Juan José Castro y Azara, Barrio Malvin Norte",
+        "city": "Montevideo",
+        "capacity": 2000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1924.png"
+      }
+    },
+    {
+      "team": {
+        "id": 2996,
+        "name": "Bella Vista",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1920,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/2996.png"
+      },
+      "venue": {
+        "id": 1744,
+        "name": "Parque José Nasazzi",
+        "address": "Avenida Leon Ribeiro",
+        "city": "Montevideo",
+        "capacity": 15000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1744.png"
+      }
+    },
+    {
+      "team": {
+        "id": 10185,
+        "name": "Uruguay U23",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1900,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/10185.png"
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "address": "Avenida Dr. Alfredo Navarro y Dr. Américo Ricaldoni, Parque Batlle",
+        "city": "Montevideo",
+        "capacity": 60235,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1624.png"
+      }
+    },
+    {
+      "team": {
+        "id": 10307,
+        "name": "Uruguay U20",
+        "code": "URU",
+        "country": "Uruguay",
+        "founded": 1900,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/10307.png"
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "address": "Avenida Dr. Alfredo Navarro y Dr. Américo Ricaldoni, Parque Batlle",
+        "city": "Montevideo",
+        "capacity": 60235,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1624.png"
+      }
+    },
+    {
+      "team": {
+        "id": 11053,
+        "name": "Danubio U20",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/11053.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 11058,
+        "name": "Nacional U20",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/11058.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 13268,
+        "name": "Rocha",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1999,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/13268.png"
+      },
+      "venue": {
+        "id": 8346,
+        "name": "Estadio Dr. Mario Sobrero",
+        "address": "Avenida Mario Anza y Avenida Italia",
+        "city": "Rocha",
+        "capacity": 10000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/8346.png"
+      }
+    },
+    {
+      "team": {
+        "id": 15628,
+        "name": "Colón",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1999,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/15628.png"
+      },
+      "venue": {
+        "id": 18748,
+        "name": "Estadio Miguel Campomar",
+        "address": "Instrucciones 2578, esquina Carmelo Colman",
+        "city": "Juan Lacaze",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/18748.png"
+      }
+    },
+    {
+      "team": {
+        "id": 16740,
+        "name": "Uruguay Montevideo",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1921,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/16740.png"
+      },
+      "venue": {
+        "id": 12660,
+        "name": "Parque ANCAP",
+        "address": "Avenida Dr. Jose Luis de la Peña y Ameghino, Barrio Pueblo Victoria",
+        "city": "Montevideo",
+        "capacity": 3000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/12660.png"
+      }
+    },
+    {
+      "team": {
+        "id": 16944,
+        "name": "Uruguay W",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1900,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/16944.png"
+      },
+      "venue": {
+        "id": 18580,
+        "name": "Estadio Banco Guayaquil",
+        "address": "Calle F S/N y Calle I, Chillo-Jijón, Sangolquí",
+        "city": "Quito",
+        "capacity": 12600,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/18580.png"
+      }
+    },
+    {
+      "team": {
+        "id": 18295,
+        "name": "La Luz",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1929,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/18295.png"
+      },
+      "venue": {
+        "id": 12661,
+        "name": "Parque Luis Rivero",
+        "address": "Boulevard José Batlle y Ordóñez y Arroyo Miguelete, Barrio Aires Puros",
+        "city": "Montevideo",
+        "capacity": 2000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/12661.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19325,
+        "name": "Alto Perú",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1940,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19325.png"
+      },
+      "venue": {
+        "id": 11116,
+        "name": "Parque Dr. Carlos Suero",
+        "address": "Instrucciones 2578, esquina Carmelo Colman",
+        "city": "Montevideo",
+        "capacity": 2000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/11116.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19326,
+        "name": "Artigas",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1927,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19326.png"
+      },
+      "venue": {
+        "id": 11116,
+        "name": "Parque Dr. Carlos Suero",
+        "address": "Instrucciones 2578, esquina Carmelo Colman",
+        "city": "Montevideo",
+        "capacity": 2000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/11116.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19327,
+        "name": "Barrio Olímpico",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19327.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19328,
+        "name": "Basáñez",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1920,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19328.png"
+      },
+      "venue": {
+        "id": 1637,
+        "name": "Parque Luis Méndez Piana",
+        "address": "Avenida Ramón V. Benzano",
+        "city": "Montevideo",
+        "capacity": 6000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1637.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19329,
+        "name": "Bella Vista de Paysandú",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19329.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19330,
+        "name": "Boquita",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19330.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19331,
+        "name": "Cooper",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19331.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19332,
+        "name": "Deportivo Italiano",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1999,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19332.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19333,
+        "name": "Durazno",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 2005,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19333.png"
+      },
+      "venue": {
+        "id": 18749,
+        "name": "Estadio Municipal Silvestre Octavio Landoni",
+        "address": "Avenida Brig. General Manuel Oribe",
+        "city": "Durazno",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/18749.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19334,
+        "name": "Huracán de Paysandú",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19334.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19335,
+        "name": "Huracán de Rivera",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19335.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19336,
+        "name": "Juanicó",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19336.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19337,
+        "name": "Laureles",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19337.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19338,
+        "name": "Lavalleja de Minas",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19338.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19339,
+        "name": "Lavalleja de Rocha",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19339.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19340,
+        "name": "Los Halcones",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1950,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19340.png"
+      },
+      "venue": {
+        "id": 19066,
+        "name": "Parque Salus",
+        "address": "Dr. Carlos Ma. De Pena y Calle Yugoeslavia",
+        "city": "Montevideo",
+        "capacity": 4000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/19066.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19341,
+        "name": "Mar de Fondo",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1934,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19341.png"
+      },
+      "venue": {
+        "id": 12660,
+        "name": "Parque ANCAP",
+        "address": "Avenida Dr. Jose Luis de la Peña y Ameghino, Barrio Pueblo Victoria",
+        "city": "Montevideo",
+        "capacity": 3000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/12660.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19342,
+        "name": "Palermo de Rocha",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19342.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19343,
+        "name": "Parque del Plata",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19343.png"
+      },
+      "venue": {
+        "id": 19066,
+        "name": "Parque Salus",
+        "address": "Dr. Carlos Ma. De Pena y Calle Yugoeslavia",
+        "city": "Montevideo",
+        "capacity": 4000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/19066.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19344,
+        "name": "Paso de la Arena",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19344.png"
+      },
+      "venue": {
+        "id": 1626,
+        "name": "Complejo Deportivo Rentistas",
+        "address": "Avenida Pedro de Mendoza 6580 entre Camino Rígel y Camino La Paz, Mendoza",
+        "city": "Montevideo",
+        "capacity": 10600,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1626.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19345,
+        "name": "Piriápolis",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19345.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19346,
+        "name": "Porongos",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19346.png"
+      },
+      "venue": {
+        "id": 22633,
+        "name": "Estadio Juan Antonio Lavalleja",
+        "address": "25 de Mayo y Boulevard Aparicio Saravia",
+        "city": "Trinidad",
+        "capacity": 6000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22633.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19347,
+        "name": "Potencia",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19347.png"
+      },
+      "venue": {
+        "id": 1647,
+        "name": "Estadio Obdulio Varela",
+        "address": "Calle Tupan",
+        "city": "Montevideo",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1647.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19348,
+        "name": "Progreso Atlántida",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19348.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19349,
+        "name": "Río Negro",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19349.png"
+      },
+      "venue": {
+        "id": 22634,
+        "name": "Estadio Municipal Casto Martínez Laguarda",
+        "address": "Avenida Larriera y Veinticinco de Agosto",
+        "city": "San José de Mayo",
+        "capacity": 3810,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22634.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19350,
+        "name": "Salto",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 2002,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19350.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19351,
+        "name": "Salus",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19351.png"
+      },
+      "venue": {
+        "id": 19066,
+        "name": "Parque Salus",
+        "address": "Dr. Carlos Ma. De Pena y Calle Yugoeslavia",
+        "city": "Montevideo",
+        "capacity": 4000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/19066.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19352,
+        "name": "Santa Emilia de Cardona",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19352.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19353,
+        "name": "Universal de San José",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19353.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19354,
+        "name": "Universitario de Salto",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19354.png"
+      },
+      "venue": {
+        "id": 22635,
+        "name": "Complejo Universitario",
+        "address": null,
+        "city": "Salto",
+        "capacity": 1000,
+        "surface": "artificial turf",
+        "image": "https://media.api-sports.io/football/venues/22635.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19355,
+        "name": "Wanderers Juvenil",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19355.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19356,
+        "name": "Wanderers Santa Lucia",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19356.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 19410,
+        "name": "Paysandu",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19410.png"
+      },
+      "venue": {
+        "id": 22636,
+        "name": "Estadio Parque Artigas",
+        "address": "Artigas y Colon",
+        "city": "Paysandú",
+        "capacity": 23000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22636.png"
+      }
+    },
+    {
+      "team": {
+        "id": 19411,
+        "name": "Platense",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1935,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/19411.png"
+      },
+      "venue": {
+        "id": 1647,
+        "name": "Estadio Obdulio Varela",
+        "address": "Calle Tupan",
+        "city": "Montevideo",
+        "capacity": 8000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1647.png"
+      }
+    },
+    {
+      "team": {
+        "id": 20002,
+        "name": "Central de San José",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/20002.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 20003,
+        "name": "Juventud de Colonia",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/20003.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 20537,
+        "name": "Uruguay U19",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/20537.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 21212,
+        "name": "Uruguay U17",
+        "code": null,
+        "country": "Uruguay",
+        "founded": 1900,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/21212.png"
+      },
+      "venue": {
+        "id": 1624,
+        "name": "Estadio Centenario",
+        "address": "Avenida Dr. Alfredo Navarro y Dr. Américo Ricaldoni, Parque Batlle",
+        "city": "Montevideo",
+        "capacity": 73609,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/1624.png"
+      }
+    },
+    {
+      "team": {
+        "id": 22215,
+        "name": "Deutscher",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22215.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22216,
+        "name": "Estudiantes del Plata",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22216.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22217,
+        "name": "Lito",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22217.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22221,
+        "name": "Campana",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22221.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22222,
+        "name": "Ferro Carril",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22222.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22223,
+        "name": "Huracán Treinta y Tres",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22223.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22224,
+        "name": "Libertad San Carlos",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22224.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22225,
+        "name": "Litoral",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22225.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22226,
+        "name": "Nacional CNF",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22226.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22227,
+        "name": "Sportivo Bella Italia",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22227.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22228,
+        "name": "Terremoto",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22228.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22229,
+        "name": "Wanderers Durazno",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22229.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22549,
+        "name": "Club Nacional de Football W",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22549.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 22758,
+        "name": "San Marcos",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/22758.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 23380,
+        "name": "Uruguay U17 W",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": true,
+        "logo": "https://media.api-sports.io/football/teams/23380.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 23462,
+        "name": "Uruguay U20 W",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/23462.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24669,
+        "name": "Atlético Arsenal",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24669.png"
+      },
+      "venue": {
+        "id": 22637,
+        "name": "Estadio Ernesto Dickinson",
+        "address": "Fernando Irazoqui",
+        "city": "Salto",
+        "capacity": 5000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22637.png"
+      }
+    },
+    {
+      "team": {
+        "id": 24670,
+        "name": "Atlético Florida",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24670.png"
+      },
+      "venue": {
+        "id": 22638,
+        "name": "Estadio Artigas Lacassy Loroña",
+        "address": null,
+        "city": "Florida",
+        "capacity": 1000,
+        "surface": "grass",
+        "image": "https://media.api-sports.io/football/venues/22638.png"
+      }
+    },
+    {
+      "team": {
+        "id": 24671,
+        "name": "Berlín",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24671.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24672,
+        "name": "Boca Juniors Melo",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24672.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24673,
+        "name": "Bristol",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24673.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24674,
+        "name": "Central de Durazno",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24674.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24675,
+        "name": "Darling",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24675.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24676,
+        "name": "Estudiantes Tacuarembó",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24676.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24677,
+        "name": "Estudiantil Sanducero",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24677.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24678,
+        "name": "Ferrocarrilero",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24678.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24679,
+        "name": "Melo Wanderers",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24679.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24680,
+        "name": "Peñarol de Rivera",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24680.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 24681,
+        "name": "Pirata Juniors",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/24681.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 25013,
+        "name": "18 de Julio",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/25013.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 25014,
+        "name": "Frontera Rivera",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/25014.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 25057,
+        "name": "Peñarol W",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/25057.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 26699,
+        "name": "Atenas Tala",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/26699.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    },
+    {
+      "team": {
+        "id": 27068,
+        "name": "Uruguay U18",
+        "code": null,
+        "country": "Uruguay",
+        "founded": null,
+        "national": false,
+        "logo": "https://media.api-sports.io/football/teams/27068.png"
+      },
+      "venue": {
+        "id": null,
+        "name": null,
+        "address": null,
+        "city": null,
+        "capacity": null,
+        "surface": null,
+        "image": null
+      }
+    }
+  ]
+}

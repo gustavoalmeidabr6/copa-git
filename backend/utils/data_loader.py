@@ -375,9 +375,11 @@ class DataLoader:
             for _, row in self.players_db.iterrows():
                 name_norm = _normalize_name(str(row["Name"]))
                 canon = _canonical(name_norm)
-                # Salva os dois mapeamentos (direto normalizado e o canônico global)
-                self.ea_lookup[canon] = float(row.get("OVR", 70)) / 10.0
-                self.ea_lookup[name_norm] = float(row.get("OVR", 70)) / 10.0
+                ovr = float(row.get("OVR", 70)) / 10.0
+                if canon not in self.ea_lookup or ovr > self.ea_lookup[canon]:
+                    self.ea_lookup[canon] = ovr
+                if name_norm not in self.ea_lookup or ovr > self.ea_lookup[name_norm]:
+                    self.ea_lookup[name_norm] = ovr
                 
         self.tm_lookup = {}
         if not self.tm_players.empty:
@@ -388,8 +390,10 @@ class DataLoader:
                         name_norm = _normalize_name(str(row[name_c]))
                         canon = _canonical(name_norm)
                         val = float(row["market_value_in_eur"])
-                        self.tm_lookup[canon] = val
-                        self.tm_lookup[name_norm] = val
+                        if canon not in self.tm_lookup or val > self.tm_lookup[canon]:
+                            self.tm_lookup[canon] = val
+                        if name_norm not in self.tm_lookup or val > self.tm_lookup[name_norm]:
+                            self.tm_lookup[name_norm] = val
                     except: pass
 
     def _load_csv(self, path: Path, name: str) -> pd.DataFrame:
@@ -600,7 +604,6 @@ class DataLoader:
                 fuzzy = get_close_matches(team_name, keys, n=1, cutoff=0.80)
                 dict_team_name = fuzzy[0] if fuzzy else None
 
-        # Agora ea_nation é apenas repassado, mas as buscas são globais
         ea_nation = team_name 
         official_roster: list[dict] = []
 
@@ -656,7 +659,19 @@ class DataLoader:
                             best_match_idx = i
                             break
                             
-                # 3. Fuzzy Logic (Se escreveu errado no doc)
+                # 3. Tenta pelo ÚLTIMO NOME (Perfeito para o formato da API: "A. Gordon" ou "H. Kane")
+                if best_match_idx == -1:
+                    pref_last = p_norm.split()[-1] if p_norm.split() else ""
+                    if pref_last and len(pref_last) >= 2:
+                        for i, p in enumerate(official_roster):
+                            if i in used_indices: continue
+                            r_norm = _normalize_name(p["name"])
+                            r_last = r_norm.split()[-1] if r_norm.split() else ""
+                            if pref_last == r_last:
+                                best_match_idx = i
+                                break
+
+                # 4. Fuzzy Logic (Se escreveu errado no doc)
                 if best_match_idx == -1:
                     avail_names = [p["name"] for i, p in enumerate(official_roster) if i not in used_indices]
                     if avail_names:
@@ -703,7 +718,7 @@ class DataLoader:
         base_data["bench_players"] = bench
         self.cache[team_name]      = base_data
         return base_data
-
+    
     @staticmethod
     def _elo_to_squad_rating(elo: float) -> float:
         return round(min(9.5, max(6.5, 6.5 + (elo - 1400) / (2200 - 1400) * 3.0)), 2)
@@ -723,7 +738,10 @@ class DataLoader:
             r = base - 0.5 if pos == "Goalkeeper" else base
             squad.append({"name": f"{team_name[:3].upper()} {suffix}", "rating": round(r, 2), "position": pos})
         return squad
-
+    
+    def update_recent_squads_from_api(self):
+        pass
+            
     def get_all_teams(self) -> dict:
         return WORLD_CUP_2026_TEAMS
 
