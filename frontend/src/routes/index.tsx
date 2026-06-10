@@ -113,11 +113,10 @@ function Index() {
           </motion.div>
         </section>
 
-        <section className="mx-auto mt-14 grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-3">
+        <section className="mx-auto mt-14 grid w-full max-w-3xl grid-cols-1 gap-5 md:grid-cols-2">
           {[
             { to: "/copa", title: "Simular", sub: "Copa do Mundo", glow: "gold" as const, icon: <Trophy className="h-20 w-20 text-gold drop-shadow-[0_0_24px_var(--gold)]" /> },
-            { to: "/partida", title: "Simular", sub: "Partida Específica", glow: "neon" as const, icon: <Swords className="h-20 w-20 text-primary drop-shadow-[0_0_24px_var(--primary)]" /> },
-            { to: "/settings", title: "", sub: "Settings", glow: "neon" as const, icon: <Settings className="h-20 w-20 animate-spin-slow text-primary/80" /> },
+            { to: "/partida", title: "Partida Amistosa", sub: "1 vs 1 Simulador", glow: "gold" as const, icon: <Swords className="h-20 w-20 text-gold/80 drop-shadow-[0_0_15px_var(--gold)]" /> },
           ].map((c, i) => (
             <motion.div
               key={c.to}

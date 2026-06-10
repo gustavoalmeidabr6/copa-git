@@ -92,7 +92,6 @@ function CopaPage() {
             <ChevronRight className="h-3 w-3" />
             <span className="text-foreground/80">Copa do Mundo Monte Carlo</span>
           </div>
-          <span className="text-primary/70">Nível 24</span>
         </div>
 
         <AnimatePresence mode="wait">

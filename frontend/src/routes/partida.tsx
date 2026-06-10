@@ -151,9 +151,7 @@ function PartidaPage() {
               {step === "select" ? "Selecionar Times" : step === "lineup" ? "Escalações" : "Resultados"}
             </span>
           </div>
-          <span className="text-primary/70">Nível 24</span>
         </div>
-
         <AnimatePresence mode="wait">
           {step === "select" && (
             <motion.div key="sel" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
