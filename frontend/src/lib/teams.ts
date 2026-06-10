@@ -257,7 +257,7 @@ export const FORMATIONS = {
 
 export type Formation = keyof typeof FORMATIONS;
 
-const POS_MAP: Record<string, string> = {
+export const POS_MAP: Record<string, string> = {
   // Goleiro
   "GK": "GOL",
   // Defensores

@@ -2,13 +2,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useMemo, useState, useRef } from "react";
-import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, Team, rosterFor, formationFor, getPlayerPosition, type Formation } from "@/lib/teams";
+import { ALL_TEAMS, FORMATIONS, POSITION_WEIGHT, Team, rosterFor, formationFor, getPlayerPosition, type Formation, KNOWN_PLAYER_POSITIONS, normalizeName, POS_MAP } from "@/lib/teams";
 import { NeonChrome } from "@/components/sim/StadiumBg";
 import { NeonButton, Panel, SectionTitle, CornerTicks } from "@/components/sim/ui";
 import { SimOverlay } from "@/components/sim/SimOverlay";
 import { SimulationTransition } from "@/components/sim/SimulationTransition";
 import { ArrowLeft, Play, Trash2, ChevronRight, BarChart3 } from "lucide-react";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const Route = createFileRoute("/partida")({
   head: () => ({
@@ -102,9 +104,14 @@ function PartidaPage() {
     setExcludedA([]);
     if (home) {
       setFormA(formationFor(home.id));
-      fetch(`http://localhost:8000/api/roster/${home.apiName}`)
+      fetch(`${API_BASE_URL}/api/roster/${home.apiName}`)
         .then(res => res.json())
         .then(data => {
+          if (data.positions) {
+            for (const [name, pos] of Object.entries(data.positions)) {
+              KNOWN_PLAYER_POSITIONS[normalizeName(name as string)] = POS_MAP[pos as string] || (pos as string);
+            }
+          }
           const arr = [...(data.starters || []), ...(data.bench || [])];
           if (arr.length > 0) setRosterA(smartSort(arr.slice(0, 26)));
         })
@@ -116,9 +123,14 @@ function PartidaPage() {
     setExcludedB([]);
     if (away) {
       setFormB(formationFor(away.id));
-      fetch(`http://localhost:8000/api/roster/${away.apiName}`)
+      fetch(`${API_BASE_URL}/api/roster/${away.apiName}`)
         .then(res => res.json())
         .then(data => {
+          if (data.positions) {
+            for (const [name, pos] of Object.entries(data.positions)) {
+              KNOWN_PLAYER_POSITIONS[normalizeName(name as string)] = POS_MAP[pos as string] || (pos as string);
+            }
+          }
           const arr = [...(data.starters || []), ...(data.bench || [])];
           if (arr.length > 0) setRosterB(smartSort(arr.slice(0, 26)));
         })
@@ -167,7 +179,7 @@ function PartidaPage() {
                   setSimState("simulating");
 
                   try {
-                    const responsePromise = fetch("http://localhost:8000/api/simulate_match", {
+                    const responsePromise = fetch(`${API_BASE_URL}/api/simulate_match`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -471,9 +483,14 @@ function TeamColumn({ team, form, setForm, roster, setRoster, excluded, setExclu
 
       <div className="flex gap-2 mt-1 mb-2">
         <button onClick={() => {
-          fetch(`http://localhost:8000/api/roster/${team.apiName}`)
+          fetch(`${API_BASE_URL}/api/roster/${team.apiName}`)
             .then(res => res.json())
             .then(data => {
+              if (data.positions) {
+                for (const [name, pos] of Object.entries(data.positions)) {
+                  KNOWN_PLAYER_POSITIONS[normalizeName(name as string)] = POS_MAP[pos as string] || (pos as string);
+                }
+              }
               const arr = [...(data.starters || []), ...(data.bench || [])];
               if (arr.length > 0) setRoster(smartSort(arr.slice(0, 26)));
               setForm(formationFor(team.id));
@@ -577,7 +594,7 @@ function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, ros
 
   useEffect(() => {
     if (stadium) {
-      fetch(`http://localhost:8000/api/weather?stadium=${encodeURIComponent(stadium)}`)
+      fetch(`${API_BASE_URL}/api/weather?stadium=${encodeURIComponent(stadium)}`)
         .then(res => res.json())
         .then(data => {
           setStadiumTemp(data.temperature);

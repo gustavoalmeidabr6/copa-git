@@ -40,8 +40,14 @@ def get_roster(team_name: str):
         key=lambda x: -x.get("rating", 7.0)
     )
     bench_players = [p["name"] for p in bench_players_data]
-    
-    return {"starters": top_players, "bench": bench_players}
+    # Coleta as posições reais para enviar ao frontend
+    positions = {}
+    for p in squad.get("top_players", []):
+        positions[p["name"]] = p.get("position", "CM")
+    for p in bench_players_data:
+        positions[p["name"]] = p.get("position", "CM")
+        
+    return {"starters": top_players, "bench": bench_players, "positions": positions}
 
 @app.get("/api/weather")
 def get_weather(stadium: str):

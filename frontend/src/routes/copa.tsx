@@ -10,6 +10,8 @@ import { SimulationTransition } from "@/components/sim/SimulationTransition";
 import { ArrowLeft, Trophy, ChevronRight, Play } from "lucide-react";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 export const Route = createFileRoute("/copa")({
   head: () => ({
     meta: [
@@ -62,7 +64,7 @@ function CopaPage() {
     setSimState("simulating");
 
     try {
-      const responsePromise = fetch("http://localhost:8000/api/simulate_tournament", { method: "POST" });
+      const responsePromise = fetch(`${API_BASE_URL}/api/simulate_tournament`, { method: "POST" });
       
       const [response] = await Promise.all([
         responsePromise,
