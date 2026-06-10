@@ -29,7 +29,7 @@ const PLAYER_PICS = [
   "/cristiano-ronaldo-473-390x509.png",
   "/harry-kane-66-390x494.png",
   "/julian-alvarez.png",
-  "/julian-alvarez-3-390x395.png",
+  "/harry-kane-66-390x494.png",
   "/kylian-mbappe-153-318x540.png",
   "/lamine-yamal-4-284x540.png",
   "/lionel-messi-392-390x381.png",
@@ -44,7 +44,7 @@ export type TournamentAPIResult = {
   total_sims: number;
   favorites: { team: string; prob: number }[];
   top_scorers: { player: string; avg_goals: number }[];
-  top_assists: { player: string; avg_assists: number }[]; 
+  top_assists: { player: string; avg_assists: number }[];
   best_attack: { team: string; gf: number }[];
   best_defense: { team: string; ga: number }[];
   biggest_zebra?: { team: string; elo: number; avg_stage_score: number };
@@ -65,7 +65,7 @@ function CopaPage() {
 
     try {
       const responsePromise = fetch(`${API_BASE_URL}/api/simulate_tournament`, { method: "POST" });
-      
+
       const [response] = await Promise.all([
         responsePromise,
         new Promise(res => setTimeout(res, 10000))
@@ -73,7 +73,7 @@ function CopaPage() {
 
       if (!response.ok) throw new Error("Erro na API");
       const data = await response.json();
-      
+
       setResult(data);
       setSimState("transitioning");
     } catch (err) {
@@ -107,13 +107,13 @@ function CopaPage() {
           )}
         </AnimatePresence>
       </main>
-      
+
       {(simState === "simulating" || simState === "transitioning") && (
-        <SimOverlay label="SIMULANDO TORNEIO" />
+        <SimOverlay label="SIMULANDO TORNEIO" withGame={true} />
       )}
 
-      <SimulationTransition 
-        isActive={simState === "transitioning" || simState === "finishing_transition"} 
+      <SimulationTransition
+        isActive={simState === "transitioning" || simState === "finishing_transition"}
         playerImageUrl={transitionPlayerImg}
         onBlindSpot={() => {
           setStep("final");
@@ -183,21 +183,21 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
     let idleTimeout: NodeJS.Timeout;
     let lastTime: number | null = null;
     let exactScrollTop = el.scrollTop;
-    
-    const speedPerMs = 0.025; 
+
+    const speedPerMs = 0.025;
 
     const startIdleTimer = () => {
       clearTimeout(idleTimeout);
       idleTimeout = setTimeout(() => {
         isInteracting = false;
-        exactScrollTop = el.scrollTop; 
-        lastTime = null; 
-      }, 3000); 
+        exactScrollTop = el.scrollTop;
+        lastTime = null;
+      }, 3000);
     };
 
     const handleInteraction = () => {
       isInteracting = true;
-      exactScrollTop = el.scrollTop; 
+      exactScrollTop = el.scrollTop;
       clearTimeout(idleTimeout);
     };
 
@@ -223,18 +223,18 @@ function AutoScrollList({ children, className, as: Component = "ul" }: { childre
         el.scrollTop = exactScrollTop;
 
         if (Math.abs(el.scrollTop - exactScrollTop) > 2) {
-           exactScrollTop = el.scrollTop;
+          exactScrollTop = el.scrollTop;
         }
 
         if (direction === 1 && el.scrollTop + el.clientHeight >= el.scrollHeight - 1) {
-          direction = -1; 
+          direction = -1;
           isPaused = true;
-          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); 
-        } 
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000);
+        }
         else if (direction === -1 && el.scrollTop <= 1) {
-          direction = 1; 
+          direction = 1;
           isPaused = true;
-          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000); 
+          pauseTimeout = setTimeout(() => { isPaused = false; lastTime = null; }, 5000);
         }
       }
       animationFrameId = requestAnimationFrame(loop);
@@ -264,8 +264,8 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
   const getTeam = (apiName: string) => {
     const found = ALL_TEAMS.find(t => t.apiName.toLowerCase() === apiName.toLowerCase() || t.name.toLowerCase() === apiName.toLowerCase());
     if (!found) {
-        console.warn(`⚠️ ALERTA: O Python retornou a seleção '${apiName}', mas ela não existe no frontend.`);
-        return ALL_TEAMS[0]; 
+      console.warn(`⚠️ ALERTA: O Python retornou a seleção '${apiName}', mas ela não existe no frontend.`);
+      return ALL_TEAMS[0];
     }
     return found;
   };
@@ -312,7 +312,7 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        
+
         <Panel glow="gold">
           <div className="mb-3 font-display text-sm uppercase tracking-[0.3em] text-gold">Chuteira de Ouro</div>
           <AutoScrollList as="ol" className="space-y-2 max-h-[12rem] overflow-y-auto pr-2 custom-scrollbar">
@@ -390,17 +390,17 @@ function FinalStep({ result }: { result: TournamentAPIResult }) {
       {result.biggest_zebra && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Panel glow="neon" className="flex flex-col sm:flex-row items-center justify-between gap-4 border-dashed border-neon/50 bg-neon/5">
-             <div className="flex items-center gap-4">
-                <div className="text-4xl">📉</div>
-                <div>
-                   <div className="font-display text-sm uppercase tracking-[0.3em] text-neon">A Grande Zebra Matemática</div>
-                   <div className="text-xs text-muted-foreground">A seleção de baixo ELO com a maior propensão estatística a surpreender na Copa.</div>
-                </div>
-             </div>
-             <div className="flex items-center gap-3 bg-background/60 px-4 py-2 rounded-md border border-border/50">
-                <TeamFlag teamId={getTeam(result.biggest_zebra.team).id} className="h-6 w-10" />
-                <span className="font-display uppercase tracking-widest text-lg">{getTeam(result.biggest_zebra.team).name}</span>
-             </div>
+            <div className="flex items-center gap-4">
+              <div className="text-4xl">📉</div>
+              <div>
+                <div className="font-display text-sm uppercase tracking-[0.3em] text-neon">A Grande Zebra Matemática</div>
+                <div className="text-xs text-muted-foreground">A seleção de baixo ELO com a maior propensão estatística a surpreender na Copa.</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-background/60 px-4 py-2 rounded-md border border-border/50">
+              <TeamFlag teamId={getTeam(result.biggest_zebra.team).id} className="h-6 w-10" />
+              <span className="font-display uppercase tracking-widest text-lg">{getTeam(result.biggest_zebra.team).name}</span>
+            </div>
           </Panel>
         </motion.div>
       )}

@@ -36,6 +36,10 @@ export function flagUrl(teamId: string, size: 80 | 160 | 320 = 160): string {
 
 // Busca a foto real do jogador usando o proxy público do Bing Imagens
 export function playerPhotoUrl(name: string, size = 96): string {
+  // Se o nome for genérico de carregamento, retorna um ícone da Copa do Mundo
+  if (!name || name.toLowerCase().includes("carregando") || name.toLowerCase().includes("simulando")) {
+    return "https://cdn-icons-png.flaticon.com/512/2822/2822216.png";
+  }
   const query = encodeURIComponent(`${name} football player face`);
   return `https://tse1.mm.bing.net/th?q=${query}&w=${size}&h=${size}&c=7&rs=1&p=0`;
 }
