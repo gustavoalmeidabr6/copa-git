@@ -915,10 +915,6 @@ class MatchSimulator:
             g = info.get("group", "A")
             groups_setup.setdefault(g, []).append(team)
 
-        cores = multiprocessing.cpu_count()
-        chunks = [num_tournaments // cores] * cores
-        for i in range(num_tournaments % cores): chunks[i] += 1
-
         final_results = {
             "champions": defaultdict(int), "player_goals": defaultdict(int),
             "player_assists": defaultdict(int), "team_goals_f": defaultdict(int),
@@ -926,17 +922,16 @@ class MatchSimulator:
             "team_stage_points": defaultdict(int)
         }
 
-        with ProcessPoolExecutor(max_workers=cores) as p_exec:
-            futures = [p_exec.submit(_worker_simulate_tournament_batch, groups_setup, match_cache, c) for c in chunks if c > 0]
-            for future in futures:
-                res = future.result()
-                for k, v in res["champions"].items(): final_results["champions"][k] += v
-                for k, v in res["player_goals"].items(): final_results["player_goals"][k] += v
-                for k, v in res["player_assists"].items(): final_results["player_assists"][k] += v
-                for k, v in res["team_goals_f"].items(): final_results["team_goals_f"][k] += v
-                for k, v in res["team_goals_a"].items(): final_results["team_goals_a"][k] += v
-                for k, v in res["team_matches"].items(): final_results["team_matches"][k] += v
-                for k, v in res["team_stage_points"].items(): final_results["team_stage_points"][k] += v
+        # RENDER FREE TIER FIX: Run synchronously instead of ProcessPoolExecutor
+        # to prevent Out Of Memory errors and CPU freezing!
+        res = _worker_simulate_tournament_batch(groups_setup, match_cache, num_tournaments)
+        for k, v in res["champions"].items(): final_results["champions"][k] += v
+        for k, v in res["player_goals"].items(): final_results["player_goals"][k] += v
+        for k, v in res["player_assists"].items(): final_results["player_assists"][k] += v
+        for k, v in res["team_goals_f"].items(): final_results["team_goals_f"][k] += v
+        for k, v in res["team_goals_a"].items(): final_results["team_goals_a"][k] += v
+        for k, v in res["team_matches"].items(): final_results["team_matches"][k] += v
+        for k, v in res["team_stage_points"].items(): final_results["team_stage_points"][k] += v
 
         top_champions = sorted(final_results["champions"].items(), key=lambda x: x[1], reverse=True)[:48]
         fav_list = [{"team": t, "prob": (c/num_tournaments)*100} for t, c in top_champions]
