@@ -270,15 +270,49 @@ class MatchSimulator:
                 elif o_canon == a_canon: price_a = out['price']
                 elif out['name'].lower() == 'draw': price_d = out['price']
                 
+            vegas_data = {}
             if price_h and price_a and price_d:
                 # Remove o Juice/Vig da Casa de Aposta e pega a probabilidade pura
                 impl_h = 1 / price_h
                 impl_a = 1 / price_a
                 impl_d = 1 / price_d
                 total = impl_h + impl_a + impl_d
+                vegas_data["h2h"] = (impl_h/total, impl_d/total, impl_a/total)
                 
-                vegas[(home_team, away_team)] = (impl_h/total, impl_d/total, impl_a/total)
-                vegas[(away_team, home_team)] = (impl_a/total, impl_d/total, impl_h/total)
+            totals = next((m for m in markets if m['key'] == 'totals'), None)
+            if totals:
+                for out in totals.get('outcomes', []):
+                    if out.get('point') == 2.5:
+                        if out['name'].lower() == 'over':
+                            vegas_data["over_2_5"] = 1 / out['price']
+                        elif out['name'].lower() == 'under':
+                            vegas_data["under_2_5"] = 1 / out['price']
+                if "over_2_5" in vegas_data and "under_2_5" in vegas_data:
+                    tot = vegas_data["over_2_5"] + vegas_data["under_2_5"]
+                    vegas_data["over_2_5"] /= tot
+                    vegas_data["under_2_5"] /= tot
+
+            btts = next((m for m in markets if m['key'] == 'btts'), None)
+            if btts:
+                for out in btts.get('outcomes', []):
+                    if out['name'].lower() == 'yes':
+                        vegas_data["btts_yes"] = 1 / out['price']
+                    elif out['name'].lower() == 'no':
+                        vegas_data["btts_no"] = 1 / out['price']
+                if "btts_yes" in vegas_data and "btts_no" in vegas_data:
+                    tot = vegas_data["btts_yes"] + vegas_data["btts_no"]
+                    vegas_data["btts_yes"] /= tot
+                    vegas_data["btts_no"] /= tot
+
+            if vegas_data:
+                vegas[(home_team, away_team)] = vegas_data.copy()
+                if "h2h" in vegas_data:
+                    h, d, a = vegas_data["h2h"]
+                    v_away = vegas_data.copy()
+                    v_away["h2h"] = (a, d, h)
+                    vegas[(away_team, home_team)] = v_away
+                else:
+                    vegas[(away_team, home_team)] = vegas_data.copy()
                 
         return vegas
 
@@ -287,9 +321,9 @@ class MatchSimulator:
         Mistura a Inteligência Artificial com o Conhecimento de Mercado (Casas de Apostas).
         Puxa as previsões de Gols em até 15% na direção do que Vegas acredita.
         """
-        v_probs = self.vegas_probs.get((home, away))
-        if v_probs:
-            v_ph, v_pd, v_pa = v_probs
+        v_data = self.vegas_probs.get((home, away))
+        if v_data and "h2h" in v_data:
+            v_ph, v_pd, v_pa = v_data["h2h"]
             
             # Razão de Força de Vegas vs Razão de Força da Máquina
             v_ratio = v_ph / max(v_pa, 0.01)
@@ -692,6 +726,27 @@ class MatchSimulator:
         top_ratings = sorted(avg_perf.items(), key=lambda x: x[1], reverse=True)[:5]
 
         score_series = pd.Series(most_likely)
+        vegas_data = self.vegas_probs.get((home_team, away_team), {})
+
+        home_fezinha = self.feature_builder.data_loader.get_team_fezinha_stats(home_team)
+        away_fezinha = self.feature_builder.data_loader.get_team_fezinha_stats(away_team)
+        
+        expected_corners = (home_fezinha.get("Corners", 9.0) + away_fezinha.get("Corners", 9.0)) / 2.0
+        expected_cards = home_fezinha.get("Cards", 1.5) + away_fezinha.get("Cards", 1.5)
+        
+        btts_pct = (home_fezinha.get("BTTS%", 50) + away_fezinha.get("BTTS%", 50)) / 200.0
+        over25_pct = (home_fezinha.get("Over25%", 50) + away_fezinha.get("Over25%", 50)) / 200.0
+        
+        has_vegas_odds = self.vegas_probs.get((home_team, away_team)) is not None
+        source = "Vegas + Modelo" if has_vegas_odds else "Apenas Modelo (CSV)"
+        
+        fezinha_data = {
+            "source": source,
+            "expectedCorners": round(expected_corners, 1),
+            "expectedCards": round(expected_cards, 1),
+            "bttsPct": round(vegas_data.get("btts_yes", btts_pct) * 100, 1),
+            "over25Pct": round(vegas_data.get("over_2_5", over25_pct) * 100, 1)
+        }
 
         return {
             "home_win_prob": round(home_win_prob, 1),
@@ -713,7 +768,9 @@ class MatchSimulator:
             "away_data_source": feats["away_data_source"],
             "home_elo": home_elo,
             "away_elo": away_elo,
-            "has_vegas_odds": self.vegas_probs.get((home_team, away_team)) is not None,
+            "has_vegas_odds": has_vegas_odds,
+            "vegas_data": vegas_data,
+            "fezinha_data": fezinha_data,
             "sim_logs": sim_logs,
             "top_scorers": top_scorers,
             "top_assists": top_assists,
@@ -802,6 +859,17 @@ class MatchSimulator:
 
             # 🎰 APLICAÇÃO DO VEGAS BLEND NO MODO COPA
             lh_final, la_final = self._apply_vegas_boost(lh_final, la_final, h, a)
+
+            # --- Lógica Sistêmica de Tradição de Copa ---
+            # Em torneios longos (Copa), as seleções de elite (ELO maior) conseguem
+            # impor seu peso de camisa e consistência. Criamos um bônus/punição dinâmico.
+            # Baseline é 1940 de ELO. Acima disso = Buff de Tradição. Abaixo = Nerf de Pipocada.
+            h_tradition = np.clip(1.0 + (elo_h - 1940) / 600.0, 0.80, 1.25)
+            a_tradition = np.clip(1.0 + (elo_a - 1940) / 600.0, 0.80, 1.25)
+            
+            lh_final *= h_tradition
+            la_final *= a_tradition
+            # ------------------------------------------------------------------
 
             mat = self._build_prob_matrix(lh_final, la_final)
             hw_prob = float(np.sum(np.tril(mat, -1))) * 100

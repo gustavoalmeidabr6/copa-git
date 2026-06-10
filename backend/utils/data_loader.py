@@ -364,6 +364,7 @@ class DataLoader:
         self.tm_goals     = self._load_csv(TM_GOALSCORERS_CSV, "Transfermarkt Goalscorers")
         self.recent_goals_dict = self._build_recent_goals_dict()
         self.squads_dict  = self._parse_convocados()
+        self.csv_stats    = self._parse_csv_stats()
         self.cache: dict  = {}
         
         # Constrói cache O(1) com os nomes normalizados e os ALIAS
@@ -411,6 +412,69 @@ class DataLoader:
             return recent["scorer"].value_counts().to_dict()
         except Exception:
             return {}
+
+    def _parse_csv_stats(self) -> dict:
+        csv_path = DATA_DIR / "estatisticas_futebol.csv"
+        if not csv_path.exists():
+            print(f"[DataLoader] AVISO: {csv_path} não encontrado.")
+            return {}
+        
+        stats = {}
+        try:
+            with open(csv_path, "r", encoding="utf-8-sig") as f:
+                lines = f.readlines()
+                
+            current_table = None
+            headers = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line: continue
+                
+                if line.startswith("Tabela:"):
+                    current_table = line.split("Tabela:")[1].strip()
+                    headers = []
+                    continue
+                    
+                parts = [p.strip() for p in line.split(',')]
+                
+                if not headers:
+                    headers = parts
+                    continue
+                
+                if len(parts) < len(headers):
+                    continue
+                    
+                row = dict(zip(headers, parts))
+                team_raw = row.get("Country")
+                if not team_raw: continue
+                
+                team_norm = _canonical(_normalize_name(team_raw))
+                if team_norm not in stats:
+                    stats[team_norm] = {}
+                    
+                if current_table == "Teams for 2026":
+                    played = float(row.get("P", 1))
+                    if played == 0: played = 1
+                    
+                    stats[team_norm]["xG"] = float(row.get("xG", 0.0))
+                    stats[team_norm]["xGA"] = float(row.get("xGA", 0.0))
+                    stats[team_norm]["Corners"] = float(row.get("Corners", 0.0))
+                    stats[team_norm]["Cards"] = float(row.get("Cards", 0.0)) / played
+                    stats[team_norm]["BTTS%"] = float(row.get("BTTS%", "0").replace("%", ""))
+                    stats[team_norm]["CS%"] = float(row.get("CS%", "0").replace("%", ""))
+                
+                elif current_table == "Over 2.5 Goals (0.5, 1.5, 3.5)":
+                    stats[team_norm]["Over25%"] = float(row.get("2.5+", "0").replace("%", ""))
+                    
+        except Exception as e:
+            print(f"[DataLoader] Erro ao parsear CSV Stats: {e}")
+            
+        return stats
+
+    def get_team_fezinha_stats(self, team_name: str) -> dict:
+        team_norm = _canonical(_normalize_name(team_name))
+        return self.csv_stats.get(team_norm, {})
 
     @staticmethod
     def _extract_team_name_from_header(raw_line: str) -> str:

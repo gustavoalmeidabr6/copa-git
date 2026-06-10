@@ -57,6 +57,8 @@ export type APIResult = {
   scoreCounts: Record<string, number>;
   sim_logs: string[];
   hasVegasOdds?: boolean;
+  vegasData?: { over_2_5?: number; under_2_5?: number; btts_yes?: number; btts_no?: number } | null;
+  fezinhaData?: { source: string; expectedCorners: number; expectedCards: number; bttsPct: number; over25Pct: number } | null;
 };
 
 function smartSort(roster: string[]) {
@@ -203,7 +205,9 @@ function PartidaPage() {
                       avgGoals: { a: data.home_lambda || 0, b: data.away_lambda || 0 },
                       scoreCounts: scoreCounts,
                       sim_logs: data.sim_logs || [],
-                      hasVegasOdds: data.has_vegas_odds || false
+                      hasVegasOdds: data.has_vegas_odds || false,
+                      vegasData: data.vegas_data || null,
+                      fezinhaData: data.fezinha_data || null
                     };
 
                     setResult(mappedResult);
@@ -641,7 +645,20 @@ function LineupStep({ home, away, formA, formB, setFormA, setFormB, rosterA, ros
 }
 
 function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: Team; result: APIResult; onBack: () => void; onMenu: () => void }) {
+  const [showFezinha, setShowFezinha] = useState(false);
+
   const topScores = useMemo(() => Object.entries(result.scoreCounts).sort((a, b) => b[1] - a[1]).slice(0, 5), [result]);
+
+  const fezinhaStats = useMemo(() => {
+    if (result.fezinhaData) return result.fezinhaData;
+    return {
+      over25Pct: result.vegasData?.over_2_5 ? result.vegasData.over_2_5 * 100 : 0,
+      bttsPct: result.vegasData?.btts_yes ? result.vegasData.btts_yes * 100 : 0,
+      expectedCorners: 0,
+      expectedCards: 0,
+      source: "Indisponível"
+    };
+  }, [result]);
   return (
     <div className="mt-6 space-y-5">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -737,6 +754,66 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
           </ol>
         </Panel>
       </div>
+
+      {result.fezinhaData && (
+        <div className="rounded-xl border border-gold/40 bg-card/60 backdrop-blur-md overflow-hidden transition-all">
+          <button onClick={() => setShowFezinha(!showFezinha)} className="w-full flex items-center justify-between p-4 bg-gold/10 hover:bg-gold/20 transition-colors">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🍀</span>
+              <span className="font-display text-sm uppercase tracking-[0.3em] text-gold font-bold">Fézinha ({fezinhaStats.source})</span>
+            </div>
+            <ChevronRight className={`h-5 w-5 text-gold transition-transform ${showFezinha ? "rotate-90" : ""}`} />
+          </button>
+          
+          <AnimatePresence>
+            {showFezinha && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-gold/20">
+                <div className="p-5 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded border border-primary/20 bg-background/50 p-3 lg:col-span-1">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Mais de 2.5 Gols</div>
+                    <div className="flex items-end justify-between">
+                      <span className="text-2xl font-bold text-foreground">{fezinhaStats.over25Pct > 0 ? fezinhaStats.over25Pct.toFixed(1) + '%' : 'Indisponível'}</span>
+                    </div>
+                    <div className="mt-1 text-[10px] text-primary">{fezinhaStats.over25Pct > 60 ? "🔥 Muito Provável" : fezinhaStats.over25Pct > 0 && fezinhaStats.over25Pct < 40 ? "❄️ Improvável" : "⚖️ Equilibrado"}</div>
+                  </div>
+                  <div className="rounded border border-primary/20 bg-background/50 p-3 lg:col-span-1">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Ambas Marcam (BTTS)</div>
+                    <div className="flex items-end justify-between">
+                      <span className="text-2xl font-bold text-foreground">{fezinhaStats.bttsPct > 0 ? fezinhaStats.bttsPct.toFixed(1) + '%' : 'Indisponível'}</span>
+                    </div>
+                    <div className="mt-1 text-[10px] text-primary">{fezinhaStats.bttsPct > 60 ? "🔥 Muito Provável" : fezinhaStats.bttsPct > 0 && fezinhaStats.bttsPct < 40 ? "❄️ Improvável" : "⚖️ Equilibrado"}</div>
+                  </div>
+                  <div className="rounded border border-primary/20 bg-background/50 p-3 lg:col-span-1">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Escanteios Esperados</div>
+                    <div className="flex items-end justify-between">
+                      <span className="text-2xl font-bold text-foreground">{fezinhaStats.expectedCorners > 0 ? fezinhaStats.expectedCorners.toFixed(1) : 'Indisponível'}</span>
+                    </div>
+                    <div className="mt-1 text-[10px] text-primary">Média do confronto (Total)</div>
+                  </div>
+                  <div className="rounded border border-primary/20 bg-background/50 p-3 lg:col-span-1">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Cartões Esperados</div>
+                    <div className="flex items-end justify-between">
+                      <span className="text-2xl font-bold text-foreground">{fezinhaStats.expectedCards > 0 ? fezinhaStats.expectedCards.toFixed(1) : 'Indisponível'}</span>
+                    </div>
+                    <div className="mt-1 text-[10px] text-primary">Atenção ao árbitro!</div>
+                  </div>
+                  
+                  <div className="md:col-span-2 lg:col-span-4 rounded border border-gold/30 bg-gold/5 p-3">
+                    <div className="text-[10px] uppercase tracking-widest text-gold/80 mb-2">Dica de Ouro do {fezinhaStats.source.includes("Vegas") ? "Mercado" : "Modelo"}</div>
+                    <p className="text-sm text-foreground/90">
+                      {fezinhaStats.over25Pct > 65 ? "O modelo espera um jogo recheado de gols! Apostar em Over 2.5 tem altíssimo valor." : 
+                       fezinhaStats.bttsPct > 65 ? "Ambas as defesas cedem espaços. O mercado de 'Ambas Marcam' (BTTS) é a melhor escolha." :
+                       fezinhaStats.expectedCorners > 10.5 ? "As duas equipes exploram muito as linhas de fundo. Olho no mercado de escanteios (Over 9.5)." :
+                       fezinhaStats.expectedCards > 4.5 ? "Jogo promete ser tenso e pegado. Fique de olho no mercado de cartões e na linha do árbitro." :
+                       "O modelo precifica um jogo truncado e tático! Excelente oportunidade para explorar mercados de Under (Menos de 2.5 gols) ou Empate anula aposta (Draw No Bet)."}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       <Panel>
         <div className="mb-3 flex items-center justify-between">

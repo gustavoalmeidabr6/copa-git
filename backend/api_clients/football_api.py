@@ -77,7 +77,7 @@ class TheOddsAPI:
         self.api_key = api_key or os.getenv("ODDS_API_KEY", "")
 
     def get_world_cup_odds(self) -> list | None:
-        cache_key = "odds_wc_outrights"
+        cache_key = "odds_international_v4"
         cached = _load_cache(cache_key, max_age_hours=10) # Cache de 10h para Odds
         if cached: return cached
         
@@ -85,19 +85,48 @@ class TheOddsAPI:
             print("⚠️  Chave TheOddsAPI não detectada. O simulador rodará sem a sabedoria do mercado.")
             return None
         
-        params = {"apiKey": self.api_key, "regions": "eu,us", "markets": "h2h", "oddsFormat": "decimal"}
+        params = {
+            "apiKey": self.api_key,
+            "regions": "us,eu,uk", 
+            "markets": "h2h,totals,btts",
+            "oddsFormat": "decimal"
+        }
+        
+        # Campeonatos Internacionais para tentar buscar
+        international_keys = [
+            "soccer_fifa_world_cup",
+            "soccer_international_friendly",
+            "soccer_uefa_nations_league",
+            "soccer_conmebol_copa_america",
+            "soccer_uefa_european_championship",
+            "soccer_fifa_world_cup_qualification"
+        ]
+        
+        all_odds = []
         try:
-            print("🌐 Baixando Odds em tempo real das casas de apostas (The Odds API)...")
-            r = requests.get(f"{self.BASE_URL}/sports/{self.SOCCER_KEY}/odds", params=params, timeout=10)
-            if r.status_code == 200:
-                data = r.json()
-                _save_cache(cache_key, data)
-                return data
-            else:
-                print(f"⚠️ Erro TheOddsAPI: Status {r.status_code}")
-        except requests.RequestException:
-            pass
-        return None
+            print("🌐 Baixando Odds e Estatísticas (H2H, Totals, BTTS) da The Odds API...")
+            for sport_key in international_keys:
+                r = requests.get(f"{self.BASE_URL}/sports/{sport_key}/odds", params=params, timeout=5)
+                
+                # Fallback if BTTS is not supported (often happens with futures or specific leagues)
+                if r.status_code == 422:
+                    p_fallback = params.copy()
+                    p_fallback["markets"] = "h2h,totals"
+                    r = requests.get(f"{self.BASE_URL}/sports/{sport_key}/odds", params=p_fallback, timeout=5)
+                    if r.status_code == 422:
+                        p_fallback["markets"] = "h2h"
+                        r = requests.get(f"{self.BASE_URL}/sports/{sport_key}/odds", params=p_fallback, timeout=5)
+
+                if r.status_code == 200:
+                    data = r.json()
+                    if isinstance(data, list):
+                        all_odds.extend(data)
+                
+            _save_cache(cache_key, all_odds)
+            return all_odds
+        except Exception as e:
+            print(f"⚠️ Erro ao buscar dados TheOddsAPI: {e}")
+            return None
 
 class OpenFootball:
     WC_2026_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
