@@ -6,5 +6,6 @@ scipy
 pandas
 scikit-learn
 xgboost
+lightgbm
 python-dotenv
 aiohttp
