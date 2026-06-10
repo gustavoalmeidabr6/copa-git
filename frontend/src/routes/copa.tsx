@@ -10,7 +10,7 @@ import { SimulationTransition } from "@/components/sim/SimulationTransition";
 import { ArrowLeft, Trophy, ChevronRight, Play } from "lucide-react";
 import { TeamFlag, PlayerAvatar } from "@/lib/visuals";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:8000").replace(/\/+$/, "");
 
 export const Route = createFileRoute("/copa")({
   head: () => ({
