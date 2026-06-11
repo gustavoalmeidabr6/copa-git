@@ -702,7 +702,7 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
         <Panel className="md:col-span-1">
           {result.hasVegasOdds ? (
             <div className="mb-4 rounded-md border border-gold/50 bg-gold/10 p-3 text-center shadow-[0_0_20px_rgba(255,215,0,0.2)]">
-              <div className="font-display text-[10px] uppercase tracking-[0.2em] text-gold/90">🔮 Previsão do Mercado (Casas de Aposta)</div>
+              <div className="font-display text-[10px] uppercase tracking-[0.2em] text-gold/90">🔮 Previsão do Modelo Estatístico</div>
               <div className="mt-1 font-display text-lg text-gold">{result.expectedScore}</div>
             </div>
           ) : (
@@ -774,8 +774,8 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
         <div className="rounded-xl border border-gold/40 bg-card/60 backdrop-blur-md overflow-hidden transition-all">
           <button onClick={() => setShowFezinha(!showFezinha)} className="w-full flex items-center justify-between p-4 bg-gold/10 hover:bg-gold/20 transition-colors">
             <div className="flex items-center gap-2">
-              <span className="text-xl">🍀</span>
-              <span className="font-display text-sm uppercase tracking-[0.3em] text-gold font-bold">Fézinha ({fezinhaStats.source})</span>
+              <span className="text-xl">📊</span>
+              <span className="font-display text-sm uppercase tracking-[0.3em] text-gold font-bold">Projeção Estatística ({fezinhaStats.source.replace('Vegas', 'Modelo')})</span>
             </div>
             <ChevronRight className={`h-5 w-5 text-gold transition-transform ${showFezinha ? "rotate-90" : ""}`} />
           </button>
@@ -814,13 +814,13 @@ function ResultStep({ home, away, result, onBack, onMenu }: { home: Team; away: 
                   </div>
                   
                   <div className="md:col-span-2 lg:col-span-4 rounded border border-gold/30 bg-gold/5 p-3">
-                    <div className="text-[10px] uppercase tracking-widest text-gold/80 mb-2">Dica de Ouro do {fezinhaStats.source.includes("Vegas") ? "Mercado" : "Modelo"}</div>
+                    <div className="text-[10px] uppercase tracking-widest text-gold/80 mb-2">Análise do Modelo</div>
                     <p className="text-sm text-foreground/90">
-                      {fezinhaStats.over25Pct > 65 ? "O modelo espera um jogo recheado de gols! Apostar em Over 2.5 tem altíssimo valor." : 
-                       fezinhaStats.bttsPct > 65 ? "Ambas as defesas cedem espaços. O mercado de 'Ambas Marcam' (BTTS) é a melhor escolha." :
-                       fezinhaStats.expectedCorners > 10.5 ? "As duas equipes exploram muito as linhas de fundo. Olho no mercado de escanteios (Over 9.5)." :
-                       fezinhaStats.expectedCards > 4.5 ? "Jogo promete ser tenso e pegado. Fique de olho no mercado de cartões e na linha do árbitro." :
-                       "O modelo precifica um jogo truncado e tático! Excelente oportunidade para explorar mercados de Under (Menos de 2.5 gols) ou Empate anula aposta (Draw No Bet)."}
+                      {fezinhaStats.over25Pct > 65 ? "O modelo espera um jogo recheado de gols! Alta expectativa de mais de 2.5 gols." : 
+                       fezinhaStats.bttsPct > 65 ? "Ambas as defesas cedem espaços. Alta probabilidade de ambas as equipes marcarem." :
+                       fezinhaStats.expectedCorners > 10.5 ? "As duas equipes exploram muito as linhas de fundo. Alta expectativa de escanteios (mais de 9.5)." :
+                       fezinhaStats.expectedCards > 4.5 ? "Jogo promete ser tenso e pegado. Fique de olho na quantidade de cartões e na linha do árbitro." :
+                       "O modelo prevê um jogo truncado e tático! Alta probabilidade de poucos gols (menos de 2.5) e jogo equilibrado."}
                     </p>
                   </div>
                 </div>
